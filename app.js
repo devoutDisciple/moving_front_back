@@ -20,7 +20,7 @@ app.use(sessionParser({
 // parse application/json
 app.use(bodyParser.json());
 // parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }));
+// app.use(bodyParser.urlencoded({ extended: false }));
 
 // 打印日志
 app.use(logger(":method :url :status :res[content-length] - :response-time ms"));

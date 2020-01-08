@@ -2,52 +2,36 @@
 
 const Sequelize = require("sequelize");
 module.exports = function(sequelize) {
-	return sequelize.define("user", {
+	return sequelize.define("register", {
 		id: {
 			type: Sequelize.INTEGER(11),
 			allowNull: true,
 			primaryKey: true,
 			autoIncrement: true
 		},
-		username: {
-			type: Sequelize.STRING(255),
-			allowNull: false,
-			primaryKey: true
-		},
-		password: {
-			type: Sequelize.STRING(255),
-			allowNull: true
-		},
 		phone: {
 			type: Sequelize.INTEGER(11),
-			allowNull: true
-		},
-		address: {
-			type: Sequelize.STRING(8000),
-			allowNull: true
-		},
-		token: {
-			type: Sequelize.STRING(255),
-			allowNull: true
+			allowNull: false,
+			primaryKey: true
 		},
 		security_code: {
 			type: Sequelize.INTEGER(11),
 			allowNull: true
 		},
-		security_create_time: {
-			type: Sequelize.DATE,
-			allowNull: true
-		},
-		security_expire_time: {
-			type: Sequelize.DATE,
+		password: {
+			type: Sequelize.STRING(255),
 			allowNull: true
 		},
 		create_time: {
 			type: Sequelize.DATE,
 			allowNull: true
+		},
+		expire_time: {
+			type: Sequelize.DATE,
+			allowNull: true
 		}
 	}, {
-		tableName: "user",
+		tableName: "securityCode",
 		timestamps: false
 	});
 };
