@@ -7,4 +7,8 @@ router.post("/add", (req, res) => {
 	registerService.register(req, res);
 });
 
+router.post("/sendMessage", (req, res) => {
+	registerService.sendMessage(req, res);
+});
+
 module.exports = router;

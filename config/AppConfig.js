@@ -11,6 +11,11 @@ module.exports = {
 	swiperPreUrl: "http://localhost:3002/",
 	goodsPreUrl: "http://localhost:3002/goods/",
 
+	// 短信验证码需要的信息
+	message_accessKeyId: "LTAI4FmR6WYzmWGpby7hCsC5",
+	message_accessKeySecret: "ewp6oNm7QLeJN1WoPpRkvUsRNtPUJ2",
+	message_sign: "moving洗衣店",
+
 	// 打印机设置
 	USER: "1094705507@qq.com", // 打印机后台注册用户名
 	UKEY: "SLb59vd942z9sGRV", // 打印机后台的key

@@ -10,7 +10,7 @@ module.exports = function(sequelize) {
 			autoIncrement: true
 		},
 		phone: {
-			type: Sequelize.STRING(11),
+			type: Sequelize.INTEGER(11),
 			allowNull: false,
 			primaryKey: true
 		},
