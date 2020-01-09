@@ -19,8 +19,9 @@ module.exports = function(sequelize) {
 			allowNull: true
 		},
 		phone: {
-			type: Sequelize.INTEGER(11),
-			allowNull: true
+			type: Sequelize.STRING(11),
+			allowNull: false,
+			primaryKey: true
 		},
 		address: {
 			type: Sequelize.STRING(8000),

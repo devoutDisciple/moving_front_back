@@ -6,6 +6,7 @@ module.exports = {
 			data: data
 		};
 	},
+	// 重新登录的
 	toLogin: () => {
 		return {
 			code: 502,
@@ -13,11 +14,12 @@ module.exports = {
 			data: "请登录"
 		};
 	},
-	error: (err) => {
+	// 需要提示错误信息的
+	error: (data) => {
 		return {
 			code: 500,
 			success: false,
-			message: err.message
+			message: data
 		};
 	}
 };
