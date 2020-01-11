@@ -10,6 +10,8 @@ const sequelize = new Sequelize(config.database, config.username, config.passwor
 		idle: 10000
 	},
 
+	timezone: "+08:00", //东八时区
+
 	// SQLite only
 	storage: "path/to/database.sqlite",
 

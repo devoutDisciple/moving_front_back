@@ -7,6 +7,7 @@ router.post("/add", (req, res) => {
 	registerService.register(req, res);
 });
 
+// 发送短信
 router.post("/sendMessage", (req, res) => {
 	registerService.sendMessage(req, res);
 });

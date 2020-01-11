@@ -11,16 +11,17 @@ const registerModel = register(sequelize);
 const user = require("../models/user");
 const userModel = user(sequelize);
 
+const ObjectUtil  = require("../util/ObjectUtil");
+
 module.exports = {
 
-	// 发送验证码
+	// 发送注册验证码
 	sendMessage: async (req, res) => {
 		try {
 			let {phoneNum} = req.body;
 			let code = PostMessage.getMessageCode();
 			// 发送验证码
 			// await PostMessage.postMessage(phoneNum, code);
-			console.log(code, 111);
 			let phoneModel = await registerModel.findOne({
 				where: {
 					phone: phoneNum
@@ -80,13 +81,16 @@ module.exports = {
 					phone: phone
 				}
 			});
+			// 生成token
+			let token = ObjectUtil.getToken();
 			await userModel.create({
 				username,
 				password,
-				phone
+				phone,
+				token
 			});
 			// let data = await registerModel.findAll();
-			res.send(resultMessage.success(""));
+			res.send(resultMessage.success(token));
 		} catch (error) {
 			console.log(error);
 			return res.send(resultMessage.error([]));

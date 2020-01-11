@@ -6,5 +6,4 @@ module.exports = {
 	password		: 	"admin",
 	database		: 	"laundry",
 	dialect			: 	"mysql",
-	timezone   		:	"+08:00"
 };
