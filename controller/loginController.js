@@ -17,4 +17,9 @@ router.post("/bySercurityCode", (req, res) => {
 	loginService.bySercurityCode(req, res);
 });
 
+// 修改密码
+router.post("/resetPassword", (req, res) => {
+	loginService.resetPassword(req, res);
+});
+
 module.exports = router;
