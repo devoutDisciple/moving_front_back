@@ -132,4 +132,15 @@ module.exports = {
 			return res.send(resultMessage.error([]));
 		}
 	},
+
+	// 测试上传
+	upload:  async (req, res, filename) => {
+		try {
+			console.log(filename, 888);
+			res.send(resultMessage.success("success"));
+		} catch (error) {
+			console.log(error);
+			return res.send(resultMessage.error([]));
+		}
+	},
 };
