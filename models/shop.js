@@ -29,6 +29,11 @@ module.exports = function(sequelize) {
 			type: Sequelize.DATE,
 			allowNull: true
 		},
+		sort: {
+			type: Sequelize.INTEGER(255),
+			allowNull: true,
+			defaultValue: "1"
+		},
 		is_delete: {
 			type: Sequelize.STRING(255),
 			allowNull: true,

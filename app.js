@@ -6,6 +6,7 @@ const cookieParser = require("cookie-parser");
 const sessionParser = require("express-session");
 const bodyParser = require("body-parser");
 const controller = require("./controller/index");
+const path = require("path");
 
 // 解析cookie和session还有body
 app.use(cookieParser()); // 挂载中间件，可以理解为实例化
@@ -16,7 +17,7 @@ app.use(sessionParser({
 	},
 	"name": "session_id"    // 在浏览器中生成cookie的名称key，默认是connect.sid
 }));
-// app.use(express.static(path.join(__dirname, "./public")));
+app.use(express.static(path.join(__dirname, "./public")));
 // parse application/json
 app.use(bodyParser.json());
 // parse application/x-www-form-urlencoded
