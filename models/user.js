@@ -14,6 +14,10 @@ module.exports = function(sequelize) {
 			allowNull: false,
 			primaryKey: true
 		},
+		nickname: {
+			type: Sequelize.STRING(255),
+			allowNull: true
+		},
 		password: {
 			type: Sequelize.STRING(255),
 			allowNull: true
@@ -22,6 +26,10 @@ module.exports = function(sequelize) {
 			type: Sequelize.STRING(11),
 			allowNull: false,
 			primaryKey: true
+		},
+		photo: {
+			type: Sequelize.STRING(255),
+			allowNull: true
 		},
 		address: {
 			type: Sequelize.STRING(8000),
@@ -45,6 +53,10 @@ module.exports = function(sequelize) {
 		},
 		create_time: {
 			type: Sequelize.DATE,
+			allowNull: true
+		},
+		is_delete: {
+			type: Sequelize.STRING(255),
 			allowNull: true
 		}
 	}, {
