@@ -9,14 +9,14 @@ module.exports = function(sequelize) {
 			primaryKey: true,
 			autoIncrement: true
 		},
+		nickname: {
+			type: Sequelize.STRING(255),
+			allowNull: true
+		},
 		username: {
 			type: Sequelize.STRING(255),
 			allowNull: false,
 			primaryKey: true
-		},
-		nickname: {
-			type: Sequelize.STRING(255),
-			allowNull: true
 		},
 		password: {
 			type: Sequelize.STRING(255),
@@ -55,9 +55,25 @@ module.exports = function(sequelize) {
 			type: Sequelize.DATE,
 			allowNull: true
 		},
+		balance: {
+			type: Sequelize.STRING(255),
+			allowNull: true,
+			defaultValue: "0"
+		},
+		integral: {
+			type: Sequelize.STRING(255),
+			allowNull: true,
+			defaultValue: "0"
+		},
+		member: {
+			type: Sequelize.STRING(255),
+			allowNull: true,
+			defaultValue: "1"
+		},
 		is_delete: {
 			type: Sequelize.STRING(255),
-			allowNull: true
+			allowNull: true,
+			defaultValue: "1"
 		}
 	}, {
 		tableName: "user",

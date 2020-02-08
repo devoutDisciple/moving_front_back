@@ -4,10 +4,15 @@ const user = require("../models/user");
 const userModel = user(sequelize);
 
 module.exports = {
-	// 获取广告数据
-	getAll: async (req, res) => {
+	// 根据token获取当前用户信息
+	getUserByToken:async (req, res) => {
 		try {
-			let data = await userModel.findOne();
+			let token = req.query.token;
+			let data = await userModel.findOne({
+				where: {
+					token: token
+				}
+			});
 			res.send(resultMessage.success(data));
 		} catch (error) {
 			console.log(error);
