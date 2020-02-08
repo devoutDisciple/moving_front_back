@@ -28,7 +28,8 @@ module.exports = {
 					phone: phone
 				}
 			});
-			res.send(resultMessage.success(token));
+			userRes.token =  token;
+			res.send(resultMessage.success(userRes));
 		} catch (error) {
 			console.log(error);
 			return res.send(resultMessage.error([]));

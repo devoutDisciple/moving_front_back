@@ -8,7 +8,12 @@ module.exports = {
 	getAll: async (req, res) => {
 		try {
 			// 查询是否注册过
-			let shops = await shopModel.findAll();
+			let shops = await shopModel.findAll({
+				order: [
+					// will return `name`  DESC 降序  ASC 升序
+					["sort", "DESC"],
+				]
+			});
 			res.send(resultMessage.success(shops));
 		} catch (error) {
 			console.log(error);
