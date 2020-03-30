@@ -1,6 +1,7 @@
-const resultMessage = require("../util/resultMessage");
-const sequelize = require("../dataSource/MysqlPoolClass");
-const shop = require("../models/shop");
+const resultMessage = require('../util/resultMessage');
+const sequelize = require('../dataSource/MysqlPoolClass');
+const responseUtil = require('../util/responseUtil');
+const shop = require('../models/shop');
 const shopModel = shop(sequelize);
 
 module.exports = {
@@ -9,12 +10,10 @@ module.exports = {
 		try {
 			// 查询是否注册过
 			let shops = await shopModel.findAll({
-				order: [
-					// will return `name`  DESC 降序  ASC 升序
-					["sort", "DESC"],
-				]
+				order: [['sort', 'DESC']],
 			});
-			res.send(resultMessage.success(shops));
+			let result = responseUtil.renderFieldsAll(shops, ['id', 'name', 'address']);
+			res.send(resultMessage.success(result));
 		} catch (error) {
 			console.log(error);
 			return res.send(resultMessage.error([]));

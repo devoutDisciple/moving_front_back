@@ -1,6 +1,6 @@
-const resultMessage = require("../util/resultMessage");
-const sequelize = require("../dataSource/MysqlPoolClass");
-const swiper = require("../models/swiper");
+const resultMessage = require('../util/resultMessage');
+const sequelize = require('../dataSource/MysqlPoolClass');
+const swiper = require('../models/swiper');
 const swiperModel = swiper(sequelize);
 
 module.exports = {
@@ -9,16 +9,16 @@ module.exports = {
 		try {
 			let id = req.query.id;
 			// 查询是否注册过
-			let shops = await swiperModel.findAll({
+			let swipers = await swiperModel.findAll({
 				where: {
-					shop_id: id
+					shop_id: id,
 				},
 				order: [
 					// will return `name`  DESC 降序  ASC 升序
-					["sort", "DESC"],
-				]
+					['sort', 'DESC'],
+				],
 			});
-			res.send(resultMessage.success(shops));
+			res.send(resultMessage.success(swipers));
 		} catch (error) {
 			console.log(error);
 			return res.send(resultMessage.error([]));

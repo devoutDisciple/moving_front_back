@@ -107,7 +107,7 @@ module.exports = {
 			let {phoneNum} = req.body;
 			let code = PostMessage.getMessageCode();
 			// 发送验证码
-			// await PostMessage.postMessage(phoneNum, code);
+			await PostMessage.postMessage(phoneNum, code);
 			let userRes = await userModel.findOne({
 				where: {
 					phone: phoneNum
