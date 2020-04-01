@@ -12,7 +12,7 @@ module.exports = {
 			let shops = await shopModel.findAll({
 				order: [['sort', 'DESC']],
 			});
-			let result = responseUtil.renderFieldsAll(shops, ['id', 'name', 'address']);
+			let result = responseUtil.renderFieldsAll(shops, ['id', 'name', 'address', 'phone']);
 			res.send(resultMessage.success(result));
 		} catch (error) {
 			console.log(error);

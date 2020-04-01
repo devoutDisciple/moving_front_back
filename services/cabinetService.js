@@ -1,17 +1,16 @@
 const resultMessage = require('../util/resultMessage');
 const sequelize = require('../dataSource/MysqlPoolClass');
-const swiper = require('../models/swiper');
-const swiperModel = swiper(sequelize);
+const cabinet = require('../models/cabinet');
+const CabinetModel = cabinet(sequelize);
 
 module.exports = {
-	// 获取所有的轮播图
-	getAllById: async (req, res) => {
+	// 根据商店获取快递柜
+	getAllByShop: async (req, res) => {
 		try {
-			let id = req.query.shopid;
-			// 查询是否注册过
-			let swipers = await swiperModel.findAll({
+			let shopid = req.query.shopid;
+			let swipers = await CabinetModel.findAll({
 				where: {
-					shop_id: id,
+					shopid: shopid,
 				},
 				order: [['sort', 'DESC']],
 			});
