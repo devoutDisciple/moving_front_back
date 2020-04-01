@@ -1,14 +1,14 @@
 module.exports = {
-	// cookieSign: "H1YHED61C24A1X2AGSEBBFS344AXORWN",
+	cookieSign: 'H1YHED61C24A1X2AGSEBBFS344AXORWN',
 	// 线上环境
-	// goodsImgFilePath: "/root/ms_back/public/goods", // 商品描述图片
-	// swiperImgFilePath: "/root/ms_back/public",// swiper图片
-	// goodsPreUrl: "http://www.bws666.com/goods/",
-	// swiperPreUrl: "http://www.bws666.com/",
+	userImgFilePath: '/root/moving_back/public/user', // 用户头像
+	userImgUrl: 'http://47.106.208.52:3001/user',
+	goodsPreUrl: 'http://47.106.208.52:3001/goods',
+
 	// 本地环境
-	userImgFilePath: '/Users/zhangzhen/moving/front_back/public/user', // 用户头像
-	userImgUrl: 'http://localhost:3001/user',
-	goodsPreUrl: 'http://localhost:3001/goods',
+	// userImgFilePath: '/Users/zhangzhen/moving/front_back/public/user', // 用户头像
+	// userImgUrl: 'http://localhost:3001/user',
+	// goodsPreUrl: 'http://localhost:3001/goods',
 
 	// 短信验证码需要的信息
 	message_accessKeyId: 'LTAI4FmR6WYzmWGpby7hCsC5',

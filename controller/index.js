@@ -4,6 +4,7 @@ const loginController = require('./loginController');
 const shopController = require('./shopController');
 const swiperController = require('./swiperController');
 const cabinetrController = require('./cabinetrController');
+const payController = require('./payController');
 
 const router = (app) => {
 	// 用户
@@ -18,5 +19,7 @@ const router = (app) => {
 	app.use('/swiper', swiperController);
 	// 快递柜
 	app.use('/cabinet', cabinetrController);
+	// 支付接口
+	app.use('/pay', payController);
 };
 module.exports = router;
