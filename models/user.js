@@ -37,6 +37,20 @@ module.exports = function (sequelize) {
 				type: Sequelize.STRING(8000),
 				allowNull: true,
 			},
+			age: {
+				type: Sequelize.INTEGER(11),
+				allowNull: true,
+				defaultValue: '20',
+			},
+			email: {
+				type: Sequelize.STRING(255),
+				allowNull: true,
+			},
+			sex: {
+				type: Sequelize.INTEGER(11),
+				allowNull: true,
+				defaultValue: '1',
+			},
 			token: {
 				type: Sequelize.STRING(255),
 				allowNull: true,

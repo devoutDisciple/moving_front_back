@@ -7,9 +7,14 @@ router.get('/getUserByToken', (req, res) => {
 	userService.getUserByToken(req, res);
 });
 
-// 测试新增
+// 修改用户头像
 router.post('/addPhoto', (req, res) => {
 	userService.addPhoto(req, res);
+});
+
+// 修改用户信息
+router.post('/update', (req, res) => {
+	userService.update(req, res);
 });
 
 module.exports = router;

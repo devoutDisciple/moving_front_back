@@ -41,8 +41,24 @@ module.exports = {
 					},
 				},
 			);
-			console.log(`${userImgUrl}/${filename}`);
-			console.log('保存成功');
+			res.send(resultMessage.success('success'));
+		} catch (error) {
+			console.log(error);
+			return res.send(resultMessage.error([]));
+		}
+	},
+
+	// 用户信息修改
+	update: async (req, res) => {
+		try {
+			let { key, value, token } = req.body,
+				params = {};
+			params[key] = value;
+			await userModel.update(params, {
+				where: {
+					token: token,
+				},
+			});
 			res.send(resultMessage.success('success'));
 		} catch (error) {
 			console.log(error);
