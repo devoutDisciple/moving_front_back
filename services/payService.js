@@ -3,7 +3,6 @@ const request = require('request');
 var xml2js = require('xml2js'); //引入xml解析模块
 const PayUtil = require('../util/PayUtil');
 const config = require('../util/AppConfig');
-const md5 = require('md5');
 const sequelize = require('../dataSource/MysqlPoolClass');
 const order = require('../models/order');
 const orderModel = order(sequelize);
@@ -29,11 +28,11 @@ module.exports = {
 				trade_type: 'APP', // 默认 交易类型
 				// time: new Date().getTime(), // 时间戳
 				key: config.key, // 商户key
-				// openid: req.query.openid,
+				// openid: req.query.openid
+				reqUrl: 'https://api.mch.weixin.qq.com/pay/unifiedorder', // 下单接口url
 			};
 			// 签名算法
 			let sign = PayUtil.createSign(params);
-			let reqUrl = 'https://api.mch.weixin.qq.com/pay/unifiedorder';
 			let formData = `<xml>
 							<appid>${params.appid}</appid>
 							<body>${params.body}</body>
@@ -49,7 +48,7 @@ module.exports = {
 			//发起请求，获取微信支付的一些必要信息
 			request(
 				{
-					url: reqUrl,
+					url: params.reqUrl,
 					method: 'POST',
 					body: formData,
 				},
@@ -73,7 +72,6 @@ module.exports = {
 								timeStamp: String(new Date().getTime()),
 								nonceStr: reData.nonce_str[0] || '',
 							};
-							console.log(responseData, 99);
 							return res.send(resultMessage.success(responseData));
 						});
 					} else {
