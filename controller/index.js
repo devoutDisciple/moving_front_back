@@ -5,6 +5,7 @@ const shopController = require('./shopController');
 const swiperController = require('./swiperController');
 const cabinetrController = require('./cabinetrController');
 const payController = require('./payController');
+const areaController = require('./areaController');
 
 const router = (app) => {
 	// 用户
@@ -21,5 +22,7 @@ const router = (app) => {
 	app.use('/cabinet', cabinetrController);
 	// 支付接口
 	app.use('/pay', payController);
+	// 地图位置
+	app.use('/area', areaController);
 };
 module.exports = router;
