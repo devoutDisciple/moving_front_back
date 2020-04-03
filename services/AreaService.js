@@ -18,7 +18,7 @@ module.exports = {
 			res.send(resultMessage.success(result));
 		} catch (error) {
 			console.log(error);
-			return res.send(resultMessage.error([]));
+			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
 		}
 	},
 };

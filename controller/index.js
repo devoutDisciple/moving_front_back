@@ -6,6 +6,7 @@ const swiperController = require('./swiperController');
 const cabinetrController = require('./cabinetrController');
 const payController = require('./payController');
 const areaController = require('./areaController');
+const addressController = require('./addressController');
 
 const router = (app) => {
 	// 用户
@@ -24,5 +25,7 @@ const router = (app) => {
 	app.use('/pay', payController);
 	// 地图位置
 	app.use('/area', areaController);
+	// 用户位置
+	app.use('/address', addressController);
 };
 module.exports = router;

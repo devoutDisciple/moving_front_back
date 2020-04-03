@@ -3,7 +3,7 @@
 const Sequelize = require('sequelize');
 module.exports = function (sequelize) {
 	return sequelize.define(
-		'address',
+		'order',
 		{
 			id: {
 				type: Sequelize.INTEGER(11),
@@ -11,47 +11,47 @@ module.exports = function (sequelize) {
 				primaryKey: true,
 				autoIncrement: true,
 			},
-			userid: {
+			shop_id: {
 				type: Sequelize.INTEGER(11),
 				allowNull: false,
 			},
-			username: {
-				type: Sequelize.STRING(255),
-				allowNull: true,
-			},
-			phone: {
-				type: Sequelize.STRING(255),
+			user_id: {
+				type: Sequelize.INTEGER(11),
 				allowNull: false,
 			},
-			sex: {
-				type: Sequelize.INTEGER(11),
+			goods: {
+				type: Sequelize.STRING(8000),
 				allowNull: true,
 			},
-			area: {
+			money: {
+				type: Sequelize.STRING(255),
+				allowNull: false,
+				defaultValue: '0',
+			},
+			send_money: {
+				type: Sequelize.STRING(255),
+				allowNull: true,
+				defaultValue: '0',
+			},
+			send_people: {
 				type: Sequelize.STRING(255),
 				allowNull: true,
 			},
-			street: {
+			desc: {
 				type: Sequelize.STRING(255),
 				allowNull: true,
 			},
-			is_defalut: {
-				type: Sequelize.INTEGER(11),
-				allowNull: true,
-				defaultValue: '1',
-			},
-			create_time: {
+			crate_time: {
 				type: Sequelize.DATE,
-				allowNull: false,
-			},
-			is_delete: {
-				type: Sequelize.INTEGER(11),
 				allowNull: true,
-				defaultValue: '1',
+			},
+			modify_time: {
+				type: Sequelize.DATE,
+				allowNull: true,
 			},
 		},
 		{
-			tableName: 'address',
+			tableName: 'order',
 			timestamps: false,
 		},
 	);

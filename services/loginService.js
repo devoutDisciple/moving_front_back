@@ -35,7 +35,7 @@ module.exports = {
 			res.send(resultMessage.success(userRes));
 		} catch (error) {
 			console.log(error);
-			return res.send(resultMessage.error([]));
+			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
 		}
 	},
 	// 通过验证码登录
@@ -69,7 +69,7 @@ module.exports = {
 			res.send(resultMessage.success(token));
 		} catch (error) {
 			console.log(error);
-			return res.send(resultMessage.error([]));
+			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
 		}
 	},
 	// 重置密码
@@ -107,7 +107,7 @@ module.exports = {
 			res.send(resultMessage.success(token));
 		} catch (error) {
 			console.log(error);
-			return res.send(resultMessage.error([]));
+			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
 		}
 	},
 	// 发送登录验证码
@@ -142,7 +142,7 @@ module.exports = {
 			res.send(resultMessage.success(''));
 		} catch (error) {
 			console.log(error);
-			return res.send(resultMessage.error([]));
+			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
 		}
 	},
 };

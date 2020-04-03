@@ -3,7 +3,7 @@
 const Sequelize = require('sequelize');
 module.exports = function (sequelize) {
 	return sequelize.define(
-		'address',
+		'cabinet',
 		{
 			id: {
 				type: Sequelize.INTEGER(11),
@@ -11,47 +11,33 @@ module.exports = function (sequelize) {
 				primaryKey: true,
 				autoIncrement: true,
 			},
-			userid: {
+			shopid: {
 				type: Sequelize.INTEGER(11),
 				allowNull: false,
 			},
-			username: {
+			name: {
 				type: Sequelize.STRING(255),
 				allowNull: true,
 			},
-			phone: {
+			address: {
 				type: Sequelize.STRING(255),
-				allowNull: false,
+				allowNull: true,
 			},
-			sex: {
+			sort: {
 				type: Sequelize.INTEGER(11),
 				allowNull: true,
 			},
-			area: {
+			url: {
 				type: Sequelize.STRING(255),
 				allowNull: true,
-			},
-			street: {
-				type: Sequelize.STRING(255),
-				allowNull: true,
-			},
-			is_defalut: {
-				type: Sequelize.INTEGER(11),
-				allowNull: true,
-				defaultValue: '1',
 			},
 			create_time: {
 				type: Sequelize.DATE,
-				allowNull: false,
-			},
-			is_delete: {
-				type: Sequelize.INTEGER(11),
 				allowNull: true,
-				defaultValue: '1',
 			},
 		},
 		{
-			tableName: 'address',
+			tableName: 'cabinet',
 			timestamps: false,
 		},
 	);

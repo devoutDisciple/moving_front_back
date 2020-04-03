@@ -9,23 +9,10 @@ module.exports = function (sequelize) {
 				type: Sequelize.INTEGER(11),
 				allowNull: false,
 				primaryKey: true,
-				autoIncrement: true,
 			},
 			userid: {
 				type: Sequelize.INTEGER(11),
 				allowNull: false,
-			},
-			username: {
-				type: Sequelize.STRING(255),
-				allowNull: true,
-			},
-			phone: {
-				type: Sequelize.STRING(255),
-				allowNull: false,
-			},
-			sex: {
-				type: Sequelize.INTEGER(11),
-				allowNull: true,
 			},
 			area: {
 				type: Sequelize.STRING(255),
