@@ -11,6 +11,11 @@ module.exports = function (sequelize) {
 				primaryKey: true,
 				autoIncrement: true,
 			},
+			shopid: {
+				type: Sequelize.INTEGER(11),
+				allowNull: false,
+				primaryKey: true,
+			},
 			name: {
 				type: Sequelize.STRING(255),
 				allowNull: true,

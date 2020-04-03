@@ -7,6 +7,7 @@ const cabinetrController = require('./cabinetrController');
 const payController = require('./payController');
 const areaController = require('./areaController');
 const addressController = require('./addressController');
+const intergralController = require('./intergralController');
 
 const router = (app) => {
 	// 用户
@@ -27,5 +28,7 @@ const router = (app) => {
 	app.use('/area', areaController);
 	// 用户位置
 	app.use('/address', addressController);
+	// 积分相关
+	app.use('/intergral', intergralController);
 };
 module.exports = router;
