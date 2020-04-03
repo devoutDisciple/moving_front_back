@@ -3,7 +3,7 @@
 const Sequelize = require('sequelize');
 module.exports = function (sequelize) {
 	return sequelize.define(
-		'register',
+		'intergral',
 		{
 			id: {
 				type: Sequelize.INTEGER(11),
@@ -11,30 +11,38 @@ module.exports = function (sequelize) {
 				primaryKey: true,
 				autoIncrement: true,
 			},
-			phone: {
-				type: Sequelize.STRING(11),
-				allowNull: false,
-				primaryKey: true,
-			},
-			security_code: {
-				type: Sequelize.INTEGER(11),
+			name: {
+				type: Sequelize.STRING(255),
 				allowNull: true,
 			},
-			password: {
+			desc: {
 				type: Sequelize.STRING(255),
+				allowNull: true,
+			},
+			url: {
+				type: Sequelize.STRING(255),
+				allowNull: false,
+			},
+			intergral: {
+				type: Sequelize.INTEGER(11),
+				allowNull: false,
+				defaultValue: '100',
+			},
+			sort: {
+				type: Sequelize.INTEGER(255),
 				allowNull: true,
 			},
 			create_time: {
 				type: Sequelize.DATE,
-				allowNull: true,
+				allowNull: false,
 			},
-			expire_time: {
-				type: Sequelize.DATE,
+			is_delete: {
+				type: Sequelize.INTEGER(11),
 				allowNull: true,
 			},
 		},
 		{
-			tableName: 'register',
+			tableName: 'intergral',
 			timestamps: false,
 		},
 	);
