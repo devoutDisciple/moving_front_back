@@ -7,7 +7,7 @@ module.exports = {
 
 	// 本地环境
 	userImgFilePath: '/Users/zhangzhen/moving/front_back/public/user', // 用户头像
-	userImgUrl: 'http://localhost:3001/user',
+	userImgUrl: 'user/',
 	goodsPreUrl: 'http://localhost:3001/goods',
 
 	// 短信验证码需要的信息

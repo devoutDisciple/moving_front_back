@@ -34,7 +34,7 @@ module.exports = {
 			let filename = 'user_' + ObjectUtil.getName() + '_' + Date.now() + '.jpg';
 			await fs.writeFileSync(`${filePath}/${filename}`, dataBuffer);
 			await userModel.update(
-				{ photo: `${userImgUrl}/${filename}` },
+				{ photo: `${userImgUrl + filename}` },
 				{
 					where: {
 						token: token,
