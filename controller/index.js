@@ -8,6 +8,7 @@ const payController = require('./payController');
 const areaController = require('./areaController');
 const addressController = require('./addressController');
 const intergralController = require('./intergralController');
+const optionsController = require('./optionsController');
 
 const router = (app) => {
 	// 用户
@@ -30,5 +31,7 @@ const router = (app) => {
 	app.use('/address', addressController);
 	// 积分相关
 	app.use('/intergral', intergralController);
+	// 用户意见
+	app.use('/options', optionsController);
 };
 module.exports = router;
