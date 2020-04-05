@@ -23,6 +23,11 @@ module.exports = function (sequelize) {
 				type: Sequelize.STRING(800),
 				allowNull: true,
 			},
+			status: {
+				type: Sequelize.INTEGER(11),
+				allowNull: false,
+				defaultValue: '1',
+			},
 			create_time: {
 				type: Sequelize.DATE,
 				allowNull: true,
