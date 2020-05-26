@@ -9,6 +9,7 @@ const areaController = require('./areaController');
 const addressController = require('./addressController');
 const intergralController = require('./intergralController');
 const optionsController = require('./optionsController');
+const clothingController = require('./clothingController');
 
 const router = (app) => {
 	// 用户
@@ -23,6 +24,8 @@ const router = (app) => {
 	app.use('/swiper', swiperController);
 	// 快递柜
 	app.use('/cabinet', cabinetrController);
+	// 衣物相关
+	app.use('/clothing', clothingController);
 	// 支付接口
 	app.use('/pay', payController);
 	// 地图位置

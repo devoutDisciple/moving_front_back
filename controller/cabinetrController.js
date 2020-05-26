@@ -7,9 +7,4 @@ router.get('/getAllByShop', (req, res) => {
 	cabinetService.getAllByShop(req, res);
 });
 
-// 发送短信
-router.get('/sendMessage', (req, res) => {
-	cabinetService.sendMessage(req, res);
-});
-
 module.exports = router;
