@@ -18,4 +18,18 @@ module.exports = {
 	// 打印机设置
 	USER: '1094705507@qq.com', // 打印机后台注册用户名
 	UKEY: 'SLb59vd942z9sGRV', // 打印机后台的key
+
+	mch_id: 1582660231, // 商户号
+	appid: 'wxcf235c09083c777a', // 微信开放平台的appid
+	grant_type: 'authorization_code',
+	key: '5EIRKZ8BBO0RT6IYVD1EU8V28H61V69F', // 商户平台的秘钥
+
+	// 洗衣柜相关
+	box_mtype: 'laundry',
+	box_skey: 'Smartbox',
+	box_userid: 'xiyigui',
+	box_password: '123123',
+	box_login_url: 'http://boxserver.zmkmdz.com/web/users/login',
+	box_open_url: 'http://boxserver.zmkmdz.com/box/laundry/open_box_cell',
+	box_getState_url: 'http://boxserver.zmkmdz.com/box/laundry/getbox_freecell',
 };

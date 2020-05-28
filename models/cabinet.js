@@ -13,7 +13,7 @@ module.exports = function (sequelize) {
 			},
 			shopid: {
 				type: Sequelize.INTEGER(11),
-				allowNull: false,
+				allowNull: true,
 			},
 			name: {
 				type: Sequelize.STRING(255),
@@ -23,9 +23,9 @@ module.exports = function (sequelize) {
 				type: Sequelize.STRING(255),
 				allowNull: true,
 			},
-			sort: {
-				type: Sequelize.INTEGER(11),
-				allowNull: true,
+			boxid: {
+				type: Sequelize.STRING(255),
+				allowNull: false,
 			},
 			url: {
 				type: Sequelize.STRING(255),
@@ -33,6 +33,10 @@ module.exports = function (sequelize) {
 			},
 			create_time: {
 				type: Sequelize.DATE,
+				allowNull: true,
+			},
+			sort: {
+				type: Sequelize.INTEGER(11),
 				allowNull: true,
 			},
 		},

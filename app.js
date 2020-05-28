@@ -52,9 +52,9 @@ controller(app);
 const httpsServer = https.createServer(credentials, app);
 
 // 启动服务器，监听对应的端口
-httpsServer.listen(443, () => {
-	console.log(chalk.yellow('moving洗衣店：server is listenning 443'));
-});
+// httpsServer.listen(443, () => {
+// 	console.log(chalk.yellow('moving洗衣店：server is listenning 443'));
+// });
 
 // 监听3001端口
 app.listen(3001, () => {

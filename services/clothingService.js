@@ -5,7 +5,7 @@ const ClothingModel = clothing(sequelize);
 const responseUtil = require('../util/responseUtil');
 
 module.exports = {
-	// 根据商店获取快递柜
+	// 根据商店获取衣物
 	getByShopid: async (req, res) => {
 		try {
 			let shopid = req.query.shopid;
