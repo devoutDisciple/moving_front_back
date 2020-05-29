@@ -10,6 +10,7 @@ const addressController = require('./addressController');
 const intergralController = require('./intergralController');
 const optionsController = require('./optionsController');
 const clothingController = require('./clothingController');
+const orderController = require('./orderController');
 
 const router = (app) => {
 	// 用户
@@ -26,6 +27,8 @@ const router = (app) => {
 	app.use('/cabinet', cabinetrController);
 	// 衣物相关
 	app.use('/clothing', clothingController);
+	// 订单相关
+	app.use('/order', orderController);
 	// 支付接口
 	app.use('/pay', payController);
 	// 地图位置

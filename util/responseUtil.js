@@ -11,6 +11,7 @@ module.exports = {
 		});
 		return result;
 	},
+
 	// 返回 {}
 	renderFieldsObj: (data, fieldsArr = []) => {
 		let result = {};

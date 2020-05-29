@@ -16,7 +16,7 @@ module.exports = {
 				},
 				order: [['sort', 'DESC']],
 			});
-			const reslut = responseUtil.renderFieldsAll(cabinets, ['id', 'shopid', 'address', 'boxid', 'url']);
+			const reslut = responseUtil.renderFieldsAll(cabinets, ['id', 'shopid', 'name', 'address', 'boxid', 'url']);
 			res.send(resultMessage.success(reslut));
 		} catch (error) {
 			console.log(error);
@@ -98,7 +98,7 @@ module.exports = {
 			let result = await cabinetUtil.openBox(boxid, cellid, token);
 			result = JSON.parse(result);
 			if (result.code == 200 && result.message == 'success') {
-				return res.send(resultMessage.success('success'));
+				return res.send(resultMessage.success({ boxid, cellid }));
 			}
 			res.send(resultMessage.error('网络出小差了, 请稍后重试'));
 		} catch (error) {

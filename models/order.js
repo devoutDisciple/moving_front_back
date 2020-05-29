@@ -11,11 +11,11 @@ module.exports = function (sequelize) {
 				primaryKey: true,
 				autoIncrement: true,
 			},
-			shop_id: {
+			shopid: {
 				type: Sequelize.INTEGER(11),
 				allowNull: false,
 			},
-			user_id: {
+			userid: {
 				type: Sequelize.INTEGER(11),
 				allowNull: false,
 			},
@@ -41,13 +41,35 @@ module.exports = function (sequelize) {
 				type: Sequelize.STRING(255),
 				allowNull: true,
 			},
-			crate_time: {
+			status: {
+				type: Sequelize.INTEGER(11),
+				allowNull: false,
+				defaultValue: '1',
+			},
+			cabinetId: {
+				type: Sequelize.INTEGER(11),
+				allowNull: false,
+			},
+			boxid: {
+				type: Sequelize.STRING(255),
+				allowNull: true,
+			},
+			cellid: {
+				type: Sequelize.STRING(255),
+				allowNull: true,
+			},
+			create_time: {
 				type: Sequelize.DATE,
 				allowNull: true,
 			},
 			modify_time: {
 				type: Sequelize.DATE,
 				allowNull: true,
+			},
+			is_delete: {
+				type: Sequelize.INTEGER(11),
+				allowNull: true,
+				defaultValue: '1',
 			},
 		},
 		{
