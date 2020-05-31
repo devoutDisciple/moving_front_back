@@ -1,7 +1,7 @@
-const request = require('request');
-const config = require('../config/AppConfig');
 const md5 = require('md5');
 const moment = require('moment');
+const request = require('request');
+const config = require('../config/AppConfig');
 
 module.exports = {
 	getToken: () => {
@@ -87,5 +87,27 @@ module.exports = {
 				reject(error);
 			}
 		});
+	},
+
+	getBoxUsedState: (usedArr) => {
+		let { box_big_num, box_samll_num } = config;
+		let big_box_used_num = 0,
+			small_box_empty_num = 0;
+		box_big_num.forEach((item) => {
+			if (usedArr.includes(item)) big_box_used_num++;
+		});
+		box_samll_num.forEach((item) => {
+			if (usedArr.includes(item)) small_box_empty_num++;
+		});
+		return {
+			bigBox: {
+				used: big_box_used_num,
+				empty: box_big_num.length - big_box_used_num,
+			},
+			samllBox: {
+				used: small_box_empty_num,
+				empty: box_samll_num.length - small_box_empty_num,
+			},
+		};
 	},
 };

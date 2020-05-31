@@ -32,4 +32,7 @@ module.exports = {
 	box_login_url: 'http://boxserver.zmkmdz.com/web/users/login',
 	box_open_url: 'http://boxserver.zmkmdz.com/box/laundry/open_box_cell',
 	box_getState_url: 'http://boxserver.zmkmdz.com/box/laundry/getbox_freecell',
+	box_total_num: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29],
+	box_samll_num: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21],
+	box_big_num: [22, 23, 24, 25, 26, 27, 28, 29],
 };

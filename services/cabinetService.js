@@ -2,6 +2,7 @@ const resultMessage = require('../util/resultMessage');
 const sequelize = require('../dataSource/MysqlPoolClass');
 const cabinet = require('../models/cabinet');
 const CabinetModel = cabinet(sequelize);
+const AppConfig = require('../config/AppConfig');
 const cabinetUtil = require('../util/cabinetUtil');
 const responseUtil = require('../util/responseUtil');
 
@@ -26,40 +27,16 @@ module.exports = {
 
 	// 获取柜子状态
 	getStateById: async (req, res) => {
-		let smallBox = {
-				empty: 0, //空闲数量
-				used: 0, // 占用数量
-			},
-			middleBox = {
-				empty: 0, //空闲数量
-				used: 0, // 占用数量
-			},
-			bigBox = {
-				empty: 0, //空闲数量
-				used: 0, // 占用数量
-			};
+		let cabinetId = req.query.cabinetId;
 		try {
-			// 获取token
-			let boxLoginDetail = await cabinetUtil.getToken();
-			boxLoginDetail = JSON.parse(boxLoginDetail);
-			let token = boxLoginDetail.data || '';
-			if (!token) return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
-			// 查看柜体状态
-			let boxDetail = await cabinetUtil.getState(token, 'guangzhouxyg003');
-			boxDetail = JSON.parse(boxDetail);
-			let data = boxDetail.data || [];
-			data.forEach((item) => {
-				if (item.celltype == '小格') {
-					item.status === '空闲' ? smallBox.empty++ : smallBox.used++;
-				}
-				if (item.celltype == '中格') {
-					item.status === '空闲' ? middleBox.empty++ : middleBox.used++;
-				}
-				if (item.celltype == '大格') {
-					item.status === '空闲' ? bigBox.empty++ : bigBox.used++;
-				}
+			let data = await CabinetModel.findOne({
+				where: {
+					id: cabinetId,
+				},
 			});
-			res.send(resultMessage.success({ smallBox, middleBox, bigBox }));
+			let used = JSON.parse(data.used);
+			let usedState = cabinetUtil.getBoxUsedState(used);
+			res.send(resultMessage.success(usedState));
 		} catch (error) {
 			console.log(error);
 			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
