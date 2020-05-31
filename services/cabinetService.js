@@ -45,7 +45,7 @@ module.exports = {
 			let token = boxLoginDetail.data || '';
 			if (!token) return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
 			// 查看柜体状态
-			let boxDetail = await cabinetUtil.getState(token, 'xiyiguitest001');
+			let boxDetail = await cabinetUtil.getState(token, 'guangzhouxyg003');
 			boxDetail = JSON.parse(boxDetail);
 			let data = boxDetail.data || [];
 			data.forEach((item) => {
@@ -70,6 +70,7 @@ module.exports = {
 	open: async (req, res) => {
 		try {
 			let { boxid, type } = req.body;
+			console.log(boxid);
 			let celltype = '小格';
 			switch (type) {
 				case 'middleBox':
@@ -87,7 +88,7 @@ module.exports = {
 			let token = boxLoginDetail.data || '';
 			if (!token) return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
 			// 查看柜体状态
-			let boxDetail = await cabinetUtil.getState(token, 'xiyiguitest001');
+			let boxDetail = await cabinetUtil.getState(token, boxid);
 			boxDetail = JSON.parse(boxDetail);
 			let data = boxDetail.data || [];
 			let cellid = '';

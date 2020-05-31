@@ -11,8 +11,11 @@ const intergralController = require('./intergralController');
 const optionsController = require('./optionsController');
 const clothingController = require('./clothingController');
 const orderController = require('./orderController');
+const versionController = require('./versionController');
 
 const router = (app) => {
+	// 版本
+	app.use('/version', versionController);
 	// 用户
 	app.use('/user', userController);
 	// 注册
