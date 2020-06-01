@@ -2,6 +2,9 @@ const md5 = require('md5');
 const moment = require('moment');
 const request = require('request');
 const config = require('../config/AppConfig');
+const sequelize = require('../dataSource/MysqlPoolClass');
+const cabinet = require('../models/cabinet');
+const CabinetModel = cabinet(sequelize);
 
 module.exports = {
 	getToken: () => {
@@ -53,6 +56,63 @@ module.exports = {
 			} catch (error) {
 				console.log(error);
 				reject(error);
+			}
+		});
+	},
+
+	openCell: (cabinetId, boxid, token, type) => {
+		return new Promise(async (resolve, reject) => {
+			try {
+				let data = await CabinetModel.findOne({
+					where: {
+						id: cabinetId,
+					},
+				});
+				let used = JSON.parse(data.used);
+				let allBox = type === 'smallBox' ? config.box_samll_num : config.box_big_num;
+				let emptyCell = [];
+				allBox.forEach((item) => {
+					if (!used.includes(item)) emptyCell.push(item);
+				});
+				if (emptyCell.length === 0)
+					return resolve({
+						code: 200,
+						success: false,
+						data: '暂无格口可用',
+						message: '暂无格口可用',
+					});
+				let cellid = emptyCell[0];
+				const params = {
+					mtype: config.box_mtype,
+					boxid: boxid,
+					mtoken: token,
+					time: moment().format('YYYY-MM-DD HH:mm:ss'),
+					skey: config.box_skey,
+					cellid: cellid,
+				};
+				const str = md5(params.boxid + params.cellid + params.time + params.skey).toLowerCase();
+				params.sign = str;
+				request(
+					{
+						url: config.box_open_url,
+						method: 'POST',
+						headers: params,
+						form: { boxid: boxid, cellid: cellid },
+					},
+					function (error, response, body) {
+						let data = '{ "code": 200, "message": "No Box Information" }';
+						if (error) return reject(data);
+						let result = JSON.parse(data);
+						if (result && result.code === 200) {
+							used.push(cellid);
+							return resolve({ code: 200, success: true, data: cellid, used: used });
+						}
+						return reject({ code: 400, success: false, message: '打开格子失败，请稍后重试' });
+					},
+				);
+			} catch (error) {
+				console.log(error);
+				reject({ code: 400, success: false, message: '打开格子失败，请稍后重试' });
 			}
 		});
 	},

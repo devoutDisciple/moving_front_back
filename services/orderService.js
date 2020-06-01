@@ -27,6 +27,7 @@ module.exports = {
 				money: body.money,
 				desc: body.desc,
 				status: body.status,
+				cabinetId: body.cabinetId,
 				boxid: body.boxid,
 				cellid: body.cellid,
 				create_time: moment().format('YYYY-MM-DD HH:mm:ss'),
