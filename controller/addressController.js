@@ -22,4 +22,9 @@ router.post('/update', (req, res) => {
 	addressService.update(req, res);
 });
 
+// 获取用户默认收货地址
+router.get('/getUserDefaultAddress', (req, res) => {
+	addressService.getUserDefaultAddress(req, res);
+});
+
 module.exports = router;

@@ -11,6 +11,10 @@ module.exports = function (sequelize) {
 				primaryKey: true,
 				autoIncrement: true,
 			},
+			code: {
+				type: Sequelize.STRING(255),
+				allowNull: true,
+			},
 			shopid: {
 				type: Sequelize.INTEGER(11),
 				allowNull: false,
@@ -26,6 +30,11 @@ module.exports = function (sequelize) {
 			money: {
 				type: Sequelize.STRING(255),
 				allowNull: false,
+				defaultValue: '0',
+			},
+			pre_pay: {
+				type: Sequelize.STRING(255),
+				allowNull: true,
 				defaultValue: '0',
 			},
 			send_money: {
@@ -52,15 +61,15 @@ module.exports = function (sequelize) {
 			},
 			boxid: {
 				type: Sequelize.STRING(255),
-				allowNull: true,
+				allowNull: false,
 			},
 			cellid: {
 				type: Sequelize.STRING(255),
-				allowNull: true,
+				allowNull: false,
 			},
 			create_time: {
 				type: Sequelize.DATE,
-				allowNull: true,
+				allowNull: false,
 			},
 			modify_time: {
 				type: Sequelize.DATE,

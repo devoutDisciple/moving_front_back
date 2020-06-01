@@ -12,4 +12,9 @@ router.get('/getOrderByPage', (req, res) => {
 	orderService.getOrderByPage(req, res);
 });
 
+// 根据订单id获取订单 getOrderById
+router.get('/getOrderById', (req, res) => {
+	orderService.getOrderById(req, res);
+});
+
 module.exports = router;

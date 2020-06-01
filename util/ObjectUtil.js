@@ -45,11 +45,12 @@ module.exports = {
 	},
 	createOrderCode: function () {
 		let str = '';
-		for (let i = 1; i <= 16; i++) {
-			let random = Math.floor(Math.random() * arr.length);
-			str += arr[random];
+		let tempArr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
+		for (let i = 1; i <= 10; i++) {
+			let random = Math.floor(Math.random() * tempArr.length);
+			str += tempArr[random];
 		}
 		str = new Date().getTime() + str;
-		return str;
+		return str.toUpperCase();
 	},
 };

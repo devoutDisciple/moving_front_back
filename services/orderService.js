@@ -43,6 +43,7 @@ module.exports = {
 		}
 	},
 
+	// 分页获取订单
 	getOrderByPage: async (req, res) => {
 		try {
 			let { current = 1, pagesize = 10, userid } = req.query;
@@ -67,7 +68,6 @@ module.exports = {
 				offset: Number(offset),
 			});
 			let result = responseUtil.renderFieldsAll(orders, ['id', 'goods', 'money', 'desc', 'status', 'create_time']);
-			console.log(result[0]);
 			result.forEach((item, index) => {
 				item.create_time = moment(item.create_time).format('YYYY-MM-DD HH:mm:ss');
 				item.shopName = orders[index]['shopDetail'] ? orders[index]['shopDetail']['name'] || '' : '';
@@ -75,6 +75,39 @@ module.exports = {
 				item.cabinetName = orders[index]['cabinetDetail'] ? orders[index]['cabinetDetail']['name'] || '' : '';
 				item.cabinetAdderss = orders[index]['cabinetDetail'] ? orders[index]['cabinetDetail']['address'] || '' : '';
 			});
+			res.send(resultMessage.success(result));
+		} catch (error) {
+			console.log(error);
+			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
+		}
+	},
+
+	getOrderById: async (req, res) => {
+		try {
+			let order = await orderModel.findOne({
+				where: {
+					id: req.query.id,
+				},
+				include: [
+					{
+						model: shopModel,
+						as: 'shopDetail',
+					},
+					{
+						model: cabinetModel,
+						as: 'cabinetDetail',
+					},
+				],
+			});
+			// eslint-disable-next-line
+			let result = responseUtil.renderFieldsObj(order, ['id','code','shopid','goods','money','pre_pay','send_money','desc','status','cabinetId','cellid','create_time']);
+			result.create_time = moment(result.create_time).format('YYYY-MM-DD HH:mm:ss');
+			result.shopName = order.shopDetail ? order.shopDetail.name : '';
+			result.shopAddress = order.shopDetail ? order.shopDetail.address : '';
+			result.shopManager = order.shopDetail ? order.shopDetail.manager : '';
+			result.shopPhone = order.shopDetail ? order.shopDetail.phone : '';
+			result.cabinetAddress = order.cabinetDetail ? order.cabinetDetail.address : '';
+			result.cabinetUrl = order.cabinetDetail ? order.cabinetDetail.url : '';
 			res.send(resultMessage.success(result));
 		} catch (error) {
 			console.log(error);
