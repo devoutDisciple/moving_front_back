@@ -15,6 +15,8 @@ const moment = require('moment');
 const CountUtil = require('../util/CountUtil');
 const responseUtil = require('../util/responseUtil');
 
+const ObjectUtil = require('../util/ObjectUtil');
+
 module.exports = {
 	// 新增订单
 	add: async (req, res) => {
@@ -22,6 +24,7 @@ module.exports = {
 			let body = req.body;
 			let params = {
 				shopid: body.shopid,
+				code: ObjectUtil.createOrderCode(),
 				userid: body.userid,
 				goods: body.goods,
 				money: body.money,
