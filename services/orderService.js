@@ -26,7 +26,7 @@ module.exports = {
 				shopid: body.shopid,
 				code: ObjectUtil.createOrderCode(),
 				userid: body.userid,
-				goods: body.goods,
+				goods: body.goods || '[]',
 				money: body.money,
 				desc: body.desc,
 				status: body.status,
