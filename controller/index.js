@@ -7,7 +7,8 @@ const cabinetrController = require('./cabinetrController');
 const payController = require('./payController');
 const areaController = require('./areaController');
 const addressController = require('./addressController');
-const intergralController = require('./intergralController');
+const intergralGoodsController = require('./intergralGoodsController');
+const intergralRecordController = require('./intergralRecordController');
 const optionsController = require('./optionsController');
 const clothingController = require('./clothingController');
 const orderController = require('./orderController');
@@ -38,8 +39,10 @@ const router = (app) => {
 	app.use('/area', areaController);
 	// 用户位置
 	app.use('/address', addressController);
-	// 积分相关
-	app.use('/intergral', intergralController);
+	// 积分商品相关
+	app.use('/intergral_goods', intergralGoodsController);
+	// 积分记录相关
+	app.use('/intergral_record', intergralRecordController);
 	// 用户意见
 	app.use('/options', optionsController);
 };

@@ -3,7 +3,7 @@ module.exports = {
 		return {
 			code: 200,
 			success: true,
-			data: data
+			data: data,
 		};
 	},
 	// 重新登录的
@@ -11,7 +11,7 @@ module.exports = {
 		return {
 			code: 502,
 			success: true,
-			data: "请登录"
+			data: '请登录',
 		};
 	},
 	// 需要提示错误信息的
@@ -19,7 +19,7 @@ module.exports = {
 		return {
 			code: 500,
 			success: false,
-			message: data
+			message: data,
 		};
-	}
+	},
 };

@@ -3,7 +3,7 @@
 const Sequelize = require('sequelize');
 module.exports = function (sequelize) {
 	return sequelize.define(
-		'intergral',
+		'intergral_goods',
 		{
 			id: {
 				type: Sequelize.INTEGER(11),
@@ -47,7 +47,7 @@ module.exports = function (sequelize) {
 			},
 		},
 		{
-			tableName: 'intergral',
+			tableName: 'intergral_goods',
 			timestamps: false,
 		},
 	);

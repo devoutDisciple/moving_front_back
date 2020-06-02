@@ -1,6 +1,6 @@
 const resultMessage = require('../util/resultMessage');
 const sequelize = require('../dataSource/MysqlPoolClass');
-const intergral = require('../models/intergral');
+const intergral = require('../models/intergral_goods');
 const intergralModel = intergral(sequelize);
 
 module.exports = {
