@@ -4,9 +4,17 @@ const intergralRecord = require('../models/intergral_record');
 const intergralRecordModel = intergralRecord(sequelize);
 const user = require('../models/user');
 const userModel = user(sequelize);
+
 const goods = require('../models/intergral_goods');
 const goodsModel = goods(sequelize);
+intergralRecordModel.belongsTo(goodsModel, { foreignKey: 'goodsid', targetKey: 'id', as: 'goodsDetail' });
+
+const shop = require('../models/shop');
+const shopModel = shop(sequelize);
+intergralRecordModel.belongsTo(shopModel, { foreignKey: 'shopid', targetKey: 'id', as: 'shopDetail' });
+
 const moment = require('moment');
+const responseUtil = require('../util/responseUtil');
 
 module.exports = {
 	// 添加兑换记录
@@ -35,6 +43,37 @@ module.exports = {
 				},
 			);
 			res.send(resultMessage.success('success'));
+		} catch (error) {
+			console.log(error);
+			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
+		}
+	},
+
+	getRecordByUserid: async (req, res) => {
+		try {
+			// 查询是否注册过
+			let records = await intergralRecordModel.findAll({
+				where: { userid: req.query.userid },
+				order: [['create_time', 'DESC']],
+				include: [
+					{
+						model: shopModel,
+						as: 'shopDetail',
+					},
+					{
+						model: goodsModel,
+						as: 'goodsDetail',
+					},
+				],
+			});
+			let result = responseUtil.renderFieldsAll(records, ['id', 'intergral', 'status', 'create_time']);
+			result.forEach((item, index) => {
+				item.create_time = moment(item.create_time).format('YYYY-MM-DD HH:mm:ss');
+				item.shopName = records[index]['shopDetail'] ? records[index]['shopDetail']['name'] || '' : '';
+				item.goodsName = records[index]['goodsDetail'] ? records[index]['goodsDetail']['name'] || '' : '';
+				item.goodsUrl = records[index]['goodsDetail'] ? records[index]['goodsDetail']['url'] || '' : '';
+			});
+			res.send(resultMessage.success(result));
 		} catch (error) {
 			console.log(error);
 			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
