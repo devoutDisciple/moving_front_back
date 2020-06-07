@@ -43,7 +43,7 @@ module.exports = {
 	},
 
 	// 打开柜子
-	open: async (req, res) => {
+	openCellSave: async (req, res) => {
 		try {
 			let { boxid, type, cabinetId } = req.body;
 			// 获取token
@@ -52,14 +52,14 @@ module.exports = {
 			let token = boxLoginDetail.data || '';
 			if (!token) return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
 			// 打开格子
-			let result = await cabinetUtil.openCell(cabinetId, boxid, token, type);
+			let result = await cabinetUtil.openCellSave(cabinetId, boxid, token, type);
 			if (!result || result.code != 200) {
 				return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
 			}
 			// 打开的格子id
 			let used = result.used,
 				cellid = result.data;
-			// 更新格子状态
+			// 更新可用格子状态
 			await CabinetModel.update(
 				{ used: JSON.stringify(used) },
 				{

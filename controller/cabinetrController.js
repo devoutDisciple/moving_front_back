@@ -8,8 +8,8 @@ router.get('/getAllByShop', (req, res) => {
 });
 
 // 打开柜子
-router.post('/open', (req, res) => {
-	cabinetService.open(req, res);
+router.post('/openCellSave', (req, res) => {
+	cabinetService.openCellSave(req, res);
 });
 
 // 获取柜子状态

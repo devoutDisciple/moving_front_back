@@ -16,6 +16,7 @@ const CountUtil = require('../util/CountUtil');
 const responseUtil = require('../util/responseUtil');
 
 const ObjectUtil = require('../util/ObjectUtil');
+const cabinetUtil = require('../util/cabinetUtil');
 
 module.exports = {
 	// 新增订单
@@ -46,12 +47,30 @@ module.exports = {
 	// 分页获取订单
 	getOrderByPage: async (req, res) => {
 		try {
-			let { current = 1, pagesize = 10, userid } = req.query;
+			let { current = 1, pagesize = 10, userid, type = 'all' } = req.query;
+			let status = [1];
+			switch (type) {
+				case 'all':
+					status = [1, 2, 3, 4, 5];
+					break;
+				case 'cleaning':
+					status = [2];
+					break;
+				case 'receiving':
+					status = [3, 4];
+					break;
+				case 'finished':
+					status = [5];
+					break;
+
+				default:
+					break;
+			}
 			let offset = CountUtil.getInt((current - 1) * pagesize);
-			console.log(pagesize, offset);
 			let orders = await orderModel.findAll({
 				where: {
 					userid: userid,
+					status: status,
 				},
 				include: [
 					{
@@ -67,7 +86,7 @@ module.exports = {
 				limit: Number(pagesize),
 				offset: Number(offset),
 			});
-			let result = responseUtil.renderFieldsAll(orders, ['id', 'goods', 'money', 'desc', 'status', 'create_time']);
+			let result = responseUtil.renderFieldsAll(orders, ['id', 'shopid', 'goods', 'money', 'desc', 'status', 'create_time']);
 			result.forEach((item, index) => {
 				item.create_time = moment(item.create_time).format('YYYY-MM-DD HH:mm:ss');
 				item.shopName = orders[index]['shopDetail'] ? orders[index]['shopDetail']['name'] || '' : '';
@@ -82,6 +101,7 @@ module.exports = {
 		}
 	},
 
+	// 获取某个订单详情
 	getOrderById: async (req, res) => {
 		try {
 			let order = await orderModel.findOne({
@@ -109,6 +129,41 @@ module.exports = {
 			result.cabinetAddress = order.cabinetDetail ? order.cabinetDetail.address : '';
 			result.cabinetUrl = order.cabinetDetail ? order.cabinetDetail.url : '';
 			res.send(resultMessage.success(result));
+		} catch (error) {
+			console.log(error);
+			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
+		}
+	},
+
+	// 打开柜子
+	openCellById: async (req, res) => {
+		try {
+			let { orderId } = req.body;
+			let order = await orderModel.findOne({
+				where: { id: orderId },
+			});
+			let { cellid, boxid, cabinetId } = order;
+			// 获取token
+			let boxLoginDetail = await cabinetUtil.getToken();
+			boxLoginDetail = JSON.parse(boxLoginDetail);
+			let token = boxLoginDetail.data || '';
+			if (!token) return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
+			// 打开柜子
+			let result = await cabinetUtil.openCellGet(cabinetId, boxid, cellid, token);
+			// 打开后可用的格子的数量
+			let used = result.used;
+			// 更新可用格子状态
+			await cabinetModel.update(
+				{ used: JSON.stringify(used) },
+				{
+					where: {
+						id: cabinetId,
+					},
+				},
+			);
+			// 更新订单状态
+			await orderModel.update({ status: 5 }, { where: { id: orderId } });
+			res.send(resultMessage.success('success'));
 		} catch (error) {
 			console.log(error);
 			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));

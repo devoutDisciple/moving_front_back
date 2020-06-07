@@ -35,7 +35,6 @@ module.exports = {
 			if (Number(user.integral) < Number(goodsDetail.intergral)) return res.send(resultMessage.error('兑换失败,您的积分不足'));
 			await intergralRecordModel.create(params);
 			let currentIntergral = Number(user.integral) - Number(goodsDetail.intergral);
-			console.log(currentIntergral, 999);
 			await userModel.update(
 				{ integral: currentIntergral },
 				{

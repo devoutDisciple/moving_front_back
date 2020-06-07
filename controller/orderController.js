@@ -17,4 +17,9 @@ router.get('/getOrderById', (req, res) => {
 	orderService.getOrderById(req, res);
 });
 
+// 根据订单id 打开柜子 openCellById
+router.post('/openCellById', (req, res) => {
+	orderService.openCellById(req, res);
+});
+
 module.exports = router;

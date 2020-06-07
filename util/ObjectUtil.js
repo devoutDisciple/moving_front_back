@@ -43,6 +43,7 @@ module.exports = {
 		let timeB = moment(b).valueOf();
 		return timeA - timeB;
 	},
+	// 创建orderCode
 	createOrderCode: function () {
 		let str = '';
 		let tempArr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0];
@@ -52,5 +53,12 @@ module.exports = {
 		}
 		str = new Date().getTime() + str;
 		return str.toUpperCase();
+	},
+	// 删除数组某个元素
+	arrRemove: function (arr, element) {
+		let index = arr.indexOf(Number(element));
+		if (index === -1) return arr;
+		arr.splice(index, 1);
+		return arr;
 	},
 };

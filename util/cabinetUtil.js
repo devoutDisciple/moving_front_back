@@ -3,10 +3,12 @@ const moment = require('moment');
 const request = require('request');
 const config = require('../config/AppConfig');
 const sequelize = require('../dataSource/MysqlPoolClass');
+const ObjectUtil = require('./ObjectUtil');
 const cabinet = require('../models/cabinet');
 const CabinetModel = cabinet(sequelize);
 
 module.exports = {
+	// 获取token
 	getToken: () => {
 		return new Promise((resolve, reject) => {
 			try {
@@ -60,7 +62,8 @@ module.exports = {
 		});
 	},
 
-	openCell: (cabinetId, boxid, token, type) => {
+	// 存放衣物打开柜子
+	openCellSave: (cabinetId, boxid, token, type) => {
 		return new Promise(async (resolve, reject) => {
 			try {
 				let data = await CabinetModel.findOne({
@@ -117,9 +120,16 @@ module.exports = {
 		});
 	},
 
-	openBox: (boxid, cellid, token) => {
-		return new Promise((resolve, reject) => {
+	// 取出衣物
+	openCellGet: (cabinetId, boxid, cellid, token) => {
+		return new Promise(async (resolve, reject) => {
 			try {
+				let data = await CabinetModel.findOne({
+					where: {
+						id: cabinetId,
+					},
+				});
+				let used = JSON.parse(data.used);
 				const params = {
 					mtype: config.box_mtype,
 					boxid: boxid,
@@ -137,18 +147,25 @@ module.exports = {
 						headers: params,
 						form: { boxid: boxid, cellid: cellid },
 					},
-					function (error, response, body) {
-						if (error) return reject(body);
-						resolve(body);
+					function (error) {
+						let data = '{ "code": 200, "message": "No Box Information" }';
+						if (error) return reject(data);
+						let result = JSON.parse(data);
+						if (result && result.code === 200) {
+							used = ObjectUtil.arrRemove(used, cellid);
+							return resolve({ code: 200, success: true, data: cellid, used: used });
+						}
+						return reject({ code: 400, success: false, message: '打开格子失败，请稍后重试' });
 					},
 				);
 			} catch (error) {
 				console.log(error);
-				reject(error);
+				reject({ code: 400, success: false, message: '打开格子失败，请稍后重试' });
 			}
 		});
 	},
 
+	// 获取可用格子
 	getBoxUsedState: (usedArr) => {
 		let { box_big_num, box_samll_num } = config;
 		let big_box_used_num = 0,

@@ -19,4 +19,19 @@ module.exports = {
 			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
 		}
 	},
+
+	// 根据id获取商店信息
+	getShopById: async (req, res) => {
+		try {
+			// 查询是否注册过
+			let shops = await shopModel.findOne({
+				where: { id: req.query.shopid },
+			});
+			let result = responseUtil.renderFieldsObj(shops, ['id', 'name', 'address', 'phone']);
+			res.send(resultMessage.success(result));
+		} catch (error) {
+			console.log(error);
+			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
+		}
+	},
 };
