@@ -14,6 +14,9 @@ const clothingController = require('./clothingController');
 const orderController = require('./orderController');
 const versionController = require('./versionController');
 
+// 测试
+const testController = require('./testController');
+
 const router = (app) => {
 	// 版本
 	app.use('/version', versionController);
@@ -45,5 +48,8 @@ const router = (app) => {
 	app.use('/intergral_record', intergralRecordController);
 	// 用户意见
 	app.use('/options', optionsController);
+
+	// 测试 testController
+	app.use('/test', testController);
 };
 module.exports = router;

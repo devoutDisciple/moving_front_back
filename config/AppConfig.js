@@ -70,9 +70,10 @@ const common = {
 	message_orderSuccessToShop: 'SMS_192790012', // 交易成功通知给商家
 
 	// 打印机设置
-	USER: '1094705507@qq.com', // 打印机后台注册用户名
-	UKEY: 'SLb59vd942z9sGRV', // 打印机后台的key
+	PRINT_USER: '1094705507@qq.com', // 打印机后台注册用户名
+	PRINT_UKEY: 'SLb59vd942z9sGRV', // 打印机后台的key
 
+	// 微信小程序平台
 	mch_id: 1582660231, // 商户号
 	appid: 'wxcf235c09083c777a', // 微信开放平台的appid
 	grant_type: 'authorization_code',
