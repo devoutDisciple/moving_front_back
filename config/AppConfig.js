@@ -38,7 +38,7 @@
 // 	box_big_num: [22, 23, 24, 25, 26, 27, 28, 29],
 // };
 
-let flag = true; // true - 线上环境 false-线下环境
+let flag = false; // true - 线上环境 false-线下环境
 
 const online = {
 	// 线上环境
@@ -60,7 +60,14 @@ const common = {
 	// 短信验证码需要的信息
 	message_accessKeyId: 'LTAI4FmR6WYzmWGpby7hCsC5',
 	message_accessKeySecret: 'ewp6oNm7QLeJN1WoPpRkvUsRNtPUJ2',
-	message_sign: 'moving洗衣店',
+	message_endpoint: 'https://dysmsapi.aliyuncs.com',
+	message_apiVersion: '2017-05-25',
+	message_sign: 'moving洗衣', // 签名
+	message_loginyanzhengma: 'SMS_182380047', //登录，注册验证码
+	message_orderStartToUser: 'SMS_192795010', // 下单成功通知给用户
+	message_orderStartToShop: 'SMS_192795012', // 下单成功通知给商家
+	message_orderSuccessToUser: 'SMS_192800014', // 交易成功通知给用户
+	message_orderSuccessToShop: 'SMS_192790012', // 交易成功通知给商家
 
 	// 打印机设置
 	USER: '1094705507@qq.com', // 打印机后台注册用户名
