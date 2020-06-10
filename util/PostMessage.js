@@ -1,6 +1,9 @@
 const Core = require('@alicloud/pop-core');
 const config = require('../config/AppConfig');
 const moment = require('moment');
+const requestOption = {
+	method: 'POST',
+};
 
 var client = new Core({
 	accessKeyId: config.message_accessKeyId,
@@ -18,9 +21,6 @@ module.exports = {
 			SignName: config.message_sign,
 			TemplateCode: config.message_loginyanzhengma,
 			TemplateParam: JSON.stringify({ code: code }),
-		};
-		var requestOption = {
-			method: 'POST',
 		};
 		return new Promise((resolve, reject) => {
 			client.request('SendSms', params, requestOption).then(
@@ -45,9 +45,6 @@ module.exports = {
 			TemplateCode: config.message_orderStartToUser,
 			TemplateParam: JSON.stringify({ name: 'MOVING' }), //模板变量值 {"code":"1111"} 对应的模板的${code}
 		};
-		var requestOption = {
-			method: 'POST',
-		};
 		return new Promise((resolve, reject) => {
 			client.request('SendSms', params, requestOption).then(
 				(result) => {
@@ -71,9 +68,6 @@ module.exports = {
 			TemplateCode: config.message_orderStartToShop,
 			TemplateParam: JSON.stringify({ name: name, time: moment().format('YYYY-MM-DD HH:mm:ss'), phone: phoneNum }),
 		};
-		var requestOption = {
-			method: 'POST',
-		};
 		return new Promise((resolve, reject) => {
 			client.request('SendSms', params, requestOption).then(
 				() => {
@@ -96,9 +90,6 @@ module.exports = {
 			TemplateCode: config.message_orderSuccessToUser,
 			TemplateParam: JSON.stringify({ name: 'MOVING' }),
 		};
-		var requestOption = {
-			method: 'POST',
-		};
 		return new Promise((resolve, reject) => {
 			client.request('SendSms', params, requestOption).then(
 				() => {
@@ -120,9 +111,6 @@ module.exports = {
 			SignName: config.message_sign,
 			TemplateCode: config.message_orderSuccessToShop,
 			TemplateParam: JSON.stringify({ code: code }),
-		};
-		var requestOption = {
-			method: 'POST',
 		};
 		return new Promise((resolve, reject) => {
 			client.request('SendSms', params, requestOption).then(

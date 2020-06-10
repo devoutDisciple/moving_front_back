@@ -53,9 +53,13 @@ module.exports = {
 			if (!token) return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
 			// 打开格子
 			let result = await cabinetUtil.openCellSave(cabinetId, boxid, token, type);
-			if (!result || result.code != 200) {
+			if (!result) {
 				return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
 			}
+			if (result && result.code !== 200) {
+				return res.send(resultMessage.error(result.message));
+			}
+
 			// 打开的格子id
 			let used = result.used,
 				cellid = result.data;

@@ -79,7 +79,7 @@ module.exports = {
 				});
 				if (emptyCell.length === 0)
 					return resolve({
-						code: 200,
+						code: 500,
 						success: false,
 						data: '暂无格口可用',
 						message: '暂无格口可用',

@@ -11,6 +11,9 @@ const cabinet = require('../models/cabinet');
 const cabinetModel = cabinet(sequelize);
 orderModel.belongsTo(cabinetModel, { foreignKey: 'cabinetId', targetKey: 'id', as: 'cabinetDetail' });
 
+const user = require('../models/user');
+const userModel = user(sequelize);
+
 const moment = require('moment');
 const CountUtil = require('../util/CountUtil');
 const responseUtil = require('../util/responseUtil');
@@ -18,14 +21,18 @@ const responseUtil = require('../util/responseUtil');
 const ObjectUtil = require('../util/ObjectUtil');
 const cabinetUtil = require('../util/cabinetUtil');
 
+// const PostMessage = require('../util/PostMessage');
+const PrintUtil = require('../util/PrintUtil');
+
 module.exports = {
 	// 新增订单
 	add: async (req, res) => {
 		try {
-			let body = req.body;
+			let body = req.body,
+				code = ObjectUtil.createOrderCode();
 			let params = {
 				shopid: body.shopid,
-				code: ObjectUtil.createOrderCode(),
+				code: code,
 				userid: body.userid,
 				goods: body.goods || '[]',
 				money: body.money,
@@ -38,6 +45,17 @@ module.exports = {
 			};
 			await orderModel.create(params);
 			res.send(resultMessage.success('success'));
+			// 打印商户订单
+			let shop = await shopModel.findOne({ where: { id: body.shopid } });
+			let user = await userModel.findOne({ where: { id: body.userid } });
+			let cabinet = await cabinetModel.findOne({ where: { id: body.cabinetId } });
+			if (shop.sn) {
+				PrintUtil.printOrder(shop.sn, body.goods, body.money, code, user.username, user.phone, cabinet.address, body.cellid, body.desc);
+			}
+
+			// 发送信息给用户
+			// let user = await userModel.findOne({ where: { id: body.userid } });
+			// await PostMessage.sendOrderStartToUser(user.phone);
 		} catch (error) {
 			console.log(error);
 			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));

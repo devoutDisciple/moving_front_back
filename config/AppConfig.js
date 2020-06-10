@@ -62,7 +62,7 @@ const common = {
 	message_accessKeySecret: 'ewp6oNm7QLeJN1WoPpRkvUsRNtPUJ2',
 	message_endpoint: 'https://dysmsapi.aliyuncs.com',
 	message_apiVersion: '2017-05-25',
-	message_sign: 'moving洗衣', // 签名
+	message_sign: 'moving洗衣店', // 签名  不能更改，阿里云注册的，要更改阿里云签名
 	message_loginyanzhengma: 'SMS_182380047', //登录，注册验证码
 	message_orderStartToUser: 'SMS_192795010', // 下单成功通知给用户
 	message_orderStartToShop: 'SMS_192795012', // 下单成功通知给商家

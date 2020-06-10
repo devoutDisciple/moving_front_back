@@ -13,11 +13,11 @@ let signature = function (STIME) {
 
 module.exports = {
 	// 打印订单
-	printOrder: async (sn) => {
+	printOrder: async (sn, goods, money, code, username, phone, address, cellid, desc) => {
 		return new Promise(async (resolve, reject) => {
 			try {
 				// 打印机编号
-				sn = '920535072';
+				// sn = '920535072';
 				//标签说明：
 				//单标签:
 				//"<BR>"为换行,"<CUT>"为切刀指令(主动切纸,仅限切刀打印机使用才有效果)
@@ -27,29 +27,37 @@ module.exports = {
 				//<W></W>字体变宽一倍,"<QR></QR>"为二维码,"<BOLD></BOLD>"为字体加粗,"<RIGHT></RIGHT>"为右对齐
 				//拼凑订单内容时可参考如下格式
 				//根据打印纸张的宽度，自行调整内容的格式，可参考下面的样例格式
-
+				goods = JSON.parse(goods);
 				let orderInfo;
 				orderInfo = '<CB>【 MOVING洗衣 】</CB><BR>'; //标题字体如需居中放大,就需要用标签套上
 				// orderInfo += '<C>-------------</C><BR>'; //标题字体如需居中放大,就需要用标签套上
 				// eslint-disable-next-line no-irregular-whitespace
 				// orderInfo += '名称　　　　　       数量  金额<BR>';
+				orderInfo += '<BR>';
 				orderInfo += '-------------------------------<BR>';
+				orderInfo += '<BR>';
 				orderInfo += `衣物概况：<BR>`;
-				orderInfo += `羽绒服 * 3  20<BR>`;
-				orderInfo += `衬衫 * 4  30<BR>`;
-				orderInfo += `毛衣 * 5  240<BR>`;
-				orderInfo += `内裤 * 6  260<BR>`;
+				if (goods.length === 0) {
+					orderInfo += `该用户暂未添加衣物<BR>`;
+				} else {
+					goods.forEach((item) => {
+						orderInfo += `${item.name} * ${item.num}   ${item.price}元<BR>`;
+					});
+				}
+
 				// orderList.map(item => {
 				// 	orderInfo += `${String(item.goodsName).padEnd(18)}${String(item.num).padEnd(6)}${(Number(item.price) * Number(item.num)).toFixed(2)}<BR>`;
 				// 	item.specification ? orderInfo += `规格:  ${item.specification}<BR>` : null;
 				// });
+				orderInfo += '<BR>';
 				orderInfo += '--------------------------------<BR>';
-				orderInfo += `合计：100 元<BR>`;
-				orderInfo += `订单编号：783485738989w738927<BR>`;
-				orderInfo += `存放地址：西溪水岸花苑 北门二号柜子 25格口<BR>`;
-				orderInfo += `用户名称：张振<BR>`;
-				orderInfo += `联系电话：18210619398<BR>`;
-				orderInfo += `备注：Moving洗衣店<BR>`;
+				orderInfo += '<BR>';
+				orderInfo += `合计：${money} 元<BR>`;
+				orderInfo += `订单编号：${code}<BR>`;
+				orderInfo += `存放地址：${address} ${cellid}格口<BR>`;
+				orderInfo += `用户名称：${username}<BR>`;
+				orderInfo += `联系电话：${phone}<BR>`;
+				orderInfo += `备注：${desc || '无'}<BR>`;
 				orderInfo += `下单时间: ${moment().format('YYYY-MM-DD HH:mm:ss')}<BR><BR>`;
 				const STIME = Math.floor(new Date().getTime() / 1000); //请求时间,当前时间的秒数
 				const post_data = {
