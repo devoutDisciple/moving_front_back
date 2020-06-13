@@ -13,22 +13,22 @@ module.exports = {
 	// 获取同一家商店的所有食物
 	payOrder: async (req, res) => {
 		try {
+			let { total_fee, desc } = req.query;
 			let orderid = PayUtil.createOrderid();
 			let params = {
 				appid: config.appid, //微信开放平台审核通过的应用APPID
 				mch_id: config.mch_id, //微信支付分配的商户号
-				body: 'MovingDryCleaner', // 商品描述
+				body: desc || 'MovingCleaner', // 商品描述
 				nonce_str: PayUtil.getNonceStr(), //随机字符串
 				out_trade_no: orderid, // 用户订单号
-				// total_fee: Number(req.query.total_fee) * 100, //商品价格 单位分
-				total_fee: 1, //商品价格 单位分
-				spbill_create_ip: '47.106.208.52', // 发起访问ip
+				total_fee: Number(total_fee) * 100, //商品价格 单位分
+				// total_fee: 1, //商品价格 单位分
+				spbill_create_ip: '47.107.43.166', // 发起访问ip
 				//异步接收微信支付结果通知的回调地址，通知url必须为外网可访问的url，不能携带参数。
 				notify_url: 'https://www.kdsou.com/kdchange/service_bak/notify.php',
 				trade_type: 'APP', // 默认 交易类型
 				// time: new Date().getTime(), // 时间戳
 				key: config.key, // 商户key
-				// openid: req.query.openid
 				reqUrl: 'https://api.mch.weixin.qq.com/pay/unifiedorder', // 下单接口url
 			};
 			// 签名算法
@@ -127,7 +127,6 @@ module.exports = {
 					url: reqUrl,
 					method: 'POST',
 					body: formData,
-					//还记得准备的证书吗这里就用到啦
 					agentOptions: {
 						cert: fs.readFileSync(path.join(__dirname, '../apiclient_cert.pem')),
 						key: fs.readFileSync(path.join(__dirname, '../apiclient_key.pem')),

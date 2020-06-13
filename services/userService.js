@@ -5,6 +5,7 @@ const AppConfig = require('../config/AppConfig');
 const user = require('../models/user');
 const userModel = user(sequelize);
 const ObjectUtil = require('../util/ObjectUtil');
+const responseUtil = require('../util/responseUtil');
 let filePath = AppConfig.userImgFilePath;
 let userImgUrl = AppConfig.userImgUrl;
 
@@ -18,7 +19,9 @@ module.exports = {
 					token: token,
 				},
 			});
-			res.send(resultMessage.success(data));
+			// eslint-disable-next-line
+			let result = responseUtil.renderFieldsObj(data, ['id', 'nickname', 'username', 'address', 'age', 'balance', 'integral', 'phone', 'sex', "photo", 'member']);
+			res.send(resultMessage.success(result));
 		} catch (error) {
 			console.log(error);
 			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
@@ -59,6 +62,25 @@ module.exports = {
 					token: token,
 				},
 			});
+			res.send(resultMessage.success('success'));
+		} catch (error) {
+			console.log(error);
+			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
+		}
+	},
+
+	// 成为会员
+	beMember: async (req, res) => {
+		try {
+			let { token, level } = req.body;
+			await userModel.update(
+				{ member: level },
+				{
+					where: {
+						token: token,
+					},
+				},
+			);
 			res.send(resultMessage.success('success'));
 		} catch (error) {
 			console.log(error);

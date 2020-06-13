@@ -17,4 +17,9 @@ router.post('/update', (req, res) => {
 	userService.update(req, res);
 });
 
+// 成为会员
+router.post('/beMember', (req, res) => {
+	userService.beMember(req, res);
+});
+
 module.exports = router;
