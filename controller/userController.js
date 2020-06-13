@@ -22,4 +22,9 @@ router.post('/beMember', (req, res) => {
 	userService.beMember(req, res);
 });
 
+// 余额充值
+router.post('/recharge', (req, res) => {
+	userService.recharge(req, res);
+});
+
 module.exports = router;

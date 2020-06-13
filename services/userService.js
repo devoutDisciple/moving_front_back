@@ -87,4 +87,24 @@ module.exports = {
 			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
 		}
 	},
+
+	// 余额充值
+	recharge: async (req, res) => {
+		try {
+			let { token, money, given } = req.body;
+			let blance = Number(money) + Number(given);
+			await userModel.update(
+				{ blance: blance },
+				{
+					where: {
+						token: token,
+					},
+				},
+			);
+			res.send(resultMessage.success('success'));
+		} catch (error) {
+			console.log(error);
+			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
+		}
+	},
 };
