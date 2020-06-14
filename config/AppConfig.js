@@ -38,7 +38,7 @@
 // 	box_big_num: [22, 23, 24, 25, 26, 27, 28, 29],
 // };
 
-let flag = false; // true - 线上环境 false-线下环境
+const Env = require('./Env');
 
 const online = {
 	// 线上环境
@@ -92,4 +92,4 @@ const common = {
 	box_big_num: [22, 23, 24, 25, 26, 27, 28, 29],
 };
 
-module.exports = Object.assign(common, flag ? online : offline);
+module.exports = Object.assign(common, Env.env ? online : offline);

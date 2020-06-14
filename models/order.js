@@ -75,6 +75,11 @@ module.exports = function (sequelize) {
 				type: Sequelize.DATE,
 				allowNull: true,
 			},
+			is_sure: {
+				type: Sequelize.INTEGER(11),
+				allowNull: true,
+				defaultValue: '1',
+			},
 			is_delete: {
 				type: Sequelize.INTEGER(11),
 				allowNull: true,

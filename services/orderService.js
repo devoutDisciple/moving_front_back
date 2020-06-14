@@ -42,6 +42,7 @@ module.exports = {
 				boxid: body.boxid,
 				cellid: body.cellid,
 				create_time: moment().format('YYYY-MM-DD HH:mm:ss'),
+				is_sure: 1,
 			};
 			await orderModel.create(params);
 			res.send(resultMessage.success('success'));
@@ -104,7 +105,7 @@ module.exports = {
 				limit: Number(pagesize),
 				offset: Number(offset),
 			});
-			let result = responseUtil.renderFieldsAll(orders, ['id', 'shopid', 'goods', 'money', 'desc', 'status', 'create_time']);
+			let result = responseUtil.renderFieldsAll(orders, ['id', 'shopid', 'goods', 'money', 'desc', 'status', 'is_sure', 'create_time']);
 			result.forEach((item, index) => {
 				item.create_time = moment(item.create_time).format('YYYY-MM-DD HH:mm:ss');
 				item.shopName = orders[index]['shopDetail'] ? orders[index]['shopDetail']['name'] || '' : '';
@@ -138,7 +139,7 @@ module.exports = {
 				],
 			});
 			// eslint-disable-next-line
-			let result = responseUtil.renderFieldsObj(order, ['id','code','shopid','goods','money','pre_pay','send_money','desc','status','cabinetId','cellid','create_time']);
+			let result = responseUtil.renderFieldsObj(order, ['id','code','shopid','goods','money','pre_pay','send_money','desc','status','cabinetId','cellid',"is_sure",'create_time']);
 			result.create_time = moment(result.create_time).format('YYYY-MM-DD HH:mm:ss');
 			result.shopName = order.shopDetail ? order.shopDetail.name : '';
 			result.shopAddress = order.shopDetail ? order.shopDetail.address : '';
@@ -147,6 +148,18 @@ module.exports = {
 			result.cabinetAddress = order.cabinetDetail ? order.cabinetDetail.address : '';
 			result.cabinetUrl = order.cabinetDetail ? order.cabinetDetail.url : '';
 			res.send(resultMessage.success(result));
+		} catch (error) {
+			console.log(error);
+			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
+		}
+	},
+
+	// 更改订单状态 updateOrderStatus
+	updateOrderStatus: async (req, res) => {
+		try {
+			let { orderid, status } = req.body;
+			await orderModel.update({ status: status }, { where: { id: orderid } });
+			res.send(resultMessage.success('success'));
 		} catch (error) {
 			console.log(error);
 			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));

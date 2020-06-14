@@ -1,11 +1,8 @@
-module.exports = {
-	// 本地环境
-	host: '127.0.0.1',
-	password: 'admin',
+const Env = require('./Env');
 
-	// 正式环境
-	// host: '47.107.43.166',
-	// password: 'Zz94102500..',
+module.exports = {
+	host: Env.env ? '47.107.43.166' : '127.0.0.1',
+	password: Env.env ? 'Zz94102500..' : 'admin',
 
 	username: 'root',
 	database: 'laundry',

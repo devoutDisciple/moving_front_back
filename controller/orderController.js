@@ -22,4 +22,9 @@ router.post('/openCellById', (req, res) => {
 	orderService.openCellById(req, res);
 });
 
+// 更改订单状态
+router.post('/updateOrderStatus', (req, res) => {
+	orderService.updateOrderStatus(req, res);
+});
+
 module.exports = router;
