@@ -12,8 +12,8 @@ let signature = function (STIME) {
 };
 
 module.exports = {
-	// 打印订单
-	printOrder: async (sn, goods, money, code, username, phone, address, cellid, desc) => {
+	// 通过柜子下单，打印小票
+	printOrderByCabinet: async (sn, goods, money, code, username, phone, address, cellid, desc) => {
 		return new Promise(async (resolve, reject) => {
 			try {
 				// 打印机编号
@@ -44,11 +44,6 @@ module.exports = {
 						orderInfo += `${item.name} * ${item.num}   ${item.price}元<BR>`;
 					});
 				}
-
-				// orderList.map(item => {
-				// 	orderInfo += `${String(item.goodsName).padEnd(18)}${String(item.num).padEnd(6)}${(Number(item.price) * Number(item.num)).toFixed(2)}<BR>`;
-				// 	item.specification ? orderInfo += `规格:  ${item.specification}<BR>` : null;
-				// });
 				orderInfo += '<BR>';
 				orderInfo += '--------------------------------<BR>';
 				orderInfo += '<BR>';

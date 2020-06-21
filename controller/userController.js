@@ -7,6 +7,11 @@ router.get('/getUserByToken', (req, res) => {
 	userService.getUserByToken(req, res);
 });
 
+// 根据token获取当前用户信息
+router.get('/getUserByUserid', (req, res) => {
+	userService.getUserByUserid(req, res);
+});
+
 // 修改用户头像
 router.post('/addPhoto', (req, res) => {
 	userService.addPhoto(req, res);

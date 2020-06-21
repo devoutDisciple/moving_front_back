@@ -20,7 +20,25 @@ module.exports = {
 				},
 			});
 			// eslint-disable-next-line
-			let result = responseUtil.renderFieldsObj(data, ['id', 'nickname', 'username', 'address', 'age', 'balance', 'integral', 'phone', 'sex', "photo", 'member']);
+			let result = responseUtil.renderFieldsObj(data, ['id', 'nickname', 'username', 'address', 'age', 'balance', "email", 'integral', 'phone', 'sex', "photo", 'member']);
+			res.send(resultMessage.success(result));
+		} catch (error) {
+			console.log(error);
+			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
+		}
+	},
+
+	// 根据用户id获取当前用户信息
+	getUserByUserid: async (req, res) => {
+		try {
+			let userid = req.query.userid;
+			let data = await userModel.findOne({
+				where: {
+					id: userid,
+				},
+			});
+			// eslint-disable-next-line
+			let result = responseUtil.renderFieldsObj(data, ['id', 'nickname', 'username', 'address', 'age', 'balance', "email", 'integral', 'phone', 'sex', "photo", 'member']);
 			res.send(resultMessage.success(result));
 		} catch (error) {
 			console.log(error);
@@ -54,12 +72,12 @@ module.exports = {
 	// 用户信息修改
 	update: async (req, res) => {
 		try {
-			let { key, value, token } = req.body,
+			let { key, value, userid } = req.body,
 				params = {};
 			params[key] = value;
 			await userModel.update(params, {
 				where: {
-					token: token,
+					id: userid,
 				},
 			});
 			res.send(resultMessage.success('success'));

@@ -24,7 +24,26 @@ module.exports = {
 		}
 	},
 
-	// 根据用户id查询地址
+	// 根据商店id查询数据  getAllByShopid
+	getAllByShopid: async (req, res) => {
+		try {
+			let { shopid } = req.query;
+			let areas = await addressModel.findAll({
+				where: {
+					shopid: shopid,
+					is_delete: 1,
+				},
+				order: [['create_time', 'DESC']],
+			});
+			let result = responseUtil.renderFieldsAll(areas, ['id', 'userid', 'username', 'phone', 'sex', 'area', 'street', 'is_defalut']);
+			res.send(resultMessage.success(result));
+		} catch (error) {
+			console.log(error);
+			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
+		}
+	},
+
+	// 根据地址id查询地址
 	getAddressById: async (req, res) => {
 		try {
 			let areas = await addressModel.findOne({
@@ -65,6 +84,19 @@ module.exports = {
 					where: { id },
 				},
 			);
+			res.send(resultMessage.success('success'));
+		} catch (error) {
+			console.log(error);
+			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
+		}
+	},
+
+	// 修改默认地址
+	changeDefalut: async (req, res) => {
+		try {
+			let { preId, currentId } = req.body;
+			preId && (await addressModel.update({ is_defalut: 1 }, { where: { id: preId } }));
+			await addressModel.update({ is_defalut: 2 }, { where: { id: currentId } });
 			res.send(resultMessage.success('success'));
 		} catch (error) {
 			console.log(error);

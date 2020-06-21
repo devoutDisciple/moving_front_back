@@ -12,6 +12,11 @@ router.get('/getAddressById', (req, res) => {
 	addressService.getAddressById(req, res);
 });
 
+// 改变默认地址 changeDefalut
+router.post('/changeDefalut', (req, res) => {
+	addressService.changeDefalut(req, res);
+});
+
 // 新增地址 address
 router.post('/add', (req, res) => {
 	addressService.add(req, res);

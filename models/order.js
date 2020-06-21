@@ -21,7 +21,7 @@ module.exports = function (sequelize) {
 			},
 			userid: {
 				type: Sequelize.INTEGER(11),
-				allowNull: false,
+				allowNull: true,
 			},
 			goods: {
 				type: Sequelize.STRING(8000),
@@ -29,7 +29,7 @@ module.exports = function (sequelize) {
 			},
 			money: {
 				type: Sequelize.STRING(255),
-				allowNull: false,
+				allowNull: true,
 				defaultValue: '0',
 			},
 			pre_pay: {
@@ -52,20 +52,20 @@ module.exports = function (sequelize) {
 			},
 			status: {
 				type: Sequelize.INTEGER(11),
-				allowNull: false,
+				allowNull: true,
 				defaultValue: '1',
 			},
 			cabinetId: {
 				type: Sequelize.INTEGER(11),
-				allowNull: false,
+				allowNull: true,
 			},
 			boxid: {
 				type: Sequelize.STRING(255),
-				allowNull: false,
+				allowNull: true,
 			},
 			cellid: {
 				type: Sequelize.STRING(255),
-				allowNull: false,
+				allowNull: true,
 			},
 			create_time: {
 				type: Sequelize.DATE,
@@ -76,6 +76,36 @@ module.exports = function (sequelize) {
 				allowNull: true,
 			},
 			is_sure: {
+				type: Sequelize.INTEGER(11),
+				allowNull: true,
+				defaultValue: '1',
+			},
+			order_type: {
+				type: Sequelize.INTEGER(11),
+				allowNull: false,
+				defaultValue: '1',
+			},
+			home_address: {
+				type: Sequelize.STRING(255),
+				allowNull: true,
+			},
+			home_username: {
+				type: Sequelize.STRING(255),
+				allowNull: true,
+			},
+			home_phone: {
+				type: Sequelize.STRING(255),
+				allowNull: true,
+			},
+			home_time: {
+				type: Sequelize.DATE,
+				allowNull: true,
+			},
+			intergral_num: {
+				type: Sequelize.STRING(255),
+				allowNull: true,
+			},
+			send_status: {
 				type: Sequelize.INTEGER(11),
 				allowNull: true,
 				defaultValue: '1',

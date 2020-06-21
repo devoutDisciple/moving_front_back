@@ -18,7 +18,7 @@ module.exports = {
 			let params = {
 				appid: config.appid, //微信开放平台审核通过的应用APPID
 				mch_id: config.mch_id, //微信支付分配的商户号
-				body: desc || 'moving洗衣', // 商品描述
+				body: desc || 'MOVING洗衣', // 商品描述
 				nonce_str: PayUtil.getNonceStr(), //随机字符串
 				out_trade_no: orderid, // 用户订单号
 				total_fee: Number(total_fee) * 100, //商品价格 单位分

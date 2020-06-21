@@ -25,8 +25,8 @@ const cabinetUtil = require('../util/cabinetUtil');
 const PrintUtil = require('../util/PrintUtil');
 
 module.exports = {
-	// 新增订单
-	add: async (req, res) => {
+	// 通过洗衣柜下单
+	addByCabinet: async (req, res) => {
 		try {
 			let body = req.body,
 				code = ObjectUtil.createOrderCode();
@@ -43,6 +43,7 @@ module.exports = {
 				cellid: body.cellid,
 				create_time: moment().format('YYYY-MM-DD HH:mm:ss'),
 				is_sure: 1,
+				order_type: body.order_type,
 			};
 			await orderModel.create(params);
 			res.send(resultMessage.success('success'));
@@ -51,9 +52,43 @@ module.exports = {
 			let user = await userModel.findOne({ where: { id: body.userid } });
 			let cabinet = await cabinetModel.findOne({ where: { id: body.cabinetId } });
 			if (shop.sn) {
-				PrintUtil.printOrder(shop.sn, body.goods, body.money, code, user.username, user.phone, cabinet.address, body.cellid, body.desc);
+				PrintUtil.printOrderByCabinet(shop.sn, body.goods, body.money, code, user.username, user.phone, cabinet.address, body.cellid, body.desc);
 			}
 
+			// 发送信息给用户
+			// let user = await userModel.findOne({ where: { id: body.userid } });
+			// await PostMessage.sendOrderStartToUser(user.phone);
+		} catch (error) {
+			console.log(error);
+			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
+		}
+	},
+
+	// 预约上门取衣
+	addByHome: async (req, res) => {
+		try {
+			let body = req.body,
+				code = ObjectUtil.createOrderCode();
+			let params = {
+				shopid: body.shopid,
+				code: code,
+				userid: body.userid,
+				goods: '[]',
+				home_username: body.home_username,
+				home_phone: body.home_phone,
+				home_address: body.home_address,
+				desc: body.desc,
+				home_time: body.home_time,
+				create_time: moment().format('YYYY-MM-DD HH:mm:ss'),
+				is_sure: 1,
+				status: 6, // 预约上门等待店员取货
+				order_type: 2, // 山门取衣
+			};
+			console.log(params, 99);
+			await orderModel.create(params);
+			setTimeout(() => {
+				res.send(resultMessage.success('success'));
+			}, 3000);
 			// 发送信息给用户
 			// let user = await userModel.findOne({ where: { id: body.userid } });
 			// await PostMessage.sendOrderStartToUser(user.phone);
@@ -70,7 +105,7 @@ module.exports = {
 			let status = [1];
 			switch (type) {
 				case 'all':
-					status = [1, 2, 3, 4, 5];
+					status = [1, 2, 3, 4, 5, 6];
 					break;
 				case 'cleaning':
 					status = [2];
@@ -105,13 +140,25 @@ module.exports = {
 				limit: Number(pagesize),
 				offset: Number(offset),
 			});
-			let result = responseUtil.renderFieldsAll(orders, ['id', 'shopid', 'goods', 'money', 'desc', 'status', 'is_sure', 'create_time']);
+			let result = responseUtil.renderFieldsAll(orders, ['id', 'shopid', 'goods', 'money', 'desc', 'status', 'is_sure', 'create_time', 'order_type']);
 			result.forEach((item, index) => {
 				item.create_time = moment(item.create_time).format('YYYY-MM-DD HH:mm:ss');
 				item.shopName = orders[index]['shopDetail'] ? orders[index]['shopDetail']['name'] || '' : '';
 				item.cabinetUrl = orders[index]['cabinetDetail'] ? orders[index]['cabinetDetail']['url'] || '' : '';
 				item.cabinetName = orders[index]['cabinetDetail'] ? orders[index]['cabinetDetail']['name'] || '' : '';
 				item.cabinetAdderss = orders[index]['cabinetDetail'] ? orders[index]['cabinetDetail']['address'] || '' : '';
+				item.send_stattus = orders[index] ? orders[index]['send_stattus'] || '' : '';
+				//上门取衣
+				if (item.order_type === 2) {
+					item.home_address = orders[index] ? orders[index]['home_address'] || '' : '';
+					item.home_username = orders[index] ? orders[index]['home_username'] || '' : '';
+					item.home_phone = orders[index] ? orders[index]['home_phone'] || '' : '';
+					item.home_time = orders[index] ? moment(orders[index]['home_time']).format('YYYY-MM-DD HH:mm:ss') || '' : '';
+				}
+				// 积分兑换
+				if (item.order_type === 3) {
+					item.home_address = orders[index] ? orders[index]['intergral_num'] || '' : '';
+				}
 			});
 			res.send(resultMessage.success(result));
 		} catch (error) {
