@@ -33,6 +33,7 @@ module.exports = {
 			};
 			// 签名算法
 			let sign = PayUtil.createSign(params);
+			console.log(sign, '-----第一次签名');
 			let formData = `<xml>
 							<appid>${params.appid}</appid>
 							<body>${params.body}</body>
@@ -54,24 +55,32 @@ module.exports = {
 				},
 				function (error, response, body) {
 					if (error) {
+						console.log(error);
 						return res.send(resultMessage.success('支付失败'));
 					} else if (!error && response.statusCode == 200) {
 						xml2js.parseString(body, function (err, result) {
 							if (err) {
+								console.log(err);
 								return res.send(resultMessage.success('支付失败'));
 							}
 							let reData = result.xml;
 							if (!reData.prepay_id) {
 								return res.send(resultMessage.success(reData.err_code_des ? reData.err_code_des[0] : '支付失败'));
 							}
+							console.log(reData, '----统一下单接口返回的数据');
 							let responseData = {
+								appid: config.appid,
 								mch_id: reData.mch_id[0] || '',
 								nonce_str: reData.nonce_str[0] || '',
-								sign: reData.sign[0] || '',
 								prepay_id: reData.prepay_id[0] || '',
-								timeStamp: String(new Date().getTime()),
+								timeStamp: String(parseInt(new Date().getTime() / 1000)),
 								nonceStr: reData.nonce_str[0] || '',
+								package: 'Sign=WXPay',
+								key: config.key, // 商户key
 							};
+							let newSign = PayUtil.createSecondSign(responseData);
+							responseData.newSign = newSign;
+							console.log(responseData, '将要返回的参数');
 							return res.send(resultMessage.success(responseData));
 						});
 					} else {

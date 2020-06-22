@@ -101,6 +101,18 @@ module.exports = function (sequelize) {
 				type: Sequelize.DATE,
 				allowNull: true,
 			},
+			intergral_address: {
+				type: Sequelize.STRING(255),
+				allowNull: true,
+			},
+			intergral_username: {
+				type: Sequelize.STRING(255),
+				allowNull: true,
+			},
+			intergral_phone: {
+				type: Sequelize.STRING(255),
+				allowNull: true,
+			},
 			intergral_num: {
 				type: Sequelize.STRING(255),
 				allowNull: true,

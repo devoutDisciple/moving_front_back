@@ -98,6 +98,48 @@ module.exports = {
 		}
 	},
 
+	// 积分兑换
+	addByIntergral: async (req, res) => {
+		try {
+			let body = req.body,
+				code = ObjectUtil.createOrderCode();
+			let params = {
+				shopid: body.shopid,
+				code: code,
+				userid: body.userid,
+				goods: body.goods,
+				intergral_address: body.intergral_address,
+				intergral_phone: body.intergral_phone,
+				intergral_username: body.intergral_username,
+				intergral_num: body.intergral_num,
+				is_sure: 1,
+				status: 7, // 预约上门等待店员取货
+				order_type: 3, // 积分兑换
+				create_time: moment().format('YYYY-MM-DD HH:mm:ss'),
+			};
+			let user = await userModel.findOne({ where: { id: body.userid } });
+			if (!user) return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
+			if (Number(user.integral) < Number(body.intergral_num)) return res.send(resultMessage.error('兑换失败,您的积分不足'));
+			await orderModel.create(params);
+			let currentIntergral = Number(user.integral) - Number(body.intergral_num);
+			await userModel.update(
+				{ integral: currentIntergral },
+				{
+					where: { id: body.userid },
+				},
+			);
+			setTimeout(() => {
+				res.send(resultMessage.success('success'));
+			}, 3000);
+			// 发送信息给用户
+			// let user = await userModel.findOne({ where: { id: body.userid } });
+			// await PostMessage.sendOrderStartToUser(user.phone);
+		} catch (error) {
+			console.log(error);
+			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
+		}
+	},
+
 	// 分页获取订单
 	getOrderByPage: async (req, res) => {
 		try {
@@ -105,7 +147,7 @@ module.exports = {
 			let status = [1];
 			switch (type) {
 				case 'all':
-					status = [1, 2, 3, 4, 5, 6];
+					status = [1, 2, 3, 4, 5, 6, 7];
 					break;
 				case 'cleaning':
 					status = [2];
@@ -157,7 +199,10 @@ module.exports = {
 				}
 				// 积分兑换
 				if (item.order_type === 3) {
-					item.home_address = orders[index] ? orders[index]['intergral_num'] || '' : '';
+					item.intergral_address = orders[index] ? orders[index]['intergral_address'] || '' : '';
+					item.intergral_phone = orders[index] ? orders[index]['intergral_phone'] || '' : '';
+					item.intergral_username = orders[index] ? orders[index]['intergral_username'] || '' : '';
+					item.intergral_num = orders[index] ? orders[index]['intergral_num'] || '' : '';
 				}
 			});
 			res.send(resultMessage.success(result));

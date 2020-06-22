@@ -12,6 +12,11 @@ router.post('/addByHome', (req, res) => {
 	orderService.addByHome(req, res);
 });
 
+// 增加积分订单 addByIntergral
+router.post('/addByIntergral', (req, res) => {
+	orderService.addByIntergral(req, res);
+});
+
 // 根据分页查询订单
 router.get('/getOrderByPage', (req, res) => {
 	orderService.getOrderByPage(req, res);

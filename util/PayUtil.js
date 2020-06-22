@@ -50,6 +50,25 @@ module.exports = {
 		stringSignTemp = md5(stringSignTemp).toUpperCase();
 		return stringSignTemp;
 	},
+	// 生成签名
+	createSecondSign: function (obj) {
+		let stringA =
+			'appid=' +
+			obj.appid +
+			'&noncestr=' +
+			obj.nonceStr +
+			'&package=' +
+			obj.package +
+			'&partnerid=' +
+			obj.mch_id +
+			'&prepayid=' +
+			obj.prepay_id +
+			'&timestamp=' +
+			obj.timeStamp;
+		let stringSignTemp = stringA + '&key=' + obj.key;
+		stringSignTemp = md5(stringSignTemp).toUpperCase();
+		return stringSignTemp;
+	},
 	// 生成订单id
 	createOrderid: function () {
 		let timeStamp = new Date().getTime();
