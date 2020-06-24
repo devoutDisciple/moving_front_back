@@ -109,13 +109,15 @@ module.exports = {
 	// 余额充值
 	recharge: async (req, res) => {
 		try {
-			let { token, money, given } = req.body;
-			let blance = Number(money) + Number(given);
+			let { userid, money, given } = req.body;
+			let user = await userModel.findOne({ where: { id: userid } });
+			let currentMoney = user.blance;
+			let blance = Number(currentMoney) + Number(money) + Number(given);
 			await userModel.update(
 				{ blance: blance },
 				{
 					where: {
-						token: token,
+						id: userid,
 					},
 				},
 			);

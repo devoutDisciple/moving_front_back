@@ -2,9 +2,9 @@ const express = require('express');
 const router = express.Router();
 const payService = require('../services/payService');
 
-// 支付订单
-router.post('/payOrder', (req, res) => {
-	payService.payOrder(req, res);
+// 使用微信支付订单
+router.post('/payOrderByWechat', (req, res) => {
+	payService.payOrderByWechat(req, res);
 });
 
 // 通过支付宝支付订单

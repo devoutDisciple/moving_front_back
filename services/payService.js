@@ -13,7 +13,7 @@ const path = require('path');
 
 module.exports = {
 	// 获取同一家商店的所有食物
-	payOrder: async (req, res) => {
+	payOrderByWechat: async (req, res) => {
 		try {
 			let { total_fee, desc } = req.body;
 			let orderid = PayUtil.createOrderid();
@@ -69,7 +69,6 @@ module.exports = {
 							if (!reData.prepay_id) {
 								return res.send(resultMessage.success(reData.err_code_des ? reData.err_code_des[0] : '支付失败'));
 							}
-							console.log(reData, '----统一下单接口返回的数据');
 							let responseData = {
 								appid: config.appid,
 								mch_id: reData.mch_id[0] || '',
@@ -82,7 +81,6 @@ module.exports = {
 							};
 							let newSign = PayUtil.createSecondSign(responseData);
 							responseData.newSign = newSign;
-							console.log(responseData, '将要返回的参数');
 							return res.send(resultMessage.success(responseData));
 						});
 					} else {
@@ -99,8 +97,8 @@ module.exports = {
 	// 使用支付宝付款
 	payByOrderAlipay: async (req, res) => {
 		try {
-			let { desc, money } = req.body;
-			console.log(desc, money, 99999);
+			let { desc, money, type } = req.body;
+			console.log(desc, money, type, 99999);
 			const alipaySdk = new AlipaySdk({
 				appId: config.alipayAppId, // 开放平台发的appid
 				// 使用支付宝开发助手生成的csr文件
@@ -115,13 +113,13 @@ module.exports = {
 			});
 			const formData = new AlipayFormData();
 			formData.setMethod('get');
-			formData.addField('notifyUrl', 'http://www.com/notify');
+			formData.addField('notifyUrl', 'http://47.107.43.166:3001/pay/getAlipayResult');
 			formData.addField('bizContent', {
 				outTradeNo: PayUtil.getNonceStr(),
 				productCode: config.alipayProductCode,
-				totalAmount: money,
+				totalAmount: Number(money) + '.00',
 				subject: desc, // 商品信息
-				body: 'moving洗衣店',
+				body: type,
 			});
 			const result = await alipaySdk.exec(config.alipayMethod, {}, { formData: formData });
 			let resData = result.split('https://openapi.alipay.com/gateway.do?')[1];
@@ -136,7 +134,6 @@ module.exports = {
 	getAlipayResult: async (req, res) => {
 		try {
 			console.log(req.body, 111);
-			console.log(123);
 		} catch (error) {
 			console.log(error);
 			return res.send(resultMessage.success('支付失败'));
