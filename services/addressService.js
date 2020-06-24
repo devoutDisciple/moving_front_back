@@ -9,6 +9,7 @@ module.exports = {
 	// 根绝用户id获取所有地址
 	getAllByUserid: async (req, res) => {
 		try {
+			console.log(req, 9999);
 			let areas = await addressModel.findAll({
 				where: {
 					userid: req.query.userid,

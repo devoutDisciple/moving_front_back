@@ -7,6 +7,8 @@ const sequelize = require('../dataSource/MysqlPoolClass');
 const order = require('../models/order');
 const orderModel = order(sequelize);
 const fs = require('fs');
+const AlipaySdk = require('alipay-sdk').default;
+const AlipayFormData = require('alipay-sdk/lib/form').default;
 const path = require('path');
 
 module.exports = {
@@ -88,6 +90,53 @@ module.exports = {
 					}
 				},
 			);
+		} catch (error) {
+			console.log(error);
+			return res.send(resultMessage.success('支付失败'));
+		}
+	},
+
+	// 使用支付宝付款
+	payByOrderAlipay: async (req, res) => {
+		try {
+			let { desc, money } = req.body;
+			console.log(desc, money, 99999);
+			const alipaySdk = new AlipaySdk({
+				appId: config.alipayAppId, // 开放平台发的appid
+				// 使用支付宝开发助手生成的csr文件
+				privateKey: fs.readFileSync(path.join(__dirname, '../sshKey/movingcleaner.top_私钥.txt'), 'ascii'),
+				// 以下三个是配置秘钥之后下载的秘钥
+				alipayRootCertContent: fs.readFileSync(path.join(__dirname, '../sshKey/alipayRootCert.crt'), 'ascii'),
+				appCertContent: fs.readFileSync(path.join(__dirname, '../sshKey/appCertPublicKey_2021001169609094.crt'), 'ascii'),
+				alipayPublicCertContent: fs.readFileSync(path.join(__dirname, '../sshKey/alipayCertPublicKey_RSA2.crt'), 'ascii'),
+				charset: 'utf-8', // 字符集编码
+				version: '1.0', // 版本，默认 1.0
+				signType: 'RSA2', // 秘钥的解码版本
+			});
+			const formData = new AlipayFormData();
+			formData.setMethod('get');
+			formData.addField('notifyUrl', 'http://www.com/notify');
+			formData.addField('bizContent', {
+				outTradeNo: PayUtil.getNonceStr(),
+				productCode: config.alipayProductCode,
+				totalAmount: money,
+				subject: desc, // 商品信息
+				body: 'moving洗衣店',
+			});
+			const result = await alipaySdk.exec(config.alipayMethod, {}, { formData: formData });
+			let resData = result.split('https://openapi.alipay.com/gateway.do?')[1];
+			res.send(resultMessage.success(resData));
+		} catch (error) {
+			console.log(error);
+			return res.send(resultMessage.success('支付失败'));
+		}
+	},
+
+	// 获取异步通知结果
+	getAlipayResult: async (req, res) => {
+		try {
+			console.log(req.body, 111);
+			console.log(123);
 		} catch (error) {
 			console.log(error);
 			return res.send(resultMessage.success('支付失败'));
