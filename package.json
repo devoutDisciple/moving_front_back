@@ -5,6 +5,7 @@
   "main": "app.js",
   "dependencies": {
     "@alicloud/pop-core": "^1.7.9",
+    "alipay-sdk": "^3.1.1",
     "body-parser": "^1.18.3",
     "cookie-parser": "^1.4.3",
     "crypto": "^1.0.1",

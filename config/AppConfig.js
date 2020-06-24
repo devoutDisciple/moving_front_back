@@ -90,6 +90,11 @@ const common = {
 	box_total_num: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29],
 	box_samll_num: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21],
 	box_big_num: [22, 23, 24, 25, 26, 27, 28, 29],
+
+	// 支付宝支付相关信息
+	alipayAppId: '2021001169609094',
+	alipayProductCode: 'QUICK_MSECURITY_PAY',
+	alipayMethod: 'alipay.trade.app.pay',
 };
 
 module.exports = Object.assign(common, Env.env ? online : offline);
