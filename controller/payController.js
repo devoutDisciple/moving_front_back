@@ -12,6 +12,11 @@ router.post('/payByOrderAlipay', (req, res) => {
 	payService.payByOrderAlipay(req, res);
 });
 
+// 通过余额支付 payByOrderByBalance
+router.post('/payByOrderByBalance', (req, res) => {
+	payService.payByOrderByBalance(req, res);
+});
+
 // 获取支付宝异步通知结果 getAlipayResult
 router.post('/getAlipayResult', (req, res) => {
 	payService.getAlipayResult(req, res);

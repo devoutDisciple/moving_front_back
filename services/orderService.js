@@ -21,7 +21,7 @@ const responseUtil = require('../util/responseUtil');
 const ObjectUtil = require('../util/ObjectUtil');
 const cabinetUtil = require('../util/cabinetUtil');
 
-// const PostMessage = require('../util/PostMessage');
+const PostMessage = require('../util/PostMessage');
 const PrintUtil = require('../util/PrintUtil');
 
 module.exports = {
@@ -54,10 +54,8 @@ module.exports = {
 			if (shop.sn) {
 				PrintUtil.printOrderByCabinet(shop.sn, body.goods, body.money, code, user.username, user.phone, cabinet.address, body.cellid, body.desc);
 			}
-
 			// 发送信息给用户
-			// let user = await userModel.findOne({ where: { id: body.userid } });
-			// await PostMessage.sendOrderStartToUser(user.phone);
+			await PostMessage.sendOrderStartToUser(user.phone);
 		} catch (error) {
 			console.log(error);
 			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
@@ -205,7 +203,9 @@ module.exports = {
 					item.intergral_num = orders[index] ? orders[index]['intergral_num'] || '' : '';
 				}
 			});
-			res.send(resultMessage.success(result));
+			setTimeout(() => {
+				res.send(resultMessage.success(result));
+			}, 3000);
 		} catch (error) {
 			console.log(error);
 			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
@@ -231,7 +231,7 @@ module.exports = {
 				],
 			});
 			// eslint-disable-next-line
-			let result = responseUtil.renderFieldsObj(order, ['id','code','shopid','goods','money','pre_pay','send_money','desc','status','cabinetId','cellid',"is_sure",'create_time']);
+			let result = responseUtil.renderFieldsObj(order, ['id','code','shopid','goods','money','pre_pay','send_money','desc','status', "order_type",'cabinetId','cellid',"is_sure",'create_time']);
 			result.create_time = moment(result.create_time).format('YYYY-MM-DD HH:mm:ss');
 			result.shopName = order.shopDetail ? order.shopDetail.name : '';
 			result.shopAddress = order.shopDetail ? order.shopDetail.address : '';
@@ -239,7 +239,23 @@ module.exports = {
 			result.shopPhone = order.shopDetail ? order.shopDetail.phone : '';
 			result.cabinetAddress = order.cabinetDetail ? order.cabinetDetail.address : '';
 			result.cabinetUrl = order.cabinetDetail ? order.cabinetDetail.url : '';
-			res.send(resultMessage.success(result));
+			//上门取衣
+			if (result.order_type === 2) {
+				result.home_address = order ? order['home_address'] || '' : '';
+				result.home_username = order ? order['home_username'] || '' : '';
+				result.home_phone = order ? order['home_phone'] || '' : '';
+				result.home_time = order ? moment(order['home_time']).format('YYYY-MM-DD HH:mm:ss') || '' : '';
+			}
+			// 积分兑换
+			if (result.order_type === 3) {
+				result.intergral_address = order ? order['intergral_address'] || '' : '';
+				result.intergral_phone = order ? order['intergral_phone'] || '' : '';
+				result.intergral_username = order ? order['intergral_username'] || '' : '';
+				result.intergral_num = order ? order['intergral_num'] || '' : '';
+			}
+			setTimeout(() => {
+				res.send(resultMessage.success(result));
+			}, 3000);
 		} catch (error) {
 			console.log(error);
 			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
@@ -286,7 +302,9 @@ module.exports = {
 			);
 			// 更新订单状态
 			await orderModel.update({ status: 5 }, { where: { id: orderId } });
-			res.send(resultMessage.success('success'));
+			setTimeout(() => {
+				res.send(resultMessage.success('success'));
+			}, 3000);
 		} catch (error) {
 			console.log(error);
 			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));

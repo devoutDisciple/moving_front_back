@@ -6,6 +6,8 @@ const config = require('../config/AppConfig');
 const sequelize = require('../dataSource/MysqlPoolClass');
 const order = require('../models/order');
 const orderModel = order(sequelize);
+const user = require('../models/user');
+const userModel = user(sequelize);
 const fs = require('fs');
 const AlipaySdk = require('alipay-sdk').default;
 const AlipayFormData = require('alipay-sdk/lib/form').default;
@@ -98,7 +100,6 @@ module.exports = {
 	payByOrderAlipay: async (req, res) => {
 		try {
 			let { desc, money, type } = req.body;
-			console.log(desc, money, type, 99999);
 			const alipaySdk = new AlipaySdk({
 				appId: config.alipayAppId, // 开放平台发的appid
 				// 使用支付宝开发助手生成的csr文件
@@ -124,6 +125,35 @@ module.exports = {
 			const result = await alipaySdk.exec(config.alipayMethod, {}, { formData: formData });
 			let resData = result.split('https://openapi.alipay.com/gateway.do?')[1];
 			res.send(resultMessage.success(resData));
+		} catch (error) {
+			console.log(error);
+			return res.send(resultMessage.success('支付失败'));
+		}
+	},
+
+	// 使用余额支付
+	payByOrderByBalance: async (req, res) => {
+		try {
+			let { userid, orderid, money } = req.body;
+			let currentUser = await userModel.findOne({
+				where: {
+					id: userid,
+				},
+			});
+			let currentBalance = Number(currentUser.balance);
+			if (currentBalance < Number(money)) {
+				return res.send(resultMessage.error('可用余额不足'));
+			}
+			// 更新用户余额
+			await userModel.update(
+				{
+					balance: parseInt(Number(Number(currentUser.balance) - Number(money))),
+				},
+				{ where: { id: userid } },
+			);
+			// 更改订单状态
+			await orderModel.update({ status: 4 }, { where: { id: orderid } });
+			res.send(resultMessage.success('success'));
 		} catch (error) {
 			console.log(error);
 			return res.send(resultMessage.success('支付失败'));
