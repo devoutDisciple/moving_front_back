@@ -103,7 +103,10 @@ module.exports = {
 						form: { boxid: boxid, cellid: cellid },
 					},
 					function (error, response, body) {
-						let data = '{ "code": 200, "message": "No Box Information" }';
+						// {"code":400,"message":"BUSY","value":0,"data":null} 错误
+						// let data = '{ "code": 200, "message": "No Box Information" }'; // 测试环境
+						console.log(body, 1111);
+						let data = body; // 真实环境
 						if (error) return reject(data);
 						let result = JSON.parse(data);
 						if (result && result.code === 200) {
@@ -147,8 +150,11 @@ module.exports = {
 						headers: params,
 						form: { boxid: boxid, cellid: cellid },
 					},
-					function (error) {
-						let data = '{ "code": 200, "message": "No Box Information" }';
+					function (error, response, body) {
+						// {"code":400,"message":"BUSY","value":0,"data":null} 错误
+						// let data = '{ "code": 200, "message": "No Box Information" }'; // 测试环境
+						console.log(body, 888);
+						let data = body; // 真实环境
 						if (error) return reject(data);
 						let result = JSON.parse(data);
 						if (result && result.code === 200) {
