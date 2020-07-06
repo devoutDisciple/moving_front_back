@@ -10,7 +10,7 @@ module.exports = {
 		try {
 			let data = await versionModel.findOne({
 				where: {
-					current: 1,
+					type: 1,
 				},
 			});
 			let result = responseUtil.renderFieldsObj(data, ['id', 'version', 'desc', 'force']);

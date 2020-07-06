@@ -29,6 +29,11 @@ module.exports = function (sequelize) {
 				allowNull: false,
 				defaultValue: '1',
 			},
+			type: {
+				type: Sequelize.INTEGER(11),
+				allowNull: false,
+				defaultValue: '1',
+			},
 			create_time: {
 				type: Sequelize.DATE,
 				allowNull: true,

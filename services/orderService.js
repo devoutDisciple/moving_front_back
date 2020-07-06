@@ -56,6 +56,8 @@ module.exports = {
 			}
 			// 发送信息给用户
 			await PostMessage.sendOrderStartToUser(user.phone);
+			// 发送信息给商家
+			await PostMessage.sendOrderStartToShop(shop.phone, user.username, user.phone);
 		} catch (error) {
 			console.log(error);
 			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
@@ -82,14 +84,13 @@ module.exports = {
 				status: 6, // 预约上门等待店员取货
 				order_type: 2, // 山门取衣
 			};
-			console.log(params, 99);
 			await orderModel.create(params);
 			setTimeout(() => {
 				res.send(resultMessage.success('success'));
 			}, 3000);
 			// 发送信息给用户
-			// let user = await userModel.findOne({ where: { id: body.userid } });
-			// await PostMessage.sendOrderStartToUser(user.phone);
+			let user = await userModel.findOne({ where: { id: body.userid } });
+			await PostMessage.sendMessageGetClothingSuccessToUser(user.phone);
 		} catch (error) {
 			console.log(error);
 			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
@@ -126,12 +127,9 @@ module.exports = {
 					where: { id: body.userid },
 				},
 			);
-			setTimeout(() => {
-				res.send(resultMessage.success('success'));
-			}, 3000);
+			res.send(resultMessage.success('success'));
 			// 发送信息给用户
-			// let user = await userModel.findOne({ where: { id: body.userid } });
-			// await PostMessage.sendOrderStartToUser(user.phone);
+			await PostMessage.sendOrderStartToUser(user.phone);
 		} catch (error) {
 			console.log(error);
 			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
