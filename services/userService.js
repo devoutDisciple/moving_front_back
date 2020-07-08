@@ -49,7 +49,7 @@ module.exports = {
 	// 用户头像新增
 	addPhoto: async (req, res) => {
 		try {
-			let { img, token } = req.body;
+			let { img, userid } = req.body;
 			var base64Data = img.replace(/^data:image\/\w+;base64,/, '');
 			var dataBuffer = new Buffer(base64Data, 'base64');
 			let filename = 'user_' + ObjectUtil.getName() + '_' + Date.now() + '.jpg';
@@ -58,7 +58,7 @@ module.exports = {
 				{ photo: `${userImgUrl + filename}` },
 				{
 					where: {
-						token: token,
+						id: userid,
 					},
 				},
 			);

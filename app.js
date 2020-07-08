@@ -6,16 +6,8 @@ const cookieParser = require('cookie-parser');
 const sessionParser = require('express-session');
 const bodyParser = require('body-parser');
 const controller = require('./controller/index');
-const fs = require('fs');
-const https = require('https');
 const path = require('path');
-const privateKey = fs.readFileSync(path.join(__dirname, './sshKey/2361522_bws666.com.key'), 'utf8');
-const certificate = fs.readFileSync(path.join(__dirname, './sshKey/2361522_bws666.com.pem'), 'utf8');
-
-const credentials = {
-	key: privateKey,
-	cert: certificate,
-};
+const config = require('./config/Env');
 
 // 解析cookie和session还有body
 app.use(cookieParser()); // 挂载中间件，可以理解为实例化
@@ -28,7 +20,7 @@ app.use(
 		name: 'session_id', // 在浏览器中生成cookie的名称key，默认是connect.sid
 	}),
 );
-app.use(express.static(path.join(__dirname, './public')));
+app.use(express.static(config.env ? '/root/asserts' : path.join(__dirname, './public')));
 
 app.use(function (req, res, next) {
 	if (req.url === '/pay/getAlipayResult') {
@@ -56,13 +48,6 @@ app.all('*', (req, res, next) => {
 
 // 路由 controller层
 controller(app);
-
-const httpsServer = https.createServer(credentials, app);
-
-// 启动服务器，监听对应的端口
-// httpsServer.listen(443, () => {
-// 	console.log(chalk.yellow('moving洗衣店：server is listenning 443'));
-// });
 
 // 监听3001端口
 app.listen(3001, () => {
