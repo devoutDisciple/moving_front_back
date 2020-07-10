@@ -1,5 +1,6 @@
 const resultMessage = require('../util/resultMessage');
 const sequelize = require('../dataSource/MysqlPoolClass');
+
 const order = require('../models/order');
 const orderModel = order(sequelize);
 

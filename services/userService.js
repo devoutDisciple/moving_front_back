@@ -87,6 +87,28 @@ module.exports = {
 		}
 	},
 
+	// 更改用户积分
+	updateUserIntergral: async (req, res) => {
+		try {
+			let { userid, money } = req.body;
+			let user = await userModel.findOne({ where: { id: userid } });
+			let currentIntergral = user.integral;
+			let updateIntergral = Number(currentIntergral) + parseInt(Number(money));
+			await userModel.update(
+				{ integral: updateIntergral },
+				{
+					where: {
+						id: userid,
+					},
+				},
+			);
+			res.send(resultMessage.success('success'));
+		} catch (error) {
+			console.log(error);
+			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
+		}
+	},
+
 	// 成为会员
 	beMember: async (req, res) => {
 		try {
@@ -111,10 +133,14 @@ module.exports = {
 		try {
 			let { userid, money, given } = req.body;
 			let user = await userModel.findOne({ where: { id: userid } });
-			let currentMoney = user.blance;
-			let blance = Number(currentMoney) + Number(money) + Number(given);
+			// 增加余额
+			let currentMoney = user.balance;
+			let balance = Number(currentMoney) + Number(money) + Number(given);
+			// 增加积分
+			let currentIntegral = user.integral;
+			let integral = Number(currentIntegral) + Number(money) + Number(given);
 			await userModel.update(
-				{ blance: blance },
+				{ balance: balance, integral: integral, member: 2 },
 				{
 					where: {
 						id: userid,

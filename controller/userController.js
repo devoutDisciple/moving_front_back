@@ -22,6 +22,11 @@ router.post('/update', (req, res) => {
 	userService.update(req, res);
 });
 
+// 更改用户积分 updateUserIntergral
+router.post('/updateUserIntergral', (req, res) => {
+	userService.updateUserIntergral(req, res);
+});
+
 // 成为会员
 router.post('/beMember', (req, res) => {
 	userService.beMember(req, res);

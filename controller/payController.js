@@ -17,9 +17,4 @@ router.post('/payByOrderByBalance', (req, res) => {
 	payService.payByOrderByBalance(req, res);
 });
 
-// 获取支付宝异步通知结果 getAlipayResult
-router.post('/getAlipayResult', (req, res) => {
-	payService.getAlipayResult(req, res);
-});
-
 module.exports = router;

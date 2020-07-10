@@ -9,12 +9,13 @@ const orderModel = order(sequelize);
 const user = require('../models/user');
 const userModel = user(sequelize);
 const fs = require('fs');
+const urlencode = require('urlencode');
 const AlipaySdk = require('alipay-sdk').default;
 const AlipayFormData = require('alipay-sdk/lib/form').default;
 const path = require('path');
 
 module.exports = {
-	// 获取同一家商店的所有食物
+	// 使用微信付款
 	payOrderByWechat: async (req, res) => {
 		try {
 			let { total_fee, desc } = req.body;
@@ -99,7 +100,16 @@ module.exports = {
 	// 使用支付宝付款
 	payByOrderAlipay: async (req, res) => {
 		try {
-			let { desc, money, type } = req.body;
+			let { desc, money, type, userid, given, orderid } = req.body;
+			let passback_params = '';
+			//type分类： member-会员 recharge-余额充值 order-订单支付
+			if (type === 'member' || type === 'recharge') {
+				passback_params = `type=${type}&userid=${userid}&money=${money}&given=${given}`;
+			}
+			// 订单支付
+			if (type === 'order') {
+				passback_params = `type=${type}&userid=${userid}&money=${money}&orderid=${orderid}`;
+			}
 			const alipaySdk = new AlipaySdk({
 				appId: config.alipayAppId, // 开放平台发的appid
 				// 使用支付宝开发助手生成的csr文件
@@ -114,13 +124,15 @@ module.exports = {
 			});
 			const formData = new AlipayFormData();
 			formData.setMethod('get');
-			formData.addField('notifyUrl', 'http://47.107.43.166:3001/pay/getAlipayResult');
+			formData.addField('notifyUrl', 'http://47.107.43.166:3001/alipay/handleOrder');
+			let totalAmount = Number(money).toFixed(2);
 			formData.addField('bizContent', {
 				outTradeNo: PayUtil.getNonceStr(),
 				productCode: config.alipayProductCode,
-				totalAmount: Number(money) + '.00',
+				totalAmount: totalAmount,
 				subject: desc, // 商品信息
 				body: type,
+				passback_params: urlencode(passback_params, 'gbk'),
 			});
 			const result = await alipaySdk.exec(config.alipayMethod, {}, { formData: formData });
 			let resData = result.split('https://openapi.alipay.com/gateway.do?')[1];
@@ -154,16 +166,6 @@ module.exports = {
 			// 更改订单状态
 			await orderModel.update({ status: 4 }, { where: { id: orderid } });
 			res.send(resultMessage.success('success'));
-		} catch (error) {
-			console.log(error);
-			return res.send(resultMessage.success('支付失败'));
-		}
-	},
-
-	// 获取异步通知结果
-	getAlipayResult: async (req, res) => {
-		try {
-			console.log(req.body, 111);
 		} catch (error) {
 			console.log(error);
 			return res.send(resultMessage.success('支付失败'));
