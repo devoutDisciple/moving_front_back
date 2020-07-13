@@ -13,7 +13,8 @@ module.exports = function (sequelize) {
 			},
 			code: {
 				type: Sequelize.STRING(255),
-				allowNull: true,
+				allowNull: false,
+				primaryKey: true,
 			},
 			userid: {
 				type: Sequelize.STRING(255),
@@ -28,16 +29,16 @@ module.exports = function (sequelize) {
 				allowNull: false,
 				defaultValue: '0',
 			},
-			is_add: {
-				type: Sequelize.INTEGER(11),
+			send: {
+				type: Sequelize.STRING(255),
 				allowNull: true,
-				defaultValue: '1',
+				defaultValue: '0',
 			},
 			pay_type: {
-				type: Sequelize.INTEGER(11),
+				type: Sequelize.STRING(255),
 				allowNull: true,
 			},
-			method: {
+			type: {
 				type: Sequelize.STRING(255),
 				allowNull: true,
 			},

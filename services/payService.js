@@ -18,29 +18,40 @@ module.exports = {
 	// 使用微信付款
 	payOrderByWechat: async (req, res) => {
 		try {
-			let { total_fee, desc } = req.body;
-			let orderid = PayUtil.createOrderid();
+			let { desc, money, type, userid, given, orderid } = req.body;
+			let passback_params = '';
+			//type分类： member-会员 recharge-余额充值 order-订单支付
+			if (type === 'member' || type === 'recharge') {
+				passback_params = { type: type, userid: userid, money: money, given: given };
+			}
+			// 订单支付
+			if (type === 'order') {
+				passback_params = { type: type, userid: userid, money: money, orderid: orderid };
+			}
+			passback_params = JSON.stringify(passback_params);
+			let out_trade_no = PayUtil.createOrderid();
 			let params = {
 				appid: config.appid, //微信开放平台审核通过的应用APPID
 				mch_id: config.mch_id, //微信支付分配的商户号
 				body: desc || 'MOVING洗衣', // 商品描述
 				nonce_str: PayUtil.getNonceStr(), //随机字符串
-				out_trade_no: orderid, // 用户订单号
-				total_fee: Number(total_fee) * 100, //商品价格 单位分
+				out_trade_no: out_trade_no, // 用户订单号
+				total_fee: Number(money) * 100, //商品价格 单位分
 				// total_fee: 1, //商品价格 单位分
 				spbill_create_ip: '47.107.43.166', // 发起访问ip
 				//异步接收微信支付结果通知的回调地址，通知url必须为外网可访问的url，不能携带参数。
-				notify_url: 'https://www.kdsou.com/kdchange/service_bak/notify.php',
+				notify_url: 'http://47.107.43.166:3001/payResult/handleWechat',
 				trade_type: 'APP', // 默认 交易类型
 				// time: new Date().getTime(), // 时间戳
 				key: config.key, // 商户key
 				reqUrl: 'https://api.mch.weixin.qq.com/pay/unifiedorder', // 下单接口url
+				attach: passback_params,
 			};
 			// 签名算法
 			let sign = PayUtil.createSign(params);
-			console.log(sign, '-----第一次签名');
 			let formData = `<xml>
 							<appid>${params.appid}</appid>
+							<attach>${params.attach}</attach>
 							<body>${params.body}</body>
 							<mch_id>${params.mch_id}</mch_id>
 							<nonce_str>${params.nonce_str}</nonce_str>
@@ -61,16 +72,16 @@ module.exports = {
 				function (error, response, body) {
 					if (error) {
 						console.log(error);
-						return res.send(resultMessage.success('支付失败'));
+						return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
 					} else if (!error && response.statusCode == 200) {
 						xml2js.parseString(body, function (err, result) {
 							if (err) {
 								console.log(err);
-								return res.send(resultMessage.success('支付失败'));
+								return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
 							}
 							let reData = result.xml;
 							if (!reData.prepay_id) {
-								return res.send(resultMessage.success(reData.err_code_des ? reData.err_code_des[0] : '支付失败'));
+								return res.send(resultMessage.error(reData.err_code_des ? reData.err_code_des[0] : '支付失败'));
 							}
 							let responseData = {
 								appid: config.appid,
@@ -87,7 +98,7 @@ module.exports = {
 							return res.send(resultMessage.success(responseData));
 						});
 					} else {
-						return res.send(resultMessage.success('支付失败'));
+						return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
 					}
 				},
 			);
@@ -122,12 +133,13 @@ module.exports = {
 				version: '1.0', // 版本，默认 1.0
 				signType: 'RSA2', // 秘钥的解码版本
 			});
+			let out_trade_no = PayUtil.createOrderid();
 			const formData = new AlipayFormData();
 			formData.setMethod('get');
-			formData.addField('notifyUrl', 'http://47.107.43.166:3001/alipay/handleOrder');
+			formData.addField('notifyUrl', 'http://47.107.43.166:3001/payResult/handleAlipy');
 			let totalAmount = Number(money).toFixed(2);
 			formData.addField('bizContent', {
-				outTradeNo: PayUtil.getNonceStr(),
+				outTradeNo: out_trade_no,
 				productCode: config.alipayProductCode,
 				totalAmount: totalAmount,
 				subject: desc, // 商品信息

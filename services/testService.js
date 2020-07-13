@@ -47,4 +47,9 @@ module.exports = {
 			console.log(error);
 		}
 	},
+	test: async (req, res) => {
+		res.setHeader('Content-Type', 'text/html');
+		let returnData = '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
+		return res.send(returnData);
+	},
 };

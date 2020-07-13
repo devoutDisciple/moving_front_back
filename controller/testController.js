@@ -12,4 +12,8 @@ router.get('/alipay', (req, res) => {
 	testService.alipay(req, res);
 });
 
+router.post('/test', (req, res) => {
+	testService.test(req, res);
+});
+
 module.exports = router;

@@ -13,7 +13,7 @@ const optionsController = require('./optionsController');
 const clothingController = require('./clothingController');
 const orderController = require('./orderController');
 const versionController = require('./versionController');
-const alipayController = require('./alipayController');
+const payResultController = require('./payResultController');
 
 // 测试
 const testController = require('./testController');
@@ -49,8 +49,8 @@ const router = (app) => {
 	app.use('/intergral_record', intergralRecordController);
 	// 用户意见
 	app.use('/options', optionsController);
-	// 处理支付宝支付皆苦
-	app.use('/alipay', alipayController);
+	// 处理支付宝支付接口
+	app.use('/payResult', payResultController);
 
 	// 测试 testController
 	app.use('/test', testController);

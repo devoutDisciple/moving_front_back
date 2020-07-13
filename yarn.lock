@@ -523,6 +523,13 @@ express-session@^1.15.6:
     safe-buffer "5.2.0"
     uid-safe "~2.1.5"
 
+express-xml-bodyparser@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.npm.taobao.org/express-xml-bodyparser/download/express-xml-bodyparser-0.3.0.tgz#b1f5a98adf6c6e412c4ccba634234b82945c62be"
+  integrity sha1-sfWpit9sbkEsTMumNCNLgpRcYr4=
+  dependencies:
+    xml2js "^0.4.11"
+
 express@^4.16.3:
   version "4.17.1"
   resolved "https://registry.npm.taobao.org/express/download/express-4.17.1.tgz#4491fc38605cf51f8629d39c2b5d026f98a4c134"
@@ -1820,7 +1827,7 @@ wrappy@1:
   resolved "https://registry.npm.taobao.org/wrappy/download/wrappy-1.0.2.tgz#b5243d8f3ec1aa35f1364605bc0d1036e30ab69f"
   integrity sha1-tSQ9jz7BqjXxNkYFvA0QNuMKtp8=
 
-xml2js@^0.4.17, xml2js@^0.4.19:
+xml2js@^0.4.11, xml2js@^0.4.17, xml2js@^0.4.19:
   version "0.4.23"
   resolved "https://registry.npm.taobao.org/xml2js/download/xml2js-0.4.23.tgz?cache=0&sync_timestamp=1576776179444&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fxml2js%2Fdownload%2Fxml2js-0.4.23.tgz#a0c69516752421eb2ac758ee4d4ccf58843eac66"
   integrity sha1-oMaVFnUkIesqx1juTUzPWIQ+rGY=
