@@ -19,13 +19,19 @@ module.exports = {
 	payOrderByWechat: async (req, res) => {
 		try {
 			let { desc, money, type, userid, given, orderid } = req.body;
+			// shopid: shopid,
+			// home_time: home_time,
+			// home_address: home_address,
+			// home_username: home_username,
+			// home_phone: home_phone,
+			// home_desc: home_desc,
 			let passback_params = '';
 			//type分类： member-会员 recharge-余额充值 order-订单支付
 			if (type === 'member' || type === 'recharge') {
 				passback_params = { type: type, userid: userid, money: money, given: given };
 			}
-			// 订单支付
-			if (type === 'order') {
+			// 订单支付 或者 上门取衣费用
+			if (type === 'order' || type === 'clothing') {
 				passback_params = { type: type, userid: userid, money: money, orderid: orderid };
 			}
 			passback_params = JSON.stringify(passback_params);
@@ -118,7 +124,7 @@ module.exports = {
 				passback_params = `type=${type}&userid=${userid}&money=${money}&given=${given}`;
 			}
 			// 订单支付
-			if (type === 'order') {
+			if (type === 'order' || type === 'clothing') {
 				passback_params = `type=${type}&userid=${userid}&money=${money}&orderid=${orderid}`;
 			}
 			const alipaySdk = new AlipaySdk({

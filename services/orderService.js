@@ -53,7 +53,17 @@ module.exports = {
 			let user = await userModel.findOne({ where: { id: body.userid } });
 			let cabinet = await cabinetModel.findOne({ where: { id: body.cabinetId } });
 			if (shop.sn) {
-				PrintUtil.printOrderByCabinet(shop.sn, body.goods, body.money, code, user.username, user.phone, cabinet.address, body.cellid, body.desc);
+				PrintUtil.printOrderByCabinet(
+					shop.sn,
+					body.goods,
+					body.money,
+					code,
+					user.username,
+					user.phone,
+					cabinet.address,
+					body.cellid,
+					body.desc,
+				);
 			}
 			// 发送信息给用户
 			await PostMessage.sendOrderStartToUser(user.phone);
@@ -81,16 +91,43 @@ module.exports = {
 				desc: body.desc,
 				home_time: body.home_time,
 				create_time: moment().format('YYYY-MM-DD HH:mm:ss'),
+				send_money: 0,
 				is_sure: 1,
 				status: 6, // 预约上门等待店员取货
 				order_type: 2, // 山门取衣
 			};
-			await orderModel.create(params);
-			setTimeout(() => {
-				res.send(resultMessage.success('success'));
-			}, 3000);
+			let order = await orderModel.create(params);
+			let orderid = order.id;
+			res.send(resultMessage.success({ data: orderid, success: 'success' }));
+		} catch (error) {
+			console.log(error);
+			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
+		}
+	},
+
+	// 预约上门取衣用余额支付
+	subMoneyByAccount: async (req, res) => {
+		try {
+			let { userid, orderid } = req.body;
+			let user = await userModel.findOne({ where: { id: userid } });
+			// 增加用户积分
+			let currentBalance = user.balance;
+			let updateBalance = (Number(currentBalance) - 9.9).toFixed(2);
+			console.log(updateBalance, 98989);
+			if (updateBalance < 9.9) {
+				return res.send(resultMessage.error('账户余额不足，请充值'));
+			}
+			await userModel.update(
+				{ balance: updateBalance },
+				{
+					where: {
+						id: userid,
+					},
+				},
+			);
+			await orderModel.update({ status: 8, send_money: 9.9 }, { where: { id: orderid } });
+			res.send(resultMessage.success('success'));
 			// 发送信息给用户
-			let user = await userModel.findOne({ where: { id: body.userid } });
 			await PostMessage.sendMessageGetClothingSuccessToUser(user.phone);
 		} catch (error) {
 			console.log(error);
@@ -144,7 +181,7 @@ module.exports = {
 			let status = [1];
 			switch (type) {
 				case 'all':
-					status = [1, 2, 3, 4, 5, 6, 7];
+					status = [1, 2, 3, 4, 5, 6, 7, 8];
 					break;
 				case 'cleaning':
 					status = [2];
@@ -179,7 +216,17 @@ module.exports = {
 				limit: Number(pagesize),
 				offset: Number(offset),
 			});
-			let result = responseUtil.renderFieldsAll(orders, ['id', 'shopid', 'goods', 'money', 'desc', 'status', 'is_sure', 'create_time', 'order_type']);
+			let result = responseUtil.renderFieldsAll(orders, [
+				'id',
+				'shopid',
+				'goods',
+				'money',
+				'desc',
+				'status',
+				'is_sure',
+				'create_time',
+				'order_type',
+			]);
 			result.forEach((item, index) => {
 				item.create_time = moment(item.create_time).format('YYYY-MM-DD HH:mm:ss');
 				item.shopName = orders[index]['shopDetail'] ? orders[index]['shopDetail']['name'] || '' : '';
@@ -202,9 +249,7 @@ module.exports = {
 					item.intergral_num = orders[index] ? orders[index]['intergral_num'] || '' : '';
 				}
 			});
-			setTimeout(() => {
-				res.send(resultMessage.success(result));
-			}, 3000);
+			res.send(resultMessage.success(result));
 		} catch (error) {
 			console.log(error);
 			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));

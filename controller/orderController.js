@@ -32,6 +32,11 @@ router.post('/openCellById', (req, res) => {
 	orderService.openCellById(req, res);
 });
 
+// 预约上门取衣扣除费用 subMoneyByAccount
+router.post('/subMoneyByAccount', (req, res) => {
+	orderService.subMoneyByAccount(req, res);
+});
+
 // 更改订单状态
 router.post('/updateOrderStatus', (req, res) => {
 	orderService.updateOrderStatus(req, res);
