@@ -1,15 +1,14 @@
 const moment = require('moment');
-const Sequelize = require('sequelize');
 const sequelize = require('../dataSource/MysqlPoolClass');
 const resultMessage = require('../util/resultMessage');
 const PostMessage = require('../util/PostMessage');
-const Op = Sequelize.Op;
 
 const register = require('../models/register');
 const registerModel = register(sequelize);
 
 const user = require('../models/user');
 const userModel = user(sequelize);
+const responseUtil = require('../util/responseUtil');
 
 const ObjectUtil = require('../util/ObjectUtil');
 
@@ -18,6 +17,14 @@ module.exports = {
 	sendMessage: async (req, res) => {
 		try {
 			let { phoneNum } = req.body;
+			// 查询是否注册过
+			let userRes = await userModel.findOne({
+				where: {
+					phone: phoneNum,
+				},
+			});
+			// 判断是否注册过
+			if (userRes) return res.send(resultMessage.error('该手机号或昵称已注册'));
 			let code = PostMessage.getMessageCode();
 			// 发送验证码
 			await PostMessage.postLoginMessage(phoneNum, code);
@@ -41,7 +48,7 @@ module.exports = {
 				create_time: moment().format('YYYY-MM-DD HH:mm:ss'),
 				expire_time: moment().add('seconds', 60).format('YYYY-MM-DD HH:mm:ss'),
 			});
-			res.send(resultMessage.success(''));
+			res.send(resultMessage.success('success'));
 		} catch (error) {
 			console.log(error);
 			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
@@ -61,7 +68,7 @@ module.exports = {
 			// 查询是否注册过
 			let userRes = await userModel.findOne({
 				where: {
-					[Op.or]: [{ phone }, { username }],
+					phone: phone,
 				},
 			});
 			// 判断是否注册过
@@ -82,14 +89,28 @@ module.exports = {
 			});
 			// 生成token
 			let token = ObjectUtil.getToken();
-			await userModel.create({
+			let userResCreate = await userModel.create({
 				username,
 				password,
 				phone,
 				token,
 			});
-			// let data = await registerModel.findAll();
-			res.send(resultMessage.success(token));
+			let result = responseUtil.renderFieldsObj(userResCreate, [
+				'id',
+				'nickname',
+				'username',
+				'address',
+				'age',
+				'balance',
+				'email',
+				'integral',
+				'phone',
+				'sex',
+				'photo',
+				'member',
+			]);
+			result.token = token;
+			res.send(resultMessage.success(result));
 		} catch (error) {
 			console.log(error);
 			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));

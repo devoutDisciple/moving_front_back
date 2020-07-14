@@ -4,6 +4,7 @@ const resultMessage = require('../util/resultMessage');
 const sequelize = require('../dataSource/MysqlPoolClass');
 const user = require('../models/user');
 const userModel = user(sequelize);
+const responseUtil = require('../util/responseUtil');
 
 const ObjectUtil = require('../util/ObjectUtil');
 
@@ -31,8 +32,22 @@ module.exports = {
 					},
 				},
 			);
-			userRes.token = token;
-			res.send(resultMessage.success(userRes));
+			let result = responseUtil.renderFieldsObj(userRes, [
+				'id',
+				'nickname',
+				'username',
+				'address',
+				'age',
+				'balance',
+				'email',
+				'integral',
+				'phone',
+				'sex',
+				'photo',
+				'member',
+			]);
+			result.token = token;
+			res.send(resultMessage.success(result));
 		} catch (error) {
 			console.log(error);
 			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
@@ -66,7 +81,22 @@ module.exports = {
 					},
 				},
 			);
-			res.send(resultMessage.success(token));
+			let result = responseUtil.renderFieldsObj(userRes, [
+				'id',
+				'nickname',
+				'username',
+				'address',
+				'age',
+				'balance',
+				'email',
+				'integral',
+				'phone',
+				'sex',
+				'photo',
+				'member',
+			]);
+			result.token = token;
+			res.send(resultMessage.success(result));
 		} catch (error) {
 			console.log(error);
 			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
@@ -104,7 +134,22 @@ module.exports = {
 					},
 				},
 			);
-			res.send(resultMessage.success(token));
+			let result = responseUtil.renderFieldsObj(userRes, [
+				'id',
+				'nickname',
+				'username',
+				'address',
+				'age',
+				'balance',
+				'email',
+				'integral',
+				'phone',
+				'sex',
+				'photo',
+				'member',
+			]);
+			result.token = token;
+			res.send(resultMessage.success(result));
 		} catch (error) {
 			console.log(error);
 			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));

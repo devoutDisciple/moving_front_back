@@ -3,7 +3,7 @@ const router = express.Router();
 const registerService = require('../services/registerService');
 
 // 注册用户
-router.post('/add', (req, res) => {
+router.post('/register', (req, res) => {
 	registerService.register(req, res);
 });
 
