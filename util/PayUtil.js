@@ -48,7 +48,6 @@ module.exports = {
 			'&trade_type=' +
 			obj.trade_type;
 		let stringSignTemp = stringA + '&key=' + obj.key;
-		console.log(stringSignTemp, '拼接的字符串');
 		stringSignTemp = md5(stringSignTemp).toUpperCase();
 		return stringSignTemp;
 	},

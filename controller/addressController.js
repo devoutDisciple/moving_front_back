@@ -32,4 +32,9 @@ router.get('/getUserDefaultAddress', (req, res) => {
 	addressService.getUserDefaultAddress(req, res);
 });
 
+// 删除地址
+router.post('/deleteById', (req, res) => {
+	addressService.deleteById(req, res);
+});
+
 module.exports = router;

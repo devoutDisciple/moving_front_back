@@ -9,7 +9,6 @@ module.exports = {
 	// 根绝用户id获取所有地址
 	getAllByUserid: async (req, res) => {
 		try {
-			console.log(req, 9999);
 			let areas = await addressModel.findAll({
 				where: {
 					userid: req.query.userid,
@@ -68,6 +67,22 @@ module.exports = {
 			let address = req.body;
 			address.create_time = moment().format('YYYY-MM-DD HH:mm:ss');
 			await addressModel.create(address);
+			res.send(resultMessage.success('success'));
+		} catch (error) {
+			console.log(error);
+			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
+		}
+	},
+
+	// 删除地址
+	deleteById: async (req, res) => {
+		try {
+			let { id } = req.body;
+			await addressModel.destroy({
+				where: {
+					id: id,
+				},
+			});
 			res.send(resultMessage.success('success'));
 		} catch (error) {
 			console.log(error);
