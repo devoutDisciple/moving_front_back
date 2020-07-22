@@ -94,6 +94,7 @@ module.exports = {
 				password,
 				phone,
 				token,
+				create_time: moment().format('YYYY-MM-DD HH:mm:ss'),
 			});
 			let result = responseUtil.renderFieldsObj(userResCreate, [
 				'id',

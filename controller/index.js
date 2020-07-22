@@ -14,6 +14,7 @@ const clothingController = require('./clothingController');
 const orderController = require('./orderController');
 const versionController = require('./versionController');
 const payResultController = require('./payResultController');
+const moneyController = require('./moneyController');
 
 // 测试
 const testController = require('./testController');
@@ -49,8 +50,10 @@ const router = (app) => {
 	app.use('/intergral_record', intergralRecordController);
 	// 用户意见
 	app.use('/options', optionsController);
-	// 处理支付宝支付接口
+	// 处理支付返回接口
 	app.use('/payResult', payResultController);
+	// 支付金额种类相关 moneyController
+	app.use('/money', moneyController);
 
 	// 测试 testController
 	app.use('/test', testController);
