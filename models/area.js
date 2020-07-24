@@ -12,8 +12,8 @@ module.exports = function (sequelize) {
 				autoIncrement: true,
 			},
 			parentid: {
-				type: Sequelize.INTEGER(11),
-				allowNull: true,
+				type: Sequelize.INTEGER(255),
+				allowNull: false,
 				defaultValue: '1',
 			},
 			level: {

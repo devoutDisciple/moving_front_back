@@ -24,7 +24,7 @@ module.exports = function (sequelize) {
 				allowNull: true,
 			},
 			sort: {
-				type: Sequelize.INTEGER(11),
+				type: Sequelize.INTEGER(255),
 				allowNull: true,
 			},
 			create_time: {

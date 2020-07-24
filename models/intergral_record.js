@@ -41,7 +41,7 @@ module.exports = function (sequelize) {
 			status: {
 				type: Sequelize.INTEGER(11),
 				allowNull: true,
-				defaultValue: 1,
+				defaultValue: '1',
 			},
 			create_time: {
 				type: Sequelize.DATE,

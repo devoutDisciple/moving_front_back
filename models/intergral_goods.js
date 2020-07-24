@@ -14,7 +14,6 @@ module.exports = function (sequelize) {
 			shopid: {
 				type: Sequelize.INTEGER(11),
 				allowNull: false,
-				primaryKey: true,
 			},
 			name: {
 				type: Sequelize.STRING(255),
@@ -44,6 +43,7 @@ module.exports = function (sequelize) {
 			is_delete: {
 				type: Sequelize.INTEGER(11),
 				allowNull: true,
+				defaultValue: '1',
 			},
 		},
 		{

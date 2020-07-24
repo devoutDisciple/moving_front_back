@@ -9,6 +9,7 @@ module.exports = function (sequelize) {
 				type: Sequelize.INTEGER(11),
 				allowNull: false,
 				primaryKey: true,
+				autoIncrement: true,
 			},
 			money: {
 				type: Sequelize.STRING(255),

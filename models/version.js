@@ -17,25 +17,28 @@ module.exports = function (sequelize) {
 			},
 			desc: {
 				type: Sequelize.STRING(255),
-				allowNull: false,
+				allowNull: true,
 			},
 			current: {
 				type: Sequelize.INTEGER(11),
 				allowNull: false,
-				defaultValue: '1',
 			},
 			force: {
 				type: Sequelize.INTEGER(11),
 				allowNull: false,
 				defaultValue: '1',
 			},
+			create_time: {
+				type: Sequelize.DATE,
+				allowNull: true,
+			},
 			type: {
 				type: Sequelize.INTEGER(11),
 				allowNull: false,
 				defaultValue: '1',
 			},
-			create_time: {
-				type: Sequelize.DATE,
+			remark: {
+				type: Sequelize.STRING(255),
 				allowNull: true,
 			},
 		},
