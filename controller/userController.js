@@ -32,6 +32,16 @@ router.post('/beMember', (req, res) => {
 	userService.beMember(req, res);
 });
 
+// 获取用户使用柜子次数 getUserCabinetUseTimeByUserid
+router.get('/getUserCabinetUseTimeByUserid', (req, res) => {
+	userService.getUserCabinetUseTimeByUserid(req, res);
+});
+
+// 减少用户使用柜子次数 subCabinetUseTime
+router.post('/subCabinetUseTime', (req, res) => {
+	userService.subCabinetUseTime(req, res);
+});
+
 // 余额充值
 router.post('/recharge', (req, res) => {
 	userService.recharge(req, res);

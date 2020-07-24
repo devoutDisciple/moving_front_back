@@ -38,7 +38,21 @@ module.exports = {
 				},
 			});
 			// eslint-disable-next-line
-			let result = responseUtil.renderFieldsObj(data, ['id', 'nickname', 'username', 'address', 'age', 'balance', "email", 'integral', 'phone', 'sex', "photo", 'member']);
+			let result = responseUtil.renderFieldsObj(data, ['id', 'nickname', 'username', 'address', 'age', 'balance', "email", 'integral', 'phone', 'sex', "photo", 'member', "cabinet_use_time"]);
+			res.send(resultMessage.success(result));
+		} catch (error) {
+			console.log(error);
+			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
+		}
+	},
+
+	// 根据用户id获取当前用户信息
+	getUserCabinetUseTimeByUserid: async (req, res) => {
+		try {
+			let { userid } = req.query;
+			let data = await userModel.findOne({ where: { id: userid } });
+			// eslint-disable-next-line
+			let result = responseUtil.renderFieldsObj(data, ["cabinet_use_time"]);
 			res.send(resultMessage.success(result));
 		} catch (error) {
 			console.log(error);
@@ -62,6 +76,26 @@ module.exports = {
 					},
 				},
 			);
+			res.send(resultMessage.success('success'));
+		} catch (error) {
+			console.log(error);
+			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
+		}
+	},
+
+	// 减少用户使用柜子次数
+	subCabinetUseTime: async (req, res) => {
+		try {
+			let { userid } = req.body;
+			let data = await userModel.findOne({
+				where: {
+					id: userid,
+				},
+			});
+			let cabinet_use_time = data.cabinet_use_time;
+			let current_cabinet_use_time = (Number(cabinet_use_time) - 1).toFixed(0);
+			if (current_cabinet_use_time < 0) return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
+			await userModel.update({ cabinet_use_time: current_cabinet_use_time }, { where: { id: userid } });
 			res.send(resultMessage.success('success'));
 		} catch (error) {
 			console.log(error);

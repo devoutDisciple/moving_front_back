@@ -130,6 +130,9 @@ module.exports = {
 			if (type === 'order' || type === 'clothing') {
 				passback_params = `type=${type}&userid=${userid}&money=${money}&orderid=${orderid}`;
 			}
+			if (type === 'save_clothing') {
+				passback_params = `type=${type}&userid=${userid}&money=${money}`;
+			}
 			const alipaySdk = new AlipaySdk({
 				appId: config.alipayAppId, // 开放平台发的appid
 				// 使用支付宝开发助手生成的csr文件

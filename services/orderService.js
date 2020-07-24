@@ -44,6 +44,7 @@ module.exports = {
 				cellid: body.cellid,
 				create_time: moment().format('YYYY-MM-DD HH:mm:ss'),
 				is_sure: 1,
+				pre_pay: body.pre_pay || 0,
 				order_type: body.order_type,
 			};
 			await orderModel.create(params);

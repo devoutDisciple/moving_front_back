@@ -122,7 +122,7 @@ const handlePayByType = async (payMsg, code, pay_type) => {
 		});
 		// 增加用户积分
 		let currentIntergral = user.integral;
-		let updateIntergral = (Number(currentIntergral) + 10).toFixed(0);
+		let updateIntergral = (Number(currentIntergral) + 1).toFixed(0);
 		let cabinet_use_time = user.cabinet_use_time;
 		let updateCabinetUseTimes = (Number(cabinet_use_time) + 1).toFixed(0);
 		console.log(cabinet_use_time, updateCabinetUseTimes, '使用次数');
