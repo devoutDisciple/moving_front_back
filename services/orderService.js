@@ -275,8 +275,24 @@ module.exports = {
 					},
 				],
 			});
-			// eslint-disable-next-line
-			let result = responseUtil.renderFieldsObj(order, ['id','code','shopid','goods','money','pre_pay','send_money','desc','status', "order_type",'cabinetId','cellid',"is_sure",'create_time']);
+			let result = responseUtil.renderFieldsObj(order, [
+				'id',
+				'code',
+				'shopid',
+				'goods',
+				'discount',
+				'origin_money',
+				'money',
+				'pre_pay',
+				'send_money',
+				'desc',
+				'status',
+				'order_type',
+				'cabinetId',
+				'cellid',
+				'is_sure',
+				'create_time',
+			]);
 			result.create_time = moment(result.create_time).format('YYYY-MM-DD HH:mm:ss');
 			result.shopName = order.shopDetail ? order.shopDetail.name : '';
 			result.shopAddress = order.shopDetail ? order.shopDetail.address : '';
