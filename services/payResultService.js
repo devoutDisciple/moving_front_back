@@ -45,7 +45,6 @@ const handlePayByType = async (payMsg, code, pay_type) => {
 			send: payMsg.given,
 			create_time: moment().format('YYYY-MM-DD HH:mm:ss'),
 		});
-		console.log(currentBalance, currentIntegral, totalBalance, totalIntegral, '最后结果');
 		await userModel.update(
 			{ balance: totalBalance, integral: totalIntegral, member: 2 },
 			{
@@ -98,7 +97,6 @@ const handlePayByType = async (payMsg, code, pay_type) => {
 		// 增加用户积分
 		let currentIntergral = user.integral;
 		let updateIntergral = (Number(currentIntergral) + 10).toFixed(0);
-		console.log(updateIntergral, '用户的积分');
 		await userModel.update(
 			{ integral: updateIntergral },
 			{
@@ -109,6 +107,34 @@ const handlePayByType = async (payMsg, code, pay_type) => {
 		);
 		// 发送信息给用户
 		PostMessage.sendMessageGetClothingSuccessToUser(user.phone);
+	}
+	// 洗衣柜使用费用支付
+	if (payMsg.type === 'save_clothing') {
+		console.log(payMsg, 123456);
+		// 支付信息入库
+		await billModal.create({
+			code,
+			userid: payMsg.userid,
+			money: payMsg.money,
+			pay_type: pay_type,
+			type: payMsg.type,
+			create_time: moment().format('YYYY-MM-DD HH:mm:ss'),
+		});
+		// 增加用户积分
+		let currentIntergral = user.integral;
+		let updateIntergral = (Number(currentIntergral) + 10).toFixed(0);
+		let cabinet_use_time = user.cabinet_use_time;
+		let updateCabinetUseTimes = (Number(cabinet_use_time) + 1).toFixed(0);
+		console.log(cabinet_use_time, updateCabinetUseTimes, '使用次数');
+		// 增加柜子使用次数
+		await userModel.update(
+			{ integral: updateIntergral, cabinet_use_time: updateCabinetUseTimes },
+			{
+				where: {
+					id: payMsg.userid,
+				},
+			},
+		);
 	}
 };
 
@@ -148,9 +174,22 @@ module.exports = {
 			// { type: 'member', userid: '10', money: '0.01', given: '400' }
 			// 会员充值 或者余额充值
 			await handlePayByType(payMsg, code, 'wechat');
-			res.setHeader('Content-Type', 'text/html');
-			let returnData = '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
-			return res.send(returnData);
+
+			var json2Xml = function (json) {
+				let _xml = '';
+				Object.keys(json).map((key) => {
+					_xml += `<${key}>${json[key]}</${key}>`;
+				});
+				return `<xml>${_xml}</xml>`;
+			};
+			var sendData = {
+				return_code: 'SUCCESS',
+				return_msg: 'OK',
+			};
+			return res.end(json2Xml(sendData));
+			// res.setHeader('Content-Type', 'text/html');
+			// let returnData = '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
+			// return res.send(returnData);
 		} catch (error) {
 			console.log(error);
 			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));

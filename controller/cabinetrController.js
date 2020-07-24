@@ -17,4 +17,9 @@ router.get('/getStateById', (req, res) => {
 	cabinetService.getStateById(req, res);
 });
 
+// 获取柜子详细信息 getDetailById
+router.get('/getDetailById', (req, res) => {
+	cabinetService.getDetailById(req, res);
+});
+
 module.exports = router;

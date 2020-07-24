@@ -24,6 +24,23 @@ module.exports = {
 		}
 	},
 
+	// 获取柜子详细信息
+	getDetailById: async (req, res) => {
+		let { cabinetId } = req.query;
+		try {
+			let data = await CabinetModel.findOne({
+				where: {
+					id: cabinetId,
+				},
+			});
+			const result = responseUtil.renderFieldsObj(data, ['id', 'shopid', 'name', 'address', 'boxid', 'url', 'create_time', 'sort']);
+			res.send(resultMessage.success(result));
+		} catch (error) {
+			console.log(error);
+			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
+		}
+	},
+
 	// 获取柜子状态
 	getStateById: async (req, res) => {
 		let cabinetId = req.query.cabinetId;

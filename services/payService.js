@@ -34,6 +34,9 @@ module.exports = {
 			if (type === 'order' || type === 'clothing') {
 				passback_params = { type: type, userid: userid, money: money, orderid: orderid };
 			}
+			if (type === 'save_clothing') {
+				passback_params = { type: type, userid: userid, money: money };
+			}
 			passback_params = JSON.stringify(passback_params);
 			let out_trade_no = PayUtil.createOrderid();
 			let params = {
