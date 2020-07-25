@@ -76,7 +76,6 @@ module.exports = {
 			if (result && result.code !== 200) {
 				return res.send(resultMessage.error(result.message));
 			}
-
 			// 打开的格子id
 			let used = result.used,
 				cellid = result.data;

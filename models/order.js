@@ -108,7 +108,7 @@ module.exports = function (sequelize) {
 			discount: {
 				type: Sequelize.STRING(255),
 				allowNull: true,
-				defaultValue: '100',
+				defaultValue: '10',
 			},
 			desc: {
 				type: Sequelize.STRING(255),
