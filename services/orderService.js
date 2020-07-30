@@ -127,8 +127,11 @@ module.exports = {
 			);
 			await orderModel.update({ status: 8, send_money: 9.9 }, { where: { id: orderid } });
 			res.send(resultMessage.success('success'));
+
 			// 发送信息给用户
-			await PostMessage.sendMessageGetClothingSuccessToUser(user.phone);
+			let orderDetail = await orderModel.findOne({ where: { id: orderid } });
+			console.log(orderDetail.home_phone, 1111);
+			await PostMessage.sendMessageGetClothingSuccessToUser(orderDetail.home_phone);
 			let result = await orderModel.findOne({
 				where: { id: orderid },
 				include: [

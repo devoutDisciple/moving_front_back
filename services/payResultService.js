@@ -110,7 +110,8 @@ const handlePayByType = async (payMsg, code, pay_type) => {
 			},
 		);
 		// 发送信息给用户
-		PostMessage.sendMessageGetClothingSuccessToUser(user.phone);
+		let orderDetail = await orderModel.findOne({ where: { id: payMsg.orderid } });
+		PostMessage.sendMessageGetClothingSuccessToUser(orderDetail.home_phone);
 		let result = await orderModel.findOne({
 			where: { id: payMsg.orderid },
 			include: [
@@ -126,7 +127,6 @@ const handlePayByType = async (payMsg, code, pay_type) => {
 	}
 	// 洗衣柜使用费用支付
 	if (payMsg.type === 'save_clothing') {
-		console.log(payMsg, 123456);
 		// 支付信息入库
 		await billModal.create({
 			code,
@@ -141,7 +141,6 @@ const handlePayByType = async (payMsg, code, pay_type) => {
 		let updateIntergral = (Number(currentIntergral) + 1).toFixed(0);
 		let cabinet_use_time = user.cabinet_use_time;
 		let updateCabinetUseTimes = (Number(cabinet_use_time) + 1).toFixed(0);
-		console.log(cabinet_use_time, updateCabinetUseTimes, '使用次数');
 		// 增加柜子使用次数
 		await userModel.update(
 			{ integral: updateIntergral, cabinet_use_time: updateCabinetUseTimes },
