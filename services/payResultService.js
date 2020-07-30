@@ -7,6 +7,10 @@ const userModel = user(sequelize);
 const order = require('../models/order');
 const orderModel = order(sequelize);
 
+const shop = require('../models/shop');
+const shopModel = shop(sequelize);
+orderModel.belongsTo(shopModel, { foreignKey: 'shopid', targetKey: 'id', as: 'shopDetail' });
+
 const bill = require('../models/bill');
 const billModal = bill(sequelize);
 
@@ -107,6 +111,18 @@ const handlePayByType = async (payMsg, code, pay_type) => {
 		);
 		// 发送信息给用户
 		PostMessage.sendMessageGetClothingSuccessToUser(user.phone);
+		let result = await orderModel.findOne({
+			where: { id: payMsg.orderid },
+			include: [
+				{
+					model: shopModel,
+					as: 'shopDetail',
+				},
+			],
+		});
+		let shopPhone = result.shopDetail.phone;
+		if (!shopPhone || !result.code) return;
+		PostMessage.sendMessageGetClothingSuccessToShop(shopPhone, result.code);
 	}
 	// 洗衣柜使用费用支付
 	if (payMsg.type === 'save_clothing') {

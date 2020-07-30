@@ -114,7 +114,6 @@ module.exports = {
 			// 增加用户积分
 			let currentBalance = user.balance;
 			let updateBalance = (Number(currentBalance) - 9.9).toFixed(2);
-			console.log(updateBalance, 98989);
 			if (updateBalance < 9.9) {
 				return res.send(resultMessage.error('账户余额不足，请充值'));
 			}
@@ -130,6 +129,18 @@ module.exports = {
 			res.send(resultMessage.success('success'));
 			// 发送信息给用户
 			await PostMessage.sendMessageGetClothingSuccessToUser(user.phone);
+			let result = await orderModel.findOne({
+				where: { id: orderid },
+				include: [
+					{
+						model: shopModel,
+						as: 'shopDetail',
+					},
+				],
+			});
+			let shopPhone = result.shopDetail.phone;
+			if (!shopPhone || !result.code) return;
+			PostMessage.sendMessageGetClothingSuccessToShop(shopPhone, result.code);
 		} catch (error) {
 			console.log(error);
 			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
@@ -167,8 +178,12 @@ module.exports = {
 				},
 			);
 			res.send(resultMessage.success('success'));
+			let goods = JSON.parse(body.goods) || {};
 			// 发送信息给用户
-			await PostMessage.sendOrderStartToUser(user.phone);
+			await PostMessage.sendMessageIntergralGoodsSuccessToUser(user.phone, goods.name || 'MOVING积分商品');
+			// 发送信息给商家
+			let shopDetail = await shopModel.findOne({ where: { id: body.shopid } });
+			await PostMessage.sendMessageIntergralGoodsSuccessToShop(shopDetail.phone);
 		} catch (error) {
 			console.log(error);
 			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
@@ -182,7 +197,7 @@ module.exports = {
 			let status = [1];
 			switch (type) {
 				case 'all':
-					status = [1, 2, 3, 4, 5, 6, 7, 8];
+					status = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 					break;
 				case 'cleaning':
 					status = [2];

@@ -146,6 +146,71 @@ module.exports = {
 		});
 	},
 
+	// 发送预约取衣给商家
+	sendMessageGetClothingSuccessToShop: (phoneNum, code) => {
+		var params = {
+			RegionId: 'cn-hangzhou',
+			PhoneNumbers: phoneNum,
+			SignName: config.notify_message_sign,
+			TemplateCode: config.message_getClothingSuccessToShop,
+			TemplateParam: JSON.stringify({ code: code }),
+		};
+		return new Promise((resolve, reject) => {
+			client.request('SendSms', params, requestOption).then(
+				() => {
+					resolve({ phoneNum });
+				},
+				(ex) => {
+					reject('发送失败');
+					console.log(ex);
+				},
+			);
+		});
+	},
+
+	// 发送积分兑换通知给用户
+	sendMessageIntergralGoodsSuccessToUser: (phoneNum, name) => {
+		var params = {
+			RegionId: 'cn-hangzhou',
+			PhoneNumbers: phoneNum,
+			SignName: config.notify_message_sign,
+			TemplateCode: config.message_intergralGoodsSuccessToUser,
+			TemplateParam: JSON.stringify({ name: name }),
+		};
+		return new Promise((resolve, reject) => {
+			client.request('SendSms', params, requestOption).then(
+				() => {
+					resolve({ phoneNum });
+				},
+				(ex) => {
+					reject('发送失败');
+					console.log(ex);
+				},
+			);
+		});
+	},
+
+	// 发送积分兑换通知给商家
+	sendMessageIntergralGoodsSuccessToShop: (phoneNum) => {
+		var params = {
+			RegionId: 'cn-hangzhou',
+			PhoneNumbers: phoneNum,
+			SignName: config.notify_message_sign,
+			TemplateCode: config.message_intergralGoodsSuccessToShop,
+		};
+		return new Promise((resolve, reject) => {
+			client.request('SendSms', params, requestOption).then(
+				() => {
+					resolve({ phoneNum });
+				},
+				(ex) => {
+					reject('发送失败');
+					console.log(ex);
+				},
+			);
+		});
+	},
+
 	// 随机的验证码
 	getMessageCode: () => {
 		//eslint-disable-next-line
