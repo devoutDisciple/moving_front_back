@@ -130,7 +130,6 @@ module.exports = {
 
 			// 发送信息给用户
 			let orderDetail = await orderModel.findOne({ where: { id: orderid } });
-			console.log(orderDetail.home_phone, 1111);
 			await PostMessage.sendMessageGetClothingSuccessToUser(orderDetail.home_phone);
 			let result = await orderModel.findOne({
 				where: { id: orderid },
