@@ -1,6 +1,7 @@
 const request = require('request');
 const sequelize = require('../dataSource/MysqlPoolClass');
 const crypto = require('crypto');
+const FilterStatus = require('./FilterStatus');
 // const md5 = require('md5');
 const moment = require('moment');
 const AppConfig = require('../config/AppConfig');
@@ -121,8 +122,6 @@ module.exports = {
 				});
 				let userDetail = orderDetail.userDetail;
 				let shopDetail = orderDetail.shopDetail;
-				console.log(userDetail, 1111);
-				console.log(shopDetail, 2222);
 				let orderInfo = '';
 				// 洗衣柜下单
 				if (orderDetail.order_type === 1) {
@@ -132,8 +131,8 @@ module.exports = {
 					let cabinetDetail = await cabinetModel.findOne({ where: { id: orderDetail.cabinetId } });
 					orderInfo = '<CB>【 MOVING洗衣 】</CB><BR>'; //标题字体如需居中放大,就需要用标签套上
 					// orderInfo += '<C>-------------</C><BR>'; //标题字体如需居中放大,就需要用标签套上
-					// eslint-disable-next-line no-irregular-whitespace
-					// orderInfo += '名称　　　　　       数量  金额<BR>';
+					orderInfo += '<BR>';
+					orderInfo += `订单类型：洗衣柜下单<BR>`;
 					orderInfo += '<BR>';
 					orderInfo += '-------------------------------<BR>';
 					orderInfo += '<BR>';
@@ -148,6 +147,7 @@ module.exports = {
 					orderInfo += '<BR>';
 					orderInfo += '--------------------------------<BR>';
 					orderInfo += '<BR>';
+					orderInfo += `订单类型：${orderDetail.code}<BR>`;
 					orderInfo += `订单编号：${orderDetail.code}<BR>`;
 					orderInfo += `存放柜子：${cabinetDetail.name}<BR>`;
 					orderInfo += `存放地址：${cabinetDetail.address} ${orderDetail.cellid}号格口<BR>`;
@@ -159,7 +159,88 @@ module.exports = {
 					orderInfo += `折扣：${orderDetail.discount} 折<BR>`;
 					orderInfo += `合计：${orderDetail.money} 元<BR>`;
 					orderInfo += `备注：${orderDetail.desc || '无'}<BR>`;
+					orderInfo += `状态：${orderDetail.is_sure === 1 ? '待确认洗衣价格' : '已确认洗衣费用'}<BR>`;
 					orderInfo += `下单时间: ${moment().format('YYYY-MM-DD HH:mm:ss')}<BR><BR>`;
+					orderInfo += '<QR>MOVING</QR>';
+				}
+
+				// 上门取衣
+				if (orderDetail.order_type === 2) {
+					if (!shopDetail.sn || !shopDetail.key) return '暂无打印机编号';
+					orderInfo = '<CB>【 MOVING洗衣 】</CB><BR>'; //标题字体如需居中放大,就需要用标签套上
+					// orderInfo += '<C>-------------</C><BR>'; //标题字体如需居中放大,就需要用标签套上
+					orderInfo += '<BR>';
+					orderInfo += `订单类型：预约上门取衣<BR>`;
+					orderInfo += '<BR>';
+					orderInfo += '-------------------------------<BR>';
+					orderInfo += `预约信息：<BR>`;
+					orderInfo += `用户名称：${orderDetail.home_username}<BR>`;
+					orderInfo += `用户地址：${orderDetail.home_address}<BR>`;
+					orderInfo += `用户手机号：${orderDetail.home_phone}<BR>`;
+					orderInfo += `预约时间：${moment(orderDetail.home_time).format('YYYY-MM-DD HH:mm:ss')}<BR>`;
+					orderInfo += `配送费：${orderDetail.send_money || 0} 元<BR>`;
+					orderInfo += `备注：${orderDetail.desc || '无'}<BR>`;
+					orderInfo += '-------------------------------<BR>';
+					orderInfo += `会员信息：<BR>`;
+					orderInfo += `会员名称：${userDetail.username}<BR>`;
+					orderInfo += `联系电话：${userDetail.phone}<BR>`;
+					orderInfo += `会员类型：${FilterStatus.filterMemberStatus(userDetail.member)}<BR>`;
+					orderInfo += '<BR>';
+					orderInfo += '<QR>MOVING</QR>';
+				}
+
+				// 积分兑换
+				if (orderDetail.order_type === 3) {
+					if (!shopDetail.sn || !shopDetail.key) return '暂无打印机编号';
+					let goods = orderDetail.goods;
+					goods = JSON.parse(goods);
+					orderInfo = '<CB>【 MOVING洗衣 】</CB><BR>'; //标题字体如需居中放大,就需要用标签套上
+					// orderInfo += '<C>-------------</C><BR>'; //标题字体如需居中放大,就需要用标签套上
+					orderInfo += '<BR>';
+					orderInfo += `订单类型：积分兑换物品<BR>`;
+					orderInfo += '<BR>';
+					orderInfo += '-------------------------------<BR>';
+					orderInfo += `订单编号：${orderDetail.code}<BR>`;
+					orderInfo += `兑换物品：${goods.name}<BR>`;
+					orderInfo += `用户名称：${orderDetail.intergral_username || '无'}<BR>`;
+					orderInfo += `联系方式：${orderDetail.intergral_phone || '无'}<BR>`;
+					orderInfo += `用户地址：${orderDetail.intergral_address || '无'}<BR>`;
+					orderInfo += `消耗积分：${orderDetail.intergral_num || 0} 积分<BR>`;
+					orderInfo += `下单时间：${moment(orderDetail.create_time).format('YYYY-MM-DD HH:mm:ss')}<BR>`;
+					orderInfo += '-------------------------------<BR>';
+					orderInfo += `会员信息：<BR>`;
+					orderInfo += `会员名称：${userDetail.username}<BR>`;
+					orderInfo += `联系电话：${userDetail.phone}<BR>`;
+					orderInfo += `会员类型：${FilterStatus.filterMemberStatus(userDetail.member)}<BR>`;
+					orderInfo += '<BR>';
+					orderInfo += '<QR>MOVING</QR>';
+				}
+
+				// 店员录入订单
+				if (orderDetail.order_type === 4) {
+					if (!shopDetail.sn || !shopDetail.key) return '暂无打印机编号';
+					let goods = orderDetail.goods;
+					goods = JSON.parse(goods);
+					orderInfo = '<CB>【 MOVING洗衣 】</CB><BR>'; //标题字体如需居中放大,就需要用标签套上
+					// orderInfo += '<C>-------------</C><BR>'; //标题字体如需居中放大,就需要用标签套上
+					orderInfo += '<BR>';
+					orderInfo += `订单类型：手动录入订单<BR>`;
+					orderInfo += '<BR>';
+					orderInfo += '-------------------------------<BR>';
+					orderInfo += `订单编号：${orderDetail.code}<BR>`;
+					orderInfo += `兑换物品：${goods.name}<BR>`;
+					orderInfo += `用户名称：${orderDetail.intergral_username || '无'}<BR>`;
+					orderInfo += `联系方式：${orderDetail.intergral_phone || '无'}<BR>`;
+					orderInfo += `用户地址：${orderDetail.intergral_address || '无'}<BR>`;
+					orderInfo += `消耗积分：${orderDetail.intergral_num || 0} 积分<BR>`;
+					orderInfo += `下单时间：${moment(orderDetail.create_time).format('YYYY-MM-DD HH:mm:ss')}<BR>`;
+					orderInfo += '-------------------------------<BR>';
+					orderInfo += `会员信息：<BR>`;
+					orderInfo += `会员名称：${userDetail.username}<BR>`;
+					orderInfo += `联系电话：${userDetail.phone}<BR>`;
+					orderInfo += `会员类型：${FilterStatus.filterMemberStatus(userDetail.member)}<BR>`;
+					orderInfo += '<BR>';
+					orderInfo += '<QR>MOVING</QR>';
 				}
 				// 打印机编号
 				// sn = '920535072';
