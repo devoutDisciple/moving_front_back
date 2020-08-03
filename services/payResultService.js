@@ -17,6 +17,7 @@ const billModal = bill(sequelize);
 const urlencode = require('urlencode');
 const moment = require('moment');
 
+const PrintUtil = require('../util/PrintUtil');
 const PostMessage = require('../util/PostMessage');
 
 const getAlipayParams = async (req) => {
@@ -124,6 +125,10 @@ const handlePayByType = async (payMsg, code, pay_type) => {
 		let shopPhone = result.shopDetail.phone;
 		if (!shopPhone || !result.code) return;
 		PostMessage.sendMessageGetClothingSuccessToShop(shopPhone, result.code);
+		// 打印商户订单
+		if (result.shopDetail.sn && result.id) {
+			PrintUtil.printOrderByCabinet(result.id);
+		}
 	}
 	// 洗衣柜使用费用支付
 	if (payMsg.type === 'save_clothing') {

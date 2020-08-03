@@ -47,24 +47,13 @@ module.exports = {
 				pre_pay: body.pre_pay || 0,
 				order_type: body.order_type,
 			};
-			await orderModel.create(params);
+			let resOrder = await orderModel.create(params);
 			res.send(resultMessage.success('success'));
-			// 打印商户订单
 			let shop = await shopModel.findOne({ where: { id: body.shopid } });
 			let user = await userModel.findOne({ where: { id: body.userid } });
-			let cabinet = await cabinetModel.findOne({ where: { id: body.cabinetId } });
-			if (shop.sn) {
-				PrintUtil.printOrderByCabinet(
-					shop.sn,
-					body.goods,
-					body.money,
-					code,
-					user.username,
-					user.phone,
-					cabinet.address,
-					body.cellid,
-					body.desc,
-				);
+			// 打印商户订单
+			if (shop.sn && resOrder.id) {
+				PrintUtil.printOrderByCabinet(resOrder.id);
 			}
 			// 发送信息给用户
 			await PostMessage.sendOrderStartToUser(user.phone);
@@ -140,9 +129,14 @@ module.exports = {
 					},
 				],
 			});
+			// 发送信息给商家
 			let shopPhone = result.shopDetail.phone;
 			if (!shopPhone || !result.code) return;
 			PostMessage.sendMessageGetClothingSuccessToShop(shopPhone, result.code);
+			// 打印商户订单
+			if (result.shopDetail.sn && orderid) {
+				PrintUtil.printOrderByCabinet(orderid);
+			}
 		} catch (error) {
 			console.log(error);
 			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
@@ -171,7 +165,7 @@ module.exports = {
 			let user = await userModel.findOne({ where: { id: body.userid } });
 			if (!user) return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
 			if (Number(user.integral) < Number(body.intergral_num)) return res.send(resultMessage.error('兑换失败,您的积分不足'));
-			await orderModel.create(params);
+			let resOrder = await orderModel.create(params);
 			let currentIntergral = Number(user.integral) - Number(body.intergral_num);
 			await userModel.update(
 				{ integral: currentIntergral },
@@ -186,6 +180,10 @@ module.exports = {
 			// 发送信息给商家
 			let shopDetail = await shopModel.findOne({ where: { id: body.shopid } });
 			await PostMessage.sendMessageIntergralGoodsSuccessToShop(shopDetail.phone);
+			// 打印商户订单
+			if (shopDetail.sn && resOrder.id) {
+				PrintUtil.printOrderByCabinet(resOrder.id);
+			}
 		} catch (error) {
 			console.log(error);
 			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));

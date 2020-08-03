@@ -219,8 +219,6 @@ module.exports = {
 				// 店员录入订单
 				if (orderDetail.order_type === 4) {
 					if (!shopDetail.sn || !shopDetail.key) return '暂无打印机编号';
-					let goods = orderDetail.goods;
-					goods = JSON.parse(goods);
 					orderInfo = '<CB>【 MOVING洗衣 】</CB><BR>'; //标题字体如需居中放大,就需要用标签套上
 					// orderInfo += '<C>-------------</C><BR>'; //标题字体如需居中放大,就需要用标签套上
 					orderInfo += '<BR>';
@@ -228,17 +226,12 @@ module.exports = {
 					orderInfo += '<BR>';
 					orderInfo += '-------------------------------<BR>';
 					orderInfo += `订单编号：${orderDetail.code}<BR>`;
-					orderInfo += `兑换物品：${goods.name}<BR>`;
-					orderInfo += `用户名称：${orderDetail.intergral_username || '无'}<BR>`;
-					orderInfo += `联系方式：${orderDetail.intergral_phone || '无'}<BR>`;
-					orderInfo += `用户地址：${orderDetail.intergral_address || '无'}<BR>`;
-					orderInfo += `消耗积分：${orderDetail.intergral_num || 0} 积分<BR>`;
+					orderInfo += `用户名称：${orderDetail.home_username}<BR>`;
+					orderInfo += `联系方式：${orderDetail.home_phone || '无'}<BR>`;
+					orderInfo += `用户地址：${orderDetail.home_address || '无'}<BR>`;
+					orderInfo += `收款金额：${orderDetail.money || 0} 元<BR>`;
 					orderInfo += `下单时间：${moment(orderDetail.create_time).format('YYYY-MM-DD HH:mm:ss')}<BR>`;
 					orderInfo += '-------------------------------<BR>';
-					orderInfo += `会员信息：<BR>`;
-					orderInfo += `会员名称：${userDetail.username}<BR>`;
-					orderInfo += `联系电话：${userDetail.phone}<BR>`;
-					orderInfo += `会员类型：${FilterStatus.filterMemberStatus(userDetail.member)}<BR>`;
 					orderInfo += '<BR>';
 					orderInfo += '<QR>MOVING</QR>';
 				}
@@ -284,4 +277,22 @@ module.exports = {
 			}
 		});
 	},
+
+	// testOrder: async () => {
+	// 	let params = {
+	// 		shopid: 26,
+	// 		code: 2321321321312,
+	// 		userid: 12,
+	// 		goods: '[]',
+	// 		money: 32,
+	// 		status: 1,
+	// 		cabinetId: 21,
+	// 		boxid: 23,
+	// 		cellid: 12,
+	// 		create_time: moment().format('YYYY-MM-DD HH:mm:ss'),
+	// 		is_sure: 1,
+	// 	};
+	// 	let res = await orderModel.create(params);
+	// 	console.log(res);
+	// },
 };
