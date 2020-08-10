@@ -31,7 +31,7 @@ const saveException = async (result, userid, boxid, cabinetid, cellid) => {
 			success: 2,
 			result: String(result),
 			optid: userid,
-			user_type: 1,
+			user_type: 2,
 			boxid: boxid,
 			cabinetid: cabinetid,
 			cellid: cellid,
