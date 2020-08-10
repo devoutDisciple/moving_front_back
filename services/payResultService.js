@@ -127,7 +127,7 @@ const handlePayByType = async (payMsg, code, pay_type) => {
 		PostMessage.sendMessageGetClothingSuccessToShop(shopPhone, result.code);
 		// 打印商户订单
 		if (result.shopDetail.sn && result.id) {
-			PrintUtil.printOrderByCabinet(result.id);
+			PrintUtil.printOrderByOrderId(result.id);
 		}
 	}
 	// 洗衣柜使用费用支付

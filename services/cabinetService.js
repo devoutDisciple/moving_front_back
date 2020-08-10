@@ -62,14 +62,14 @@ module.exports = {
 	// 打开柜子
 	openCellSave: async (req, res) => {
 		try {
-			let { boxid, type, cabinetId } = req.body;
+			let { boxid, type, cabinetId, userid } = req.body;
 			// 获取token
 			let boxLoginDetail = await cabinetUtil.getToken();
 			boxLoginDetail = JSON.parse(boxLoginDetail);
 			let token = boxLoginDetail.data || '';
 			if (!token) return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
 			// 打开格子
-			let result = await cabinetUtil.openCellSave(cabinetId, boxid, token, type);
+			let result = await cabinetUtil.openCellSave(cabinetId, boxid, token, type, userid);
 			if (!result) {
 				return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
 			}

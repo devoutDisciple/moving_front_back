@@ -36,6 +36,7 @@ module.exports = {
 				code: code,
 				userid: body.userid,
 				goods: body.goods || '[]',
+				origin_money: body.money,
 				money: body.money,
 				desc: body.desc,
 				status: body.status,
@@ -53,7 +54,7 @@ module.exports = {
 			let user = await userModel.findOne({ where: { id: body.userid } });
 			// 打印商户订单
 			if (shop.sn && resOrder.id) {
-				PrintUtil.printOrderByCabinet(resOrder.id);
+				PrintUtil.printOrderByOrderId(resOrder.id);
 			}
 			// 发送信息给用户
 			await PostMessage.sendOrderStartToUser(user.phone);
@@ -135,7 +136,7 @@ module.exports = {
 			PostMessage.sendMessageGetClothingSuccessToShop(shopPhone, result.code);
 			// 打印商户订单
 			if (result.shopDetail.sn && orderid) {
-				PrintUtil.printOrderByCabinet(orderid);
+				PrintUtil.printOrderByOrderId(orderid);
 			}
 		} catch (error) {
 			console.log(error);
@@ -182,7 +183,7 @@ module.exports = {
 			await PostMessage.sendMessageIntergralGoodsSuccessToShop(shopDetail.phone);
 			// 打印商户订单
 			if (shopDetail.sn && resOrder.id) {
-				PrintUtil.printOrderByCabinet(resOrder.id);
+				PrintUtil.printOrderByOrderId(resOrder.id);
 			}
 		} catch (error) {
 			console.log(error);

@@ -43,7 +43,7 @@ module.exports = {
 			PhoneNumbers: phoneNum,
 			SignName: config.notify_message_sign,
 			TemplateCode: config.message_orderStartToUser,
-			TemplateParam: JSON.stringify({ name: 'MOVING' }), //模板变量值 {"code":"1111"} 对应的模板的${code}
+			TemplateParam: JSON.stringify({ name: 'MOVING' }),
 		};
 		return new Promise((resolve, reject) => {
 			client.request('SendSms', params, requestOption).then(
