@@ -124,6 +124,11 @@ module.exports = function (sequelize) {
 				allowNull: true,
 				defaultValue: '1',
 			},
+			urgency: {
+				type: Sequelize.INTEGER(11),
+				allowNull: true,
+				defaultValue: '1',
+			},
 			create_time: {
 				type: Sequelize.DATE,
 				allowNull: false,

@@ -45,6 +45,7 @@ module.exports = {
 				cellid: body.cellid,
 				create_time: moment().format('YYYY-MM-DD HH:mm:ss'),
 				is_sure: 1,
+				urgency: body.urgency,
 				pre_pay: body.pre_pay || 0,
 				order_type: body.order_type,
 			};
@@ -85,6 +86,7 @@ module.exports = {
 				send_money: 0,
 				is_sure: 1,
 				status: 6, // 预约上门等待店员取货
+				urgency: body.urgency,
 				order_type: 2, // 山门取衣
 			};
 			let order = await orderModel.create(params);
@@ -240,6 +242,7 @@ module.exports = {
 				'money',
 				'desc',
 				'status',
+				'urgency',
 				'is_sure',
 				'create_time',
 				'order_type',
@@ -302,6 +305,7 @@ module.exports = {
 				'pre_pay',
 				'send_money',
 				'desc',
+				'urgency',
 				'status',
 				'order_type',
 				'cabinetId',
