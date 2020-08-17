@@ -20,6 +20,8 @@ const moment = require('moment');
 const PrintUtil = require('../util/PrintUtil');
 const PostMessage = require('../util/PostMessage');
 
+const config = require('../config/AppConfig');
+
 const getAlipayParams = async (req) => {
 	let resBody = req.body;
 	let params = urlencode.parse(`value=${resBody.passback_params}`, { charset: 'gbk' });
@@ -110,6 +112,7 @@ const handlePayByType = async (payMsg, code, pay_type) => {
 				},
 			},
 		);
+		if (config.send_message_flag === 2) return;
 		// 发送信息给用户
 		let orderDetail = await orderModel.findOne({ where: { id: payMsg.orderid } });
 		PostMessage.sendMessageGetClothingSuccessToUser(orderDetail.home_phone);

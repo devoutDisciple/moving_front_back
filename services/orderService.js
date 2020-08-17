@@ -25,6 +25,8 @@ const cabinetUtil = require('../util/cabinetUtil');
 const PostMessage = require('../util/PostMessage');
 const PrintUtil = require('../util/PrintUtil');
 
+const config = require('../config/AppConfig');
+
 module.exports = {
 	// 通过洗衣柜下单
 	addByCabinet: async (req, res) => {
@@ -51,6 +53,7 @@ module.exports = {
 			};
 			let resOrder = await orderModel.create(params);
 			res.send(resultMessage.success('success'));
+			if (config.send_message_flag === 2) return;
 			let shop = await shopModel.findOne({ where: { id: body.shopid } });
 			let user = await userModel.findOne({ where: { id: body.userid } });
 			// 打印商户订单
@@ -120,6 +123,7 @@ module.exports = {
 			await orderModel.update({ status: 8, send_money: 9.9 }, { where: { id: orderid } });
 			res.send(resultMessage.success('success'));
 
+			if (config.send_message_flag === 2) return;
 			// 发送信息给用户
 			let orderDetail = await orderModel.findOne({ where: { id: orderid } });
 			await PostMessage.sendMessageGetClothingSuccessToUser(orderDetail.home_phone);
@@ -177,6 +181,8 @@ module.exports = {
 				},
 			);
 			res.send(resultMessage.success('success'));
+
+			if (config.send_message_flag === 2) return;
 			let goods = JSON.parse(body.goods) || {};
 			// 发送信息给用户
 			await PostMessage.sendMessageIntergralGoodsSuccessToUser(user.phone, goods.name || 'MOVING积分商品');
@@ -319,6 +325,7 @@ module.exports = {
 			result.shopManager = order.shopDetail ? order.shopDetail.manager : '';
 			result.shopPhone = order.shopDetail ? order.shopDetail.phone : '';
 			result.cabinetAddress = order.cabinetDetail ? order.cabinetDetail.address : '';
+			result.cabinetName = order.cabinetDetail ? order.cabinetDetail.name : '';
 			result.cabinetUrl = order.cabinetDetail ? order.cabinetDetail.url : '';
 			//上门取衣
 			if (result.order_type === 2) {
@@ -383,9 +390,7 @@ module.exports = {
 			);
 			// 更新订单状态
 			await orderModel.update({ status: 5 }, { where: { id: orderId } });
-			setTimeout(() => {
-				res.send(resultMessage.success('success'));
-			}, 3000);
+			res.send(resultMessage.success('success'));
 		} catch (error) {
 			console.log(error);
 			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
