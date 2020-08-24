@@ -42,4 +42,9 @@ router.post('/updateOrderStatus', (req, res) => {
 	orderService.updateOrderStatus(req, res);
 });
 
+// 店内下单
+router.post('/addByShopInput', (req, res) => {
+	orderService.addByShopInput(req, res);
+});
+
 module.exports = router;

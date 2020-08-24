@@ -1,5 +1,6 @@
 const resultMessage = require('../util/resultMessage');
 const sequelize = require('../dataSource/MysqlPoolClass');
+const MoneyUtil = require('../util/MoneyUtil');
 
 const order = require('../models/order');
 const orderModel = order(sequelize);
@@ -27,6 +28,8 @@ const PrintUtil = require('../util/PrintUtil');
 
 const config = require('../config/AppConfig');
 
+let isThursDay = moment(new Date().getTime()).day() === 4;
+
 module.exports = {
 	// 通过洗衣柜下单
 	addByCabinet: async (req, res) => {
@@ -47,9 +50,51 @@ module.exports = {
 				cellid: body.cellid,
 				create_time: moment().format('YYYY-MM-DD HH:mm:ss'),
 				is_sure: 1,
+				discount: isThursDay ? 8.5 : 10,
 				urgency: body.urgency,
 				pre_pay: body.pre_pay || 0,
 				order_type: body.order_type,
+			};
+			let resOrder = await orderModel.create(params);
+			res.send(resultMessage.success('success'));
+			if (config.send_message_flag === 2) return;
+			let shop = await shopModel.findOne({ where: { id: body.shopid } });
+			let user = await userModel.findOne({ where: { id: body.userid } });
+			// 打印商户订单
+			if (shop.sn && resOrder.id) {
+				PrintUtil.printOrderByOrderId(resOrder.id);
+			}
+			// 发送信息给用户
+			await PostMessage.sendOrderStartToUser(user.phone);
+			// 发送信息给商家
+			await PostMessage.sendOrderStartToShop(shop.phone, user.username, user.phone);
+		} catch (error) {
+			console.log(error);
+			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
+		}
+	},
+
+	// 店内下单
+	addByShopInput: async (req, res) => {
+		try {
+			let body = req.body,
+				code = ObjectUtil.createOrderCode();
+			let params = {
+				shopid: body.shopid,
+				code: code,
+				userid: body.userid,
+				goods: body.goods || '[]',
+				origin_money: body.money,
+				money: body.money,
+				desc: body.desc,
+				status: 2,
+				create_time: moment().format('YYYY-MM-DD HH:mm:ss'),
+				is_sure: 1,
+				send_status: body.send_status,
+				urgency: body.urgency,
+				discount: isThursDay ? 8.5 : 10,
+				pre_pay: 0,
+				order_type: 5,
 			};
 			let resOrder = await orderModel.create(params);
 			res.send(resultMessage.success('success'));
@@ -88,6 +133,7 @@ module.exports = {
 				create_time: moment().format('YYYY-MM-DD HH:mm:ss'),
 				send_money: 0,
 				is_sure: 1,
+				discount: isThursDay ? 8.5 : 10,
 				status: 6, // 预约上门等待店员取货
 				urgency: body.urgency,
 				order_type: 2, // 山门取衣
@@ -248,6 +294,7 @@ module.exports = {
 				'money',
 				'desc',
 				'status',
+				'discount',
 				'urgency',
 				'is_sure',
 				'create_time',
@@ -260,6 +307,7 @@ module.exports = {
 				item.cabinetName = orders[index]['cabinetDetail'] ? orders[index]['cabinetDetail']['name'] || '' : '';
 				item.cabinetAdderss = orders[index]['cabinetDetail'] ? orders[index]['cabinetDetail']['address'] || '' : '';
 				item.send_stattus = orders[index] ? orders[index]['send_stattus'] || '' : '';
+				MoneyUtil.countMoney(item);
 				//上门取衣
 				if (item.order_type === 2) {
 					item.home_address = orders[index] ? orders[index]['home_address'] || '' : '';
@@ -285,10 +333,9 @@ module.exports = {
 	// 获取某个订单详情
 	getOrderById: async (req, res) => {
 		try {
+			let { id } = req.query;
 			let order = await orderModel.findOne({
-				where: {
-					id: req.query.id,
-				},
+				where: { id: id },
 				include: [
 					{
 						model: shopModel,
@@ -327,6 +374,7 @@ module.exports = {
 			result.cabinetAddress = order.cabinetDetail ? order.cabinetDetail.address : '';
 			result.cabinetName = order.cabinetDetail ? order.cabinetDetail.name : '';
 			result.cabinetUrl = order.cabinetDetail ? order.cabinetDetail.url : '';
+			MoneyUtil.countMoney(result);
 			//上门取衣
 			if (result.order_type === 2) {
 				result.home_address = order ? order['home_address'] || '' : '';
