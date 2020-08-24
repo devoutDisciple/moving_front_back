@@ -22,6 +22,12 @@ module.exports = {
 				// 用户应付金额
 				item.payMoney = Number(item.discountMoney).toFixed(2);
 			}
+			if (item.payMoney * 1 == 0) {
+				item.payMoney = 0.01;
+			}
+			if (item.payMoney < 0) {
+				item.payMoney = 100000;
+			}
 		}
 	},
 };

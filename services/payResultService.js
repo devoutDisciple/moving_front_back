@@ -14,6 +14,9 @@ orderModel.belongsTo(shopModel, { foreignKey: 'shopid', targetKey: 'id', as: 'sh
 const bill = require('../models/bill');
 const billModal = bill(sequelize);
 
+const account = require('../models/account');
+const accountModel = account(sequelize);
+
 const urlencode = require('urlencode');
 const moment = require('moment');
 
@@ -116,6 +119,20 @@ const handlePayByType = async (payMsg, code, pay_type) => {
 		// 发送信息给用户
 		let orderDetail = await orderModel.findOne({ where: { id: payMsg.orderid } });
 		PostMessage.sendMessageGetClothingSuccessToUser(orderDetail.home_phone);
+
+		// 批量发送消息给商家
+		let shopid = orderDetail.shopid;
+		if (!shopid || !orderDetail.code) return;
+		let accountLists = await accountModel.findAll({ where: { shopid: shopid } });
+		let phoneList = [];
+		if (Array.isArray(accountLists)) {
+			accountLists.forEach((item) => {
+				phoneList.push(item.phone);
+			});
+		}
+		PostMessage.sendMessageGetClothingSuccessToShopBatch(phoneList, orderDetail.code);
+
+		// 打印商户订单
 		let result = await orderModel.findOne({
 			where: { id: payMsg.orderid },
 			include: [
@@ -125,10 +142,6 @@ const handlePayByType = async (payMsg, code, pay_type) => {
 				},
 			],
 		});
-		let shopPhone = result.shopDetail.phone;
-		if (!shopPhone || !result.code) return;
-		PostMessage.sendMessageGetClothingSuccessToShop(shopPhone, result.code);
-		// 打印商户订单
 		if (result.shopDetail.sn && result.id) {
 			PrintUtil.printOrderByOrderId(result.id);
 		}

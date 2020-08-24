@@ -147,7 +147,6 @@ module.exports = {
 					orderInfo += '<BR>';
 					orderInfo += '--------------------------------<BR>';
 					orderInfo += '<BR>';
-					orderInfo += `订单类型：${orderDetail.code}<BR>`;
 					orderInfo += `订单编号：${orderDetail.code}<BR>`;
 					orderInfo += `存放柜子：${cabinetDetail.name}<BR>`;
 					orderInfo += `存放地址：${cabinetDetail.address} ${orderDetail.cellid}号格口<BR>`;
@@ -233,6 +232,42 @@ module.exports = {
 					orderInfo += `下单时间：${moment(orderDetail.create_time).format('YYYY-MM-DD HH:mm:ss')}<BR>`;
 					orderInfo += '-------------------------------<BR>';
 					orderInfo += '<BR>';
+					orderInfo += '<QR>MOVING</QR>';
+				}
+
+				// 店内下单
+				if (orderDetail.order_type === 5) {
+					if (!shopDetail.sn || !shopDetail.key) return '暂无打印机编号';
+					let goods = orderDetail.goods;
+					goods = JSON.parse(goods);
+					orderInfo = '<CB>【 MOVING洗衣 】</CB><BR>'; //标题字体如需居中放大,就需要用标签套上
+					// orderInfo += '<C>-------------</C><BR>'; //标题字体如需居中放大,就需要用标签套上
+					orderInfo += '<BR>';
+					orderInfo += `订单类型：店内下单<BR>`;
+					orderInfo += '<BR>';
+					orderInfo += '-------------------------------<BR>';
+					orderInfo += '<BR>';
+					orderInfo += `衣物概况：<BR>`;
+					if (goods.length === 0) {
+						orderInfo += `该用户暂未添加衣物<BR>`;
+					} else {
+						goods.forEach((item) => {
+							orderInfo += `${item.name} * ${item.num}   ${item.price}元<BR>`;
+						});
+					}
+					orderInfo += '<BR>';
+					orderInfo += '--------------------------------<BR>';
+					orderInfo += '<BR>';
+					orderInfo += `订单编号：${orderDetail.code}<BR>`;
+					orderInfo += `用户名称：${userDetail.username}<BR>`;
+					orderInfo += `联系电话：${userDetail.phone}<BR>`;
+					orderInfo += `派送费：${orderDetail.send_money} 元<BR>`;
+					orderInfo += `原价：${orderDetail.origin_money} 元<BR>`;
+					orderInfo += `折扣：${orderDetail.discount} 折<BR>`;
+					orderInfo += `合计：${orderDetail.money} 元<BR>`;
+					orderInfo += `备注：${orderDetail.desc || '无'}<BR>`;
+					orderInfo += `状态：${orderDetail.is_sure === 1 ? '待确认洗衣价格' : '已确认洗衣费用'}<BR>`;
+					orderInfo += `下单时间: ${moment().format('YYYY-MM-DD HH:mm:ss')}<BR><BR>`;
 					orderInfo += '<QR>MOVING</QR>';
 				}
 				// 打印机编号

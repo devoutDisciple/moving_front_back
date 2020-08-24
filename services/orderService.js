@@ -13,6 +13,9 @@ const cabinet = require('../models/cabinet');
 const cabinetModel = cabinet(sequelize);
 orderModel.belongsTo(cabinetModel, { foreignKey: 'cabinetId', targetKey: 'id', as: 'cabinetDetail' });
 
+const account = require('../models/account');
+const accountModel = account(sequelize);
+
 const user = require('../models/user');
 const userModel = user(sequelize);
 
@@ -65,9 +68,18 @@ module.exports = {
 				PrintUtil.printOrderByOrderId(resOrder.id);
 			}
 			// 发送信息给用户
-			await PostMessage.sendOrderStartToUser(user.phone);
+			PostMessage.sendOrderStartToUser(user.phone);
 			// 发送信息给商家
-			await PostMessage.sendOrderStartToShop(shop.phone, user.username, user.phone);
+			// await PostMessage.sendOrderStartToShop(shop.phone, user.username, user.phone);
+			// 批量发送信息
+			let accountLists = await accountModel.findAll({ where: { shopid: body.shopid } });
+			let phoneList = [];
+			if (Array.isArray(accountLists)) {
+				accountLists.forEach((item) => {
+					phoneList.push(item.phone);
+				});
+			}
+			PostMessage.sendOrderStartToShopBatch(phoneList, user.username, user.phone);
 		} catch (error) {
 			console.log(error);
 			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
@@ -106,9 +118,18 @@ module.exports = {
 				PrintUtil.printOrderByOrderId(resOrder.id);
 			}
 			// 发送信息给用户
-			await PostMessage.sendOrderStartToUser(user.phone);
+			PostMessage.sendOrderStartToUser(user.phone);
 			// 发送信息给商家
-			await PostMessage.sendOrderStartToShop(shop.phone, user.username, user.phone);
+			// await PostMessage.sendOrderStartToShop(shop.phone, user.username, user.phone);
+			// 批量发送信息
+			let accountLists = await accountModel.findAll({ where: { shopid: body.shopid } });
+			let phoneList = [];
+			if (Array.isArray(accountLists)) {
+				accountLists.forEach((item) => {
+					phoneList.push(item.phone);
+				});
+			}
+			PostMessage.sendOrderStartToShopBatch(phoneList, user.username, user.phone);
 		} catch (error) {
 			console.log(error);
 			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
@@ -172,7 +193,21 @@ module.exports = {
 			if (config.send_message_flag === 2) return;
 			// 发送信息给用户
 			let orderDetail = await orderModel.findOne({ where: { id: orderid } });
-			await PostMessage.sendMessageGetClothingSuccessToUser(orderDetail.home_phone);
+			PostMessage.sendMessageGetClothingSuccessToUser(orderDetail.home_phone);
+
+			// 批量发送消息
+			let shopid = orderDetail.id;
+			if (!shopid || !orderDetail.code) return;
+			let accountLists = await accountModel.findAll({ where: { shopid: shopid } });
+			let phoneList = [];
+			if (Array.isArray(accountLists)) {
+				accountLists.forEach((item) => {
+					phoneList.push(item.phone);
+				});
+			}
+			PostMessage.sendMessageGetClothingSuccessToShopBatch(phoneList, orderDetail.code);
+
+			// 打印商户订单
 			let result = await orderModel.findOne({
 				where: { id: orderid },
 				include: [
@@ -182,11 +217,6 @@ module.exports = {
 					},
 				],
 			});
-			// 发送信息给商家
-			let shopPhone = result.shopDetail.phone;
-			if (!shopPhone || !result.code) return;
-			PostMessage.sendMessageGetClothingSuccessToShop(shopPhone, result.code);
-			// 打印商户订单
 			if (result.shopDetail.sn && orderid) {
 				PrintUtil.printOrderByOrderId(orderid);
 			}
@@ -231,11 +261,19 @@ module.exports = {
 			if (config.send_message_flag === 2) return;
 			let goods = JSON.parse(body.goods) || {};
 			// 发送信息给用户
-			await PostMessage.sendMessageIntergralGoodsSuccessToUser(user.phone, goods.name || 'MOVING积分商品');
-			// 发送信息给商家
-			let shopDetail = await shopModel.findOne({ where: { id: body.shopid } });
-			await PostMessage.sendMessageIntergralGoodsSuccessToShop(shopDetail.phone);
+			PostMessage.sendMessageIntergralGoodsSuccessToUser(user.phone, goods.name || 'MOVING积分商品');
+			// 批量发送信息
+			let accountLists = await accountModel.findAll({ where: { shopid: body.shopid } });
+			let phoneList = [];
+			if (Array.isArray(accountLists)) {
+				accountLists.forEach((item) => {
+					phoneList.push(item.phone);
+				});
+			}
+			PostMessage.sendMessageIntergralGoodsSuccessToShopBatch(phoneList);
+
 			// 打印商户订单
+			let shopDetail = await shopModel.findOne({ where: { id: body.shopid } });
 			if (shopDetail.sn && resOrder.id) {
 				PrintUtil.printOrderByOrderId(resOrder.id);
 			}
