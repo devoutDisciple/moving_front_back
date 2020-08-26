@@ -13,9 +13,7 @@ module.exports = {
 				order: [['sort', 'DESC']],
 			});
 			let result = responseUtil.renderFieldsAll(shops, ['id', 'name', 'address', 'phone']);
-			setTimeout(() => {
-				res.send(resultMessage.success(result));
-			}, 3000);
+			res.send(resultMessage.success(result));
 		} catch (error) {
 			console.log(error);
 			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));

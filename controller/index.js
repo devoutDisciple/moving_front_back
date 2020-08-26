@@ -16,9 +16,6 @@ const versionController = require('./versionController');
 const payResultController = require('./payResultController');
 const moneyController = require('./moneyController');
 
-// 测试
-const testController = require('./testController');
-
 const router = (app) => {
 	// 版本
 	app.use('/version', versionController);
@@ -54,8 +51,5 @@ const router = (app) => {
 	app.use('/payResult', payResultController);
 	// 支付金额种类相关 moneyController
 	app.use('/money', moneyController);
-
-	// 测试 testController
-	app.use('/test', testController);
 };
 module.exports = router;

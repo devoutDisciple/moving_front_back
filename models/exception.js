@@ -27,12 +27,12 @@ module.exports = function (sequelize) {
 				type: Sequelize.INTEGER(11),
 				allowNull: true,
 			},
-			boxid: {
-				type: Sequelize.STRING(255),
-				allowNull: true,
-			},
 			cabinetid: {
 				type: Sequelize.INTEGER(11),
+				allowNull: true,
+			},
+			boxid: {
+				type: Sequelize.STRING(255),
 				allowNull: true,
 			},
 			cellid: {

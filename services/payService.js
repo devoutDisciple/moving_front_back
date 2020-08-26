@@ -180,13 +180,9 @@ module.exports = {
 			if (currentBalance < Number(money)) {
 				return res.send(resultMessage.error('可用余额不足'));
 			}
+			let useabledMoney = Number(Number(currentUser.balance) - Number(money)).toFixed(2);
 			// 更新用户余额
-			await userModel.update(
-				{
-					balance: parseInt(Number(Number(currentUser.balance) - Number(money))),
-				},
-				{ where: { id: userid } },
-			);
+			await userModel.update({ balance: useabledMoney }, { where: { id: userid } });
 			// 更改订单状态
 			await orderModel.update({ status: 4 }, { where: { id: orderid } });
 			res.send(resultMessage.success('success'));

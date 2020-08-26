@@ -118,7 +118,7 @@ module.exports = {
 				PrintUtil.printOrderByOrderId(resOrder.id);
 			}
 			// 发送信息给用户
-			PostMessage.sendOrderStartToUser(user.phone);
+			PostMessage.sendUserShopOrderSuccessToUser(user.phone);
 			// 发送信息给商家
 			// await PostMessage.sendOrderStartToShop(shop.phone, user.username, user.phone);
 			// 批量发送信息
@@ -129,7 +129,7 @@ module.exports = {
 					phoneList.push(item.phone);
 				});
 			}
-			PostMessage.sendOrderStartToShopBatch(phoneList, user.username, user.phone);
+			PostMessage.sendUserShopOrderSuccessToShopBatch(phoneList);
 		} catch (error) {
 			console.log(error);
 			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
@@ -175,7 +175,7 @@ module.exports = {
 			let user = await userModel.findOne({ where: { id: userid } });
 			// 增加用户积分
 			let currentBalance = user.balance;
-			let updateBalance = (Number(currentBalance) - 9.9).toFixed(2);
+			let updateBalance = Number(Number(currentBalance) - 9.9).toFixed(2);
 			if (updateBalance < 9.9) {
 				return res.send(resultMessage.error('账户余额不足，请充值'));
 			}
@@ -335,6 +335,7 @@ module.exports = {
 				'discount',
 				'urgency',
 				'is_sure',
+				'send_status',
 				'create_time',
 				'order_type',
 			]);
@@ -399,6 +400,7 @@ module.exports = {
 				'urgency',
 				'status',
 				'order_type',
+				'send_status',
 				'cabinetId',
 				'cellid',
 				'is_sure',
@@ -427,9 +429,7 @@ module.exports = {
 				result.intergral_username = order ? order['intergral_username'] || '' : '';
 				result.intergral_num = order ? order['intergral_num'] || '' : '';
 			}
-			setTimeout(() => {
-				res.send(resultMessage.success(result));
-			}, 3000);
+			res.send(resultMessage.success(result));
 		} catch (error) {
 			console.log(error);
 			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));

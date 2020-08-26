@@ -23,11 +23,6 @@ module.exports = function (sequelize) {
 				type: Sequelize.INTEGER(11),
 				allowNull: true,
 			},
-			order_type: {
-				type: Sequelize.INTEGER(11),
-				allowNull: false,
-				defaultValue: '1',
-			},
 			goods: {
 				type: Sequelize.STRING(8000),
 				allowNull: true,
@@ -110,9 +105,10 @@ module.exports = function (sequelize) {
 				allowNull: true,
 				defaultValue: '10',
 			},
-			desc: {
-				type: Sequelize.STRING(255),
-				allowNull: true,
+			order_type: {
+				type: Sequelize.INTEGER(11),
+				allowNull: false,
+				defaultValue: '1',
 			},
 			send_status: {
 				type: Sequelize.INTEGER(11),
@@ -128,6 +124,10 @@ module.exports = function (sequelize) {
 				type: Sequelize.INTEGER(11),
 				allowNull: true,
 				defaultValue: '1',
+			},
+			desc: {
+				type: Sequelize.STRING(255),
+				allowNull: true,
 			},
 			create_time: {
 				type: Sequelize.DATE,

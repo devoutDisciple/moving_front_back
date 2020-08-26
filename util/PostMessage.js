@@ -214,7 +214,7 @@ module.exports = {
 			TemplateParamJson: JSON.stringify(TemplateParamJson),
 		};
 		return new Promise((resolve, reject) => {
-			client.request('SendSms', params, requestOption).then(
+			client.request('SendBatchSms', params, requestOption).then(
 				() => {
 					resolve('success');
 				},
@@ -283,7 +283,55 @@ module.exports = {
 			TemplateCode: config.message_intergralGoodsSuccessToShop,
 		};
 		return new Promise((resolve, reject) => {
+			client.request('SendBatchSms', params, requestOption).then(
+				() => {
+					resolve('success');
+				},
+				(ex) => {
+					reject('发送失败');
+					console.log(ex);
+				},
+			);
+		});
+	},
+
+	// 发送用户店内下单成功通知给用户
+	sendUserShopOrderSuccessToUser: (phoneNum) => {
+		var params = {
+			RegionId: 'cn-hangzhou',
+			PhoneNumbers: phoneNum,
+			SignName: config.notify_message_sign,
+			TemplateCode: config.message_userShopOrderSuccessToUsre,
+		};
+		return new Promise((resolve, reject) => {
 			client.request('SendSms', params, requestOption).then(
+				(result) => {
+					console.log(JSON.stringify(result));
+					resolve({ phoneNum });
+				},
+				(ex) => {
+					reject('发送失败');
+					console.log(ex);
+				},
+			);
+		});
+	},
+
+	// 发送用户店内订单通知给商家
+	sendUserShopOrderSuccessToShopBatch: (PhoneNumberJson) => {
+		if (!Array.isArray(PhoneNumberJson)) return;
+		let SignNameJson = [];
+		PhoneNumberJson.forEach(() => {
+			SignNameJson.push(config.notify_message_sign);
+		});
+		var params = {
+			RegionId: 'cn-hangzhou',
+			PhoneNumberJson: JSON.stringify(PhoneNumberJson),
+			SignNameJson: JSON.stringify(SignNameJson),
+			TemplateCode: config.message_userShopOrderSuccessToShop,
+		};
+		return new Promise((resolve, reject) => {
+			client.request('SendBatchSms', params, requestOption).then(
 				() => {
 					resolve('success');
 				},
