@@ -163,8 +163,8 @@ module.exports = {
 					if (orderDetail.urgency === 2) {
 						orderInfo += `加急费用：${orderDetail.urgencyMoney} 元<BR>`;
 					}
-					orderInfo += `优惠：${orderDetail.subDiscountMoney} 折<BR>`;
-					orderInfo += `应付金额：${orderDetail.payMoney} 折<BR>`;
+					orderInfo += `优惠：${orderDetail.subDiscountMoney} 元<BR>`;
+					orderInfo += `应付金额：${orderDetail.payMoney} 元<BR>`;
 					orderInfo += `备注：${orderDetail.desc || '无'}<BR>`;
 					orderInfo += `状态：${orderDetail.is_sure === 1 ? '待确认洗衣价格' : '已确认洗衣费用'}<BR>`;
 					orderInfo += `下单时间: ${moment().format('YYYY-MM-DD HH:mm:ss')}<BR><BR>`;
@@ -274,8 +274,8 @@ module.exports = {
 					if (orderDetail.urgency === 2) {
 						orderInfo += `加急费用：${orderDetail.urgencyMoney} 元<BR>`;
 					}
-					orderInfo += `优惠：${orderDetail.subDiscountMoney} 折<BR>`;
-					orderInfo += `应付金额：${orderDetail.payMoney} 折<BR>`;
+					orderInfo += `优惠：${orderDetail.subDiscountMoney} 元<BR>`;
+					orderInfo += `应付金额：${orderDetail.payMoney} 元<BR>`;
 					orderInfo += `备注：${orderDetail.desc || '无'}<BR>`;
 					orderInfo += `配送方式：${orderDetail.send_status == 1 ? 'MOVING洗衣柜' : '用户自取'}<BR>`;
 					orderInfo += `下单时间: ${moment().format('YYYY-MM-DD HH:mm:ss')}<BR><BR>`;

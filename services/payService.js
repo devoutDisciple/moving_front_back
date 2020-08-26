@@ -32,6 +32,7 @@ module.exports = {
 			}
 			// 订单支付 或者 上门取衣费用
 			if (type === 'order' || type === 'clothing') {
+				console.log(type, userid, money, orderid, 888);
 				passback_params = { type: type, userid: userid, money: money, orderid: orderid };
 			}
 			if (type === 'save_clothing') {
@@ -45,7 +46,7 @@ module.exports = {
 				body: desc || 'MOVING洗衣', // 商品描述
 				nonce_str: PayUtil.getNonceStr(), //随机字符串
 				out_trade_no: out_trade_no, // 用户订单号
-				total_fee: Number(money) * 100, //商品价格 单位分
+				total_fee: Number(Number(money) * 100).toFixed(0), //商品价格 单位分
 				// total_fee: 1, //商品价格 单位分
 				spbill_create_ip: '47.107.43.166', // 发起访问ip
 				//异步接收微信支付结果通知的回调地址，通知url必须为外网可访问的url，不能携带参数。
