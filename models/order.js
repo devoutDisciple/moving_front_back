@@ -115,6 +115,11 @@ module.exports = function (sequelize) {
 				allowNull: true,
 				defaultValue: '1',
 			},
+			send_home: {
+				type: Sequelize.INTEGER(11),
+				allowNull: true,
+				defaultValue: '1',
+			},
 			status: {
 				type: Sequelize.INTEGER(11),
 				allowNull: true,

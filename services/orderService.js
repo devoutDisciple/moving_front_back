@@ -171,14 +171,15 @@ module.exports = {
 	// 预约上门取衣用余额支付
 	subMoneyByAccount: async (req, res) => {
 		try {
-			let { userid, orderid } = req.body;
+			let { userid, orderid, money } = req.body;
 			let user = await userModel.findOne({ where: { id: userid } });
-			// 增加用户积分
+			// 目前账户余额
 			let currentBalance = user.balance;
-			let updateBalance = Number(Number(currentBalance) - 9.9).toFixed(2);
-			if (updateBalance < 9.9) {
+			let updateBalance = Number(Number(currentBalance) - Number(money)).toFixed(2);
+			if (updateBalance < 0) {
 				return res.send(resultMessage.error('账户余额不足，请充值'));
 			}
+			// 更新账户余额
 			await userModel.update(
 				{ balance: updateBalance },
 				{
@@ -187,7 +188,30 @@ module.exports = {
 					},
 				},
 			);
-			await orderModel.update({ status: 8, send_money: 9.9 }, { where: { id: orderid } });
+			let currentOrderDetail = await orderModel.findOne({ where: { id: orderid } });
+			// 将要更新的状态
+			let state = {};
+			// 支付取衣费用
+			if (currentOrderDetail.status === 6) {
+				state.status = 8;
+				state.send_money = 9.9;
+			}
+			// 如果是支付订单金额,如果是存放在柜子里
+			if (currentOrderDetail.status === 3 && currentOrderDetail.cabinetId && currentOrderDetail.boxid && currentOrderDetail.cellid) {
+				state.status = 4;
+			}
+
+			// 如果是支付订单金额,此时订单已经派送到用户手中
+			if (
+				currentOrderDetail.status === 3 &&
+				currentOrderDetail.send_home === 2 &&
+				!currentOrderDetail.cabinetId &&
+				!currentOrderDetail.boxid
+			) {
+				state.status = 5;
+			}
+			// 更新订单状态
+			await orderModel.update(state, { where: { id: orderid } });
 			res.send(resultMessage.success('success'));
 
 			if (config.send_message_flag === 2) return;
@@ -336,6 +360,7 @@ module.exports = {
 				'urgency',
 				'is_sure',
 				'send_status',
+				'send_home',
 				'create_time',
 				'order_type',
 			]);
@@ -401,6 +426,7 @@ module.exports = {
 				'status',
 				'order_type',
 				'send_status',
+				'send_home',
 				'cabinetId',
 				'cellid',
 				'is_sure',
@@ -441,6 +467,18 @@ module.exports = {
 		try {
 			let { orderid, status } = req.body;
 			await orderModel.update({ status: status }, { where: { id: orderid } });
+			res.send(resultMessage.success('success'));
+		} catch (error) {
+			console.log(error);
+			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
+		}
+	},
+
+	// 取消订单
+	cancleOrder: async (req, res) => {
+		try {
+			let { orderid } = req.body;
+			await orderModel.destroy({ where: { id: orderid } });
 			res.send(resultMessage.success('success'));
 		} catch (error) {
 			console.log(error);

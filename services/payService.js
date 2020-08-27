@@ -185,7 +185,25 @@ module.exports = {
 			// 更新用户余额
 			await userModel.update({ balance: useabledMoney }, { where: { id: userid } });
 			// 更改订单状态
-			await orderModel.update({ status: 4 }, { where: { id: orderid } });
+			let currentOrderDetail = await orderModel.findOne({ where: { id: orderid } });
+			// 将要更新的状态
+			let status = 4;
+			// 如果是支付订单金额,如果是存放在柜子里
+			if (currentOrderDetail.status === 3 && currentOrderDetail.cabinetId && currentOrderDetail.boxid && currentOrderDetail.cellid) {
+				status = 4;
+			}
+
+			// 如果是支付订单金额,此时订单已经派送到用户手中
+			if (
+				currentOrderDetail.status === 3 &&
+				currentOrderDetail.send_home === 2 &&
+				!currentOrderDetail.cabinetId &&
+				!currentOrderDetail.boxid
+			) {
+				status = 5;
+			}
+			// 更改订单状态
+			await orderModel.update({ status: status }, { where: { id: orderid } });
 			res.send(resultMessage.success('success'));
 		} catch (error) {
 			console.log(error);

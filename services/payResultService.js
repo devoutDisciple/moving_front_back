@@ -64,6 +64,7 @@ const handlePayByType = async (payMsg, code, pay_type) => {
 			},
 		);
 	}
+
 	// 订单支付
 	if (payMsg.type === 'order') {
 		// 支付信息入库
@@ -77,7 +78,25 @@ const handlePayByType = async (payMsg, code, pay_type) => {
 			create_time: moment().format('YYYY-MM-DD HH:mm:ss'),
 		});
 		// 更改订单状态
-		await orderModel.update({ status: 4 }, { where: { id: payMsg.orderid } });
+		let currentOrderDetail = await orderModel.findOne({ where: { id: payMsg.orderid } });
+		// 将要更新的状态
+		let status = 4;
+		// 如果是支付订单金额,如果是存放在柜子里
+		if (currentOrderDetail.status === 3 && currentOrderDetail.cabinetId && currentOrderDetail.boxid && currentOrderDetail.cellid) {
+			status = 4;
+		}
+
+		// 如果是支付订单金额,此时订单已经派送到用户手中
+		if (
+			currentOrderDetail.status === 3 &&
+			currentOrderDetail.send_home === 2 &&
+			!currentOrderDetail.cabinetId &&
+			!currentOrderDetail.boxid
+		) {
+			status = 5;
+		}
+		// 更改订单状态
+		await orderModel.update({ status: status }, { where: { id: payMsg.orderid } });
 		// 增加用户积分
 		let currentIntergral = user.integral;
 		let updateIntergral = (Number(currentIntergral) + parseInt(Number(payMsg.money))).toFixed(0);
@@ -90,6 +109,7 @@ const handlePayByType = async (payMsg, code, pay_type) => {
 			},
 		);
 	}
+
 	// 上门取衣支付
 	if (payMsg.type === 'clothing') {
 		// 支付信息入库
@@ -102,11 +122,33 @@ const handlePayByType = async (payMsg, code, pay_type) => {
 			type: payMsg.type,
 			create_time: moment().format('YYYY-MM-DD HH:mm:ss'),
 		});
-		// 更改订单状态
-		await orderModel.update({ status: 8, send_money: payMsg.money }, { where: { id: payMsg.orderid } });
+		let currentOrderDetail = await orderModel.findOne({ where: { id: payMsg.orderid } });
+		// 如果是预付上门取衣费用
+		if (currentOrderDetail.status === 6) {
+			// 更改订单状态
+			await orderModel.update({ status: 8, send_money: payMsg.money }, { where: { id: payMsg.orderid } });
+		}
+
+		// 如果是支付订单金额,如果是存放在柜子里
+		if (currentOrderDetail.status === 3 && currentOrderDetail.cabinetId && currentOrderDetail.boxid && currentOrderDetail.cellid) {
+			// 更改订单状态
+			await orderModel.update({ status: 4, send_money: payMsg.money }, { where: { id: payMsg.orderid } });
+		}
+
+		// 如果是支付订单金额,此时订单已经派送到用户手中
+		if (
+			currentOrderDetail.status === 3 &&
+			currentOrderDetail.send_home === 2 &&
+			!currentOrderDetail.cabinetId &&
+			!currentOrderDetail.boxid
+		) {
+			// 更改订单状态
+			await orderModel.update({ status: 5, send_money: payMsg.money }, { where: { id: payMsg.orderid } });
+		}
+
 		// 增加用户积分
 		let currentIntergral = user.integral;
-		let updateIntergral = (Number(currentIntergral) + 10).toFixed(0);
+		let updateIntergral = Number(Number(currentIntergral) + Number(payMsg.money)).toFixed(0);
 		await userModel.update(
 			{ integral: updateIntergral },
 			{
@@ -146,6 +188,7 @@ const handlePayByType = async (payMsg, code, pay_type) => {
 			PrintUtil.printOrderByOrderId(result.id);
 		}
 	}
+
 	// 洗衣柜使用费用支付
 	if (payMsg.type === 'save_clothing') {
 		// 支付信息入库
