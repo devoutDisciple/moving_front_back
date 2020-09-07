@@ -26,6 +26,7 @@ module.exports = function (sequelize) {
 			goods: {
 				type: Sequelize.STRING(8000),
 				allowNull: true,
+				defaultValue: '[]',
 			},
 			send_people: {
 				type: Sequelize.STRING(255),

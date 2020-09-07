@@ -31,7 +31,8 @@ module.exports = {
 	// 根据用户id获取当前用户信息
 	getUserByUserid: async (req, res) => {
 		try {
-			let userid = req.query.userid;
+			let { userid } = req.query;
+			if (!userid) return res.send(resultMessage.error('暂无用户信息'));
 			let data = await userModel.findOne({
 				where: {
 					id: userid,
@@ -50,6 +51,7 @@ module.exports = {
 	getUserCabinetUseTimeByUserid: async (req, res) => {
 		try {
 			let { userid } = req.query;
+			if (!userid) return res.send(resultMessage.error('暂无用户信息'));
 			let data = await userModel.findOne({ where: { id: userid } });
 			// eslint-disable-next-line
 			let result = responseUtil.renderFieldsObj(data, ["cabinet_use_time"]);
