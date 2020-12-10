@@ -19,6 +19,7 @@ module.exports = {
 	payOrderByWechat: async (req, res) => {
 		try {
 			let { desc, money, type, userid, given, orderid } = req.body;
+			if (!type || !userid) return res.send(resultMessage.error('系统维护中，请稍后重试！'));
 			// shopid: shopid,
 			// home_time: home_time,
 			// home_address: home_address,
@@ -122,6 +123,7 @@ module.exports = {
 	payByOrderAlipay: async (req, res) => {
 		try {
 			let { desc, money, type, userid, given, orderid } = req.body;
+			if (!type || !userid) return res.send(resultMessage.error('系统维护中，请稍后重试！'));
 			let passback_params = '';
 			//type分类： member-会员 recharge-余额充值 order-订单支付
 			if (type === 'member' || type === 'recharge') {
