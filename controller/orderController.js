@@ -47,7 +47,7 @@ router.post('/addByShopInput', (req, res) => {
 	orderService.addByShopInput(req, res);
 });
 
-// 取消订单 cancleOrder
+// 取消订单
 router.post('/cancleOrder', (req, res) => {
 	orderService.cancleOrder(req, res);
 });
