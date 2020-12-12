@@ -18,7 +18,7 @@ module.exports = {
 		var params = {
 			RegionId: 'cn-hangzhou',
 			PhoneNumbers: phoneNum,
-			SignName: config.login_message_sign,
+			SignName: config.notify_message_sign,
 			TemplateCode: config.message_loginyanzhengma,
 			TemplateParam: JSON.stringify({ code: code }),
 		};
