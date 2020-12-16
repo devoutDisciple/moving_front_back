@@ -1,57 +1,61 @@
+const urlencode = require('urlencode');
+const moment = require('moment');
 const resultMessage = require('../util/resultMessage');
 const sequelize = require('../dataSource/MysqlPoolClass');
 
 const user = require('../models/user');
+
 const userModel = user(sequelize);
 
 const order = require('../models/order');
+
 const orderModel = order(sequelize);
 
 const shop = require('../models/shop');
+
 const shopModel = shop(sequelize);
 orderModel.belongsTo(shopModel, { foreignKey: 'shopid', targetKey: 'id', as: 'shopDetail' });
 
 const bill = require('../models/bill');
+
 const billModal = bill(sequelize);
 
 const account = require('../models/account');
-const accountModel = account(sequelize);
 
-const urlencode = require('urlencode');
-const moment = require('moment');
+const accountModel = account(sequelize);
 
 const PrintUtil = require('../util/PrintUtil');
 const PostMessage = require('../util/PostMessage');
 
 const config = require('../config/AppConfig');
 
-const getAlipayParams = async (req) => {
-	let resBody = req.body;
-	let params = urlencode.parse(`value=${resBody.passback_params}`, { charset: 'gbk' });
-	let value = params.value;
-	let arr = value.split('&');
-	let payMsg = {};
-	arr.forEach((item) => {
-		let tempArr = item.split('=');
+const getAlipayParams = async req => {
+	const resBody = req.body;
+	const params = urlencode.parse(`value=${resBody.passback_params}`, { charset: 'gbk' });
+	const { value } = params;
+	const arr = value.split('&');
+	const payMsg = {};
+	arr.forEach(item => {
+		const tempArr = item.split('=');
 		payMsg[tempArr[0]] = tempArr[1];
 	});
 	return payMsg;
 };
 
 const handlePayByType = async (payMsg, code, pay_type) => {
-	let user = await userModel.findOne({ where: { id: payMsg.userid } });
+	const userDetail = await userModel.findOne({ where: { id: payMsg.userid } });
 	if (payMsg.type === 'member' || payMsg.type === 'recharge') {
-		let currentBalance = user.balance;
-		let currentIntegral = user.integral;
-		let totalBalance = (Number(currentBalance) + Number(payMsg.money) + Number(payMsg.given)).toFixed(2);
-		let totalIntegral = (Number(currentIntegral) + Number(payMsg.money) + Number(payMsg.given)).toFixed(0);
+		const currentBalance = userDetail.balance;
+		const currentIntegral = userDetail.integral;
+		const totalBalance = (Number(currentBalance) + Number(payMsg.money) + Number(payMsg.given)).toFixed(2);
+		const totalIntegral = (Number(currentIntegral) + Number(payMsg.money) + Number(payMsg.given)).toFixed(0);
 		// 支付信息入库
 		await billModal.create({
 			code,
 			userid: payMsg.userid,
 			money: payMsg.money,
 			type: payMsg.type,
-			pay_type: pay_type,
+			pay_type,
 			send: payMsg.given,
 			create_time: moment().format('YYYY-MM-DD HH:mm:ss'),
 		});
@@ -73,12 +77,12 @@ const handlePayByType = async (payMsg, code, pay_type) => {
 			userid: payMsg.userid,
 			orderid: payMsg.orderid,
 			money: payMsg.money,
-			pay_type: pay_type,
+			pay_type,
 			type: payMsg.type,
 			create_time: moment().format('YYYY-MM-DD HH:mm:ss'),
 		});
 		// 更改订单状态
-		let currentOrderDetail = await orderModel.findOne({ where: { id: payMsg.orderid } });
+		const currentOrderDetail = await orderModel.findOne({ where: { id: payMsg.orderid } });
 		// 将要更新的状态
 		let status = 4;
 		// 如果是支付订单金额,如果是存放在柜子里
@@ -96,10 +100,10 @@ const handlePayByType = async (payMsg, code, pay_type) => {
 			status = 5;
 		}
 		// 更改订单状态
-		await orderModel.update({ status: status }, { where: { id: payMsg.orderid } });
+		await orderModel.update({ status }, { where: { id: payMsg.orderid } });
 		// 增加用户积分
-		let currentIntergral = user.integral;
-		let updateIntergral = (Number(currentIntergral) + parseInt(Number(payMsg.money))).toFixed(0);
+		const currentIntergral = userDetail.integral;
+		const updateIntergral = (Number(currentIntergral) + Number(payMsg.money)).toFixed(0);
 		await userModel.update(
 			{ integral: updateIntergral },
 			{
@@ -118,11 +122,11 @@ const handlePayByType = async (payMsg, code, pay_type) => {
 			userid: payMsg.userid,
 			orderid: payMsg.orderid,
 			money: payMsg.money,
-			pay_type: pay_type,
+			pay_type,
 			type: payMsg.type,
 			create_time: moment().format('YYYY-MM-DD HH:mm:ss'),
 		});
-		let currentOrderDetail = await orderModel.findOne({ where: { id: payMsg.orderid } });
+		const currentOrderDetail = await orderModel.findOne({ where: { id: payMsg.orderid } });
 		// 如果是预付上门取衣费用
 		if (currentOrderDetail.status === 6) {
 			// 更改订单状态
@@ -147,8 +151,8 @@ const handlePayByType = async (payMsg, code, pay_type) => {
 		}
 
 		// 增加用户积分
-		let currentIntergral = user.integral;
-		let updateIntergral = Number(Number(currentIntergral) + Number(payMsg.money)).toFixed(0);
+		const currentIntergral = userDetail.integral;
+		const updateIntergral = Number(Number(currentIntergral) + Number(payMsg.money)).toFixed(0);
 		await userModel.update(
 			{ integral: updateIntergral },
 			{
@@ -159,23 +163,23 @@ const handlePayByType = async (payMsg, code, pay_type) => {
 		);
 		if (config.send_message_flag === 2) return;
 		// 发送信息给用户
-		let orderDetail = await orderModel.findOne({ where: { id: payMsg.orderid } });
+		const orderDetail = await orderModel.findOne({ where: { id: payMsg.orderid } });
 		PostMessage.sendMessageGetClothingSuccessToUser(orderDetail.home_phone);
 
 		// 批量发送消息给商家
-		let shopid = orderDetail.shopid;
+		const { shopid } = orderDetail;
 		if (!shopid || !orderDetail.code) return;
-		let accountLists = await accountModel.findAll({ where: { shopid: shopid } });
-		let phoneList = [];
+		const accountLists = await accountModel.findAll({ where: { shopid } });
+		const phoneList = [];
 		if (Array.isArray(accountLists)) {
-			accountLists.forEach((item) => {
+			accountLists.forEach(item => {
 				phoneList.push(item.phone);
 			});
 		}
 		PostMessage.sendMessageGetClothingSuccessToShopBatch(phoneList, orderDetail.code);
 
 		// 打印商户订单
-		let result = await orderModel.findOne({
+		const result = await orderModel.findOne({
 			where: { id: payMsg.orderid },
 			include: [
 				{
@@ -196,15 +200,15 @@ const handlePayByType = async (payMsg, code, pay_type) => {
 			code,
 			userid: payMsg.userid,
 			money: payMsg.money,
-			pay_type: pay_type,
+			pay_type,
 			type: payMsg.type,
 			create_time: moment().format('YYYY-MM-DD HH:mm:ss'),
 		});
 		// 增加用户积分
-		let currentIntergral = user.integral;
-		let updateIntergral = (Number(currentIntergral) + 1).toFixed(0);
-		let cabinet_use_time = user.cabinet_use_time;
-		let updateCabinetUseTimes = (Number(cabinet_use_time) + 1).toFixed(0);
+		const currentIntergral = userDetail.integral;
+		const updateIntergral = (Number(currentIntergral) + 1).toFixed(0);
+		const { cabinet_use_time } = userDetail;
+		const updateCabinetUseTimes = (Number(cabinet_use_time) + 1).toFixed(0);
 		// 增加柜子使用次数
 		await userModel.update(
 			{ integral: updateIntergral, cabinet_use_time: updateCabinetUseTimes },
@@ -222,13 +226,13 @@ module.exports = {
 	handleAlipy: async (req, res) => {
 		try {
 			if (!req.body || !req.body.passback_params) return res.send(resultMessage.error('支付失败'));
-			let alipayRes = req.body;
-			let code = alipayRes.out_trade_no;
+			const alipayRes = req.body;
+			const code = alipayRes.out_trade_no;
 			// type： member-成为会员 recharge-充值 order-订单支付
 			// 查看是否已经村则该订单
-			let currentBill = await billModal.findOne({ where: { code: code } });
+			const currentBill = await billModal.findOne({ where: { code } });
 			if (currentBill) return;
-			let payMsg = await getAlipayParams(req);
+			const payMsg = await getAlipayParams(req);
 			// { type: 'member', userid: '10', money: '0.01', given: '400' }
 			// 会员充值 或者余额充值
 			await handlePayByType(payMsg, code, 'alipay');
@@ -242,26 +246,26 @@ module.exports = {
 	// 处理微信支付回调
 	handleWechat: async (req, res) => {
 		try {
-			let resBody = req.body;
-			if (!resBody.xml || resBody.xml.result_code != 'SUCCESS') return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
-			let code = resBody.xml.out_trade_no;
+			const resBody = req.body;
+			if (!resBody.xml || resBody.xml.result_code !== 'SUCCESS') return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
+			const code = resBody.xml.out_trade_no;
 			// type： member-成为会员 recharge-充值 order-订单支付
 			// 查看是否已经村则该订单
-			let currentBill = await billModal.findOne({ where: { code: code } });
+			const currentBill = await billModal.findOne({ where: { code } });
 			if (currentBill) return;
-			let payMsg = JSON.parse(resBody.xml.attach);
+			const payMsg = JSON.parse(resBody.xml.attach);
 			// { type: 'member', userid: '10', money: '0.01', given: '400' }
 			// 会员充值 或者余额充值
 			await handlePayByType(payMsg, code, 'wechat');
 
-			var json2Xml = function (json) {
-				let _xml = '';
-				Object.keys(json).map((key) => {
-					_xml += `<${key}>${json[key]}</${key}>`;
+			const json2Xml = json => {
+				let XML = '';
+				Object.keys(json).forEach(key => {
+					XML += `<${key}>${json[key]}</${key}>`;
 				});
-				return `<xml>${_xml}</xml>`;
+				return `<xml>${XML}</xml>`;
 			};
-			var sendData = {
+			const sendData = {
 				return_code: 'SUCCESS',
 				return_msg: 'OK',
 			};

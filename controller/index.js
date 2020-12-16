@@ -16,7 +16,7 @@ const versionController = require('./versionController');
 const payResultController = require('./payResultController');
 const moneyController = require('./moneyController');
 
-const router = (app) => {
+const router = app => {
 	// 版本
 	app.use('/version', versionController);
 	// 用户
