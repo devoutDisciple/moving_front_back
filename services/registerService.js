@@ -4,9 +4,11 @@ const resultMessage = require('../util/resultMessage');
 const PostMessage = require('../util/PostMessage');
 
 const register = require('../models/register');
+
 const registerModel = register(sequelize);
 
 const user = require('../models/user');
+
 const userModel = user(sequelize);
 const responseUtil = require('../util/responseUtil');
 
@@ -16,19 +18,19 @@ module.exports = {
 	// 发送注册验证码
 	sendMessage: async (req, res) => {
 		try {
-			let { phoneNum } = req.body;
+			const { phoneNum } = req.body;
 			// 查询是否注册过
-			let userRes = await userModel.findOne({
+			const userRes = await userModel.findOne({
 				where: {
 					phone: phoneNum,
 				},
 			});
 			// 判断是否注册过
 			if (userRes) return res.send(resultMessage.error('该手机号或昵称已注册'));
-			let code = PostMessage.getMessageCode();
+			const code = PostMessage.getMessageCode();
 			// 发送验证码
 			await PostMessage.postLoginMessage(phoneNum, code);
-			let phoneModel = await registerModel.findOne({
+			const phoneModel = await registerModel.findOne({
 				where: {
 					phone: phoneNum,
 				},
@@ -46,7 +48,9 @@ module.exports = {
 				phone: phoneNum,
 				security_code: code,
 				create_time: moment().format('YYYY-MM-DD HH:mm:ss'),
-				expire_time: moment().add('seconds', 60).format('YYYY-MM-DD HH:mm:ss'),
+				expire_time: moment()
+					.add('seconds', 60)
+					.format('YYYY-MM-DD HH:mm:ss'),
 			});
 			res.send(resultMessage.success('success'));
 		} catch (error) {
@@ -58,23 +62,23 @@ module.exports = {
 	// 注册用户
 	register: async (req, res) => {
 		try {
-			let { phone, security_code, password, username } = req.body;
+			const { phone, security_code, password, username } = req.body;
 			// 查询是否获得了验证码
-			let registerRes = await registerModel.findOne({
+			const registerRes = await registerModel.findOne({
 				where: {
-					phone: phone,
+					phone,
 				},
 			});
 			// 查询是否注册过
-			let userRes = await userModel.findOne({
+			const userRes = await userModel.findOne({
 				where: {
-					phone: phone,
+					phone,
 				},
 			});
 			// 判断是否注册过
 			if (userRes) return res.send(resultMessage.error('该手机号或昵称已注册'));
 			// 判断用户的验证码是否正确
-			if (!registerRes || registerRes.security_code != security_code) {
+			if (!registerRes || registerRes.security_code !== security_code) {
 				return res.send(resultMessage.error('请输入正确的验证码'));
 			}
 			// 判断验证码是否过期
@@ -84,19 +88,19 @@ module.exports = {
 			// 删除该条暂存的注册记录
 			await registerModel.destroy({
 				where: {
-					phone: phone,
+					phone,
 				},
 			});
 			// 生成token
-			let token = ObjectUtil.getToken();
-			let userResCreate = await userModel.create({
+			const token = ObjectUtil.getToken();
+			const userResCreate = await userModel.create({
 				username,
 				password,
 				phone,
 				token,
 				create_time: moment().format('YYYY-MM-DD HH:mm:ss'),
 			});
-			let result = responseUtil.renderFieldsObj(userResCreate, [
+			const result = responseUtil.renderFieldsObj(userResCreate, [
 				'id',
 				'nickname',
 				'username',

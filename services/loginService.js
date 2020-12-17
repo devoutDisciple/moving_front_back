@@ -3,6 +3,7 @@ const PostMessage = require('../util/PostMessage');
 const resultMessage = require('../util/resultMessage');
 const sequelize = require('../dataSource/MysqlPoolClass');
 const user = require('../models/user');
+
 const userModel = user(sequelize);
 const responseUtil = require('../util/responseUtil');
 
@@ -12,27 +13,27 @@ module.exports = {
 	// 通过账号密码登录
 	byPassword: async (req, res) => {
 		try {
-			let { phone, password } = req.body;
+			const { phone, password } = req.body;
 			// 查询是否注册过
-			let userRes = await userModel.findOne({
+			const userRes = await userModel.findOne({
 				where: {
-					phone: phone,
+					phone,
 				},
 			});
 			// 判断是否注册过
 			if (!userRes) return res.send(resultMessage.error('该手机号未注册'));
-			if (password != userRes.password) return res.send(resultMessage.error('账号或密码错误'));
+			if (password !== userRes.password) return res.send(resultMessage.error('账号或密码错误'));
 			// 生成token
-			let token = ObjectUtil.getToken();
+			const token = ObjectUtil.getToken();
 			await userModel.update(
 				{ token },
 				{
 					where: {
-						phone: phone,
+						phone,
 					},
 				},
 			);
-			let result = responseUtil.renderFieldsObj(userRes, [
+			const result = responseUtil.renderFieldsObj(userRes, [
 				'id',
 				'nickname',
 				'username',
@@ -56,32 +57,32 @@ module.exports = {
 	// 通过验证码登录
 	bySercurityCode: async (req, res) => {
 		try {
-			let { phone, security_code } = req.body;
+			const { phone, security_code } = req.body;
 			// 查询是否注册过
-			let userRes = await userModel.findOne({
+			const userRes = await userModel.findOne({
 				where: {
-					phone: phone,
+					phone,
 				},
 			});
 			// 判断是否注册过
 			if (!userRes) return res.send(resultMessage.error('该手机号未注册'));
 			// 判断验证码是否正确
-			if (userRes.security_code != security_code) return res.send(resultMessage.error('验证码错误'));
+			if (userRes.security_code !== security_code) return res.send(resultMessage.error('验证码错误'));
 			// 判断验证码是否过期
 			if (ObjectUtil.maxTime(new Date().getTime(), userRes.security_expire_time) > 0) {
 				return res.send(resultMessage.error('验证码已经过期'));
 			}
 			// 生成token
-			let token = ObjectUtil.getToken();
+			const token = ObjectUtil.getToken();
 			await userModel.update(
 				{ token },
 				{
 					where: {
-						phone: phone,
+						phone,
 					},
 				},
 			);
-			let result = responseUtil.renderFieldsObj(userRes, [
+			const result = responseUtil.renderFieldsObj(userRes, [
 				'id',
 				'nickname',
 				'username',
@@ -105,17 +106,17 @@ module.exports = {
 	// 重置密码
 	resetPassword: async (req, res) => {
 		try {
-			let { phone, security_code, password, confirmPassword } = req.body;
+			const { phone, security_code, password, confirmPassword } = req.body;
 			// 查询是否注册过
-			let userRes = await userModel.findOne({
+			const userRes = await userModel.findOne({
 				where: {
-					phone: phone,
+					phone,
 				},
 			});
 			// 判断是否注册过
 			if (!userRes) return res.send(resultMessage.error('该手机号未注册'));
 			// 判断验证码是否正确
-			if (userRes.security_code != security_code) return res.send(resultMessage.error('验证码错误'));
+			if (userRes.security_code !== security_code) return res.send(resultMessage.error('验证码错误'));
 			// 判断验证码是否过期
 			if (ObjectUtil.maxTime(new Date().getTime(), userRes.security_expire_time) > 0) {
 				return res.send(resultMessage.error('验证码已经过期'));
@@ -125,16 +126,16 @@ module.exports = {
 				return res.send(resultMessage.error('两次输入密码不一致'));
 			}
 			// 生成token
-			let token = ObjectUtil.getToken();
+			const token = ObjectUtil.getToken();
 			await userModel.update(
 				{ password, token },
 				{
 					where: {
-						phone: phone,
+						phone,
 					},
 				},
 			);
-			let result = responseUtil.renderFieldsObj(userRes, [
+			const result = responseUtil.renderFieldsObj(userRes, [
 				'id',
 				'nickname',
 				'username',
@@ -158,11 +159,11 @@ module.exports = {
 	// 发送登录验证码
 	sendMessage: async (req, res) => {
 		try {
-			let { phoneNum } = req.body;
-			let code = PostMessage.getMessageCode();
+			const { phoneNum } = req.body;
+			const code = PostMessage.getMessageCode();
 			// 发送验证码
 			await PostMessage.postLoginMessage(phoneNum, code);
-			let userRes = await userModel.findOne({
+			const userRes = await userModel.findOne({
 				where: {
 					phone: phoneNum,
 				},
@@ -176,7 +177,9 @@ module.exports = {
 				{
 					security_code: code,
 					security_create_time: moment().format('YYYY-MM-DD HH:mm:ss'),
-					security_expire_time: moment().add('seconds', 60).format('YYYY-MM-DD HH:mm:ss'),
+					security_expire_time: moment()
+						.add('seconds', 60)
+						.format('YYYY-MM-DD HH:mm:ss'),
 				},
 				{
 					where: {

@@ -9,6 +9,7 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const controller = require('./controller/index');
 const config = require('./config/Env');
+require('./schedule');
 
 // 解析cookie和session还有body
 app.use(cookieParser()); // 挂载中间件，可以理解为实例化

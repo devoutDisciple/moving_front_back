@@ -1,6 +1,7 @@
 const resultMessage = require('../util/resultMessage');
 const sequelize = require('../dataSource/MysqlPoolClass');
 const cabinet = require('../models/cabinet');
+
 const CabinetModel = cabinet(sequelize);
 const cabinetUtil = require('../util/cabinetUtil');
 const responseUtil = require('../util/responseUtil');
@@ -9,11 +10,9 @@ module.exports = {
 	// 根据商店获取快递柜
 	getAllByShop: async (req, res) => {
 		try {
-			let shopid = req.query.shopid;
-			let cabinets = await CabinetModel.findAll({
-				where: {
-					shopid: shopid,
-				},
+			const shopid = req.query.shopid;
+			const cabinets = await CabinetModel.findAll({
+				where: { shopid },
 				order: [['sort', 'DESC']],
 			});
 			const reslut = responseUtil.renderFieldsAll(cabinets, ['id', 'shopid', 'name', 'address', 'boxid', 'url']);
@@ -26,12 +25,10 @@ module.exports = {
 
 	// 获取柜子详细信息
 	getDetailById: async (req, res) => {
-		let { cabinetId } = req.query;
+		const { cabinetId } = req.query;
 		try {
-			let data = await CabinetModel.findOne({
-				where: {
-					id: cabinetId,
-				},
+			const data = await CabinetModel.findOne({
+				where: { id: cabinetId },
 			});
 			const result = responseUtil.renderFieldsObj(data, ['id', 'shopid', 'name', 'address', 'boxid', 'url', 'create_time', 'sort']);
 			res.send(resultMessage.success(result));
@@ -43,15 +40,13 @@ module.exports = {
 
 	// 获取柜子状态
 	getStateById: async (req, res) => {
-		let cabinetId = req.query.cabinetId;
+		const cabinetId = req.query.cabinetId;
 		try {
-			let data = await CabinetModel.findOne({
-				where: {
-					id: cabinetId,
-				},
+			const data = await CabinetModel.findOne({
+				where: { id: cabinetId },
 			});
-			let used = JSON.parse(data.used);
-			let usedState = cabinetUtil.getBoxUsedState(used);
+			const used = JSON.parse(data.used);
+			const usedState = cabinetUtil.getBoxUsedState(used);
 			res.send(resultMessage.success(usedState));
 		} catch (error) {
 			console.log(error);
@@ -62,14 +57,14 @@ module.exports = {
 	// 打开柜子
 	openCellSave: async (req, res) => {
 		try {
-			let { boxid, type, cabinetId, userid } = req.body;
+			const { boxid, type, cabinetId, userid } = req.body;
 			// 获取token
 			let boxLoginDetail = await cabinetUtil.getToken();
 			boxLoginDetail = JSON.parse(boxLoginDetail);
-			let token = boxLoginDetail.data || '';
+			const token = boxLoginDetail.data || '';
 			if (!token) return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
 			// 打开格子
-			let result = await cabinetUtil.openCellSave(cabinetId, boxid, token, type, userid);
+			const result = await cabinetUtil.openCellSave(cabinetId, boxid, token, type, userid);
 			if (!result) {
 				return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
 			}
@@ -77,15 +72,13 @@ module.exports = {
 				return res.send(resultMessage.error(result.message));
 			}
 			// 打开的格子id
-			let used = result.used,
-				cellid = result.data;
+			const used = result.used;
+			const cellid = result.data;
 			// 更新可用格子状态
 			await CabinetModel.update(
 				{ used: JSON.stringify(used) },
 				{
-					where: {
-						id: cabinetId,
-					},
+					where: { id: cabinetId },
 				},
 			);
 			res.send(resultMessage.success({ cellid }));

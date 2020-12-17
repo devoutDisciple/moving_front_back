@@ -1,14 +1,15 @@
 const resultMessage = require('../util/resultMessage');
 const sequelize = require('../dataSource/MysqlPoolClass');
 const intergral = require('../models/intergral_goods');
+
 const intergralModel = intergral(sequelize);
 
 module.exports = {
 	// 根据商店id获取积分商品
 	getAllById: async (req, res) => {
 		try {
-			let id = req.query.id;
-			let intergrals = await intergralModel.findAll({
+			const id = req.query.id;
+			const intergrals = await intergralModel.findAll({
 				where: {
 					shopid: id,
 				},

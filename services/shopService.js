@@ -2,6 +2,7 @@ const resultMessage = require('../util/resultMessage');
 const sequelize = require('../dataSource/MysqlPoolClass');
 const responseUtil = require('../util/responseUtil');
 const shop = require('../models/shop');
+
 const shopModel = shop(sequelize);
 
 module.exports = {
@@ -9,10 +10,10 @@ module.exports = {
 	getAll: async (req, res) => {
 		try {
 			// 查询是否注册过
-			let shops = await shopModel.findAll({
+			const shops = await shopModel.findAll({
 				order: [['sort', 'DESC']],
 			});
-			let result = responseUtil.renderFieldsAll(shops, ['id', 'name', 'address', 'phone']);
+			const result = responseUtil.renderFieldsAll(shops, ['id', 'name', 'address', 'phone']);
 			res.send(resultMessage.success(result));
 		} catch (error) {
 			console.log(error);
@@ -24,10 +25,10 @@ module.exports = {
 	getShopById: async (req, res) => {
 		try {
 			// 查询是否注册过
-			let shops = await shopModel.findOne({
+			const shops = await shopModel.findOne({
 				where: { id: req.query.shopid },
 			});
-			let result = responseUtil.renderFieldsObj(shops, ['id', 'name', 'address', 'phone']);
+			const result = responseUtil.renderFieldsObj(shops, ['id', 'name', 'address', 'phone']);
 			res.send(resultMessage.success(result));
 		} catch (error) {
 			console.log(error);

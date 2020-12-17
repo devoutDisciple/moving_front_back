@@ -1,7 +1,8 @@
 const express = require('express');
+
 const router = express.Router();
+const xmlparser = require('express-xml-bodyparser'); // 引入
 const payResultService = require('../services/payResultService');
-const xmlparser = require('express-xml-bodyparser'); //引入
 
 // 处理支付宝支付返回接口
 router.post('/handleAlipy', (req, res) => {

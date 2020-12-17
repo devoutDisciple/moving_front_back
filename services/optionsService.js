@@ -1,14 +1,15 @@
+const moment = require('moment');
 const resultMessage = require('../util/resultMessage');
 const sequelize = require('../dataSource/MysqlPoolClass');
 const options = require('../models/options');
-const moment = require('moment');
+
 const optionsModel = options(sequelize);
 
 module.exports = {
 	// 新增用户意见
 	add: async (req, res) => {
 		try {
-			let body = req.body;
+			const body = req.body;
 			body.create_time = moment().format('YYYY-MM-DD HH:mm:ss');
 			await optionsModel.create(body);
 			res.send(resultMessage.success('success'));

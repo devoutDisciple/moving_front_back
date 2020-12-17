@@ -13,5 +13,6 @@ module.exports = {
 		'no-param-reassign': 0,
 		camelcase: 0,
 		'prefer-destructuring': 0,
+		'no-console': 0,
 	},
 };

@@ -1,24 +1,26 @@
-const resultMessage = require('../util/resultMessage');
 const request = require('request');
-var xml2js = require('xml2js'); //引入xml解析模块
-const PayUtil = require('../util/PayUtil');
-const config = require('../config/AppConfig');
-const sequelize = require('../dataSource/MysqlPoolClass');
-const order = require('../models/order');
-const orderModel = order(sequelize);
-const user = require('../models/user');
-const userModel = user(sequelize);
+const xml2js = require('xml2js');
 const fs = require('fs');
-const urlencode = require('urlencode');
-const AlipaySdk = require('alipay-sdk').default;
-const AlipayFormData = require('alipay-sdk/lib/form').default;
 const path = require('path');
+const AlipaySdk = require('alipay-sdk').default;
+// 引入xml解析模块
+const urlencode = require('urlencode');
+const AlipayFormData = require('alipay-sdk/lib/form').default;
+const sequelize = require('../dataSource/MysqlPoolClass');
+const resultMessage = require('../util/resultMessage');
+const order = require('../models/order');
+const user = require('../models/user');
+
+const orderModel = order(sequelize);
+const userModel = user(sequelize);
+const config = require('../config/AppConfig');
+const PayUtil = require('../util/PayUtil');
 
 module.exports = {
 	// 使用微信付款
 	payOrderByWechat: async (req, res) => {
 		try {
-			let { desc, money, type, userid, given, orderid } = req.body;
+			const { desc, money, type, userid, given, orderid } = req.body;
 			if (!type || !userid) return res.send(resultMessage.error('系统维护中，请稍后重试！'));
 			// shopid: shopid,
 			// home_time: home_time,
@@ -27,30 +29,29 @@ module.exports = {
 			// home_phone: home_phone,
 			// home_desc: home_desc,
 			let passback_params = '';
-			//type分类： member-会员 recharge-余额充值 order-订单支付
+			// type分类： member-会员 recharge-余额充值 order-订单支付
 			if (type === 'member' || type === 'recharge') {
-				passback_params = { type: type, userid: userid, money: money, given: given };
+				passback_params = { type, userid, money, given };
 			}
 			// 订单支付 或者 上门取衣费用
 			if (type === 'order' || type === 'clothing') {
-				console.log(type, userid, money, orderid, 888);
-				passback_params = { type: type, userid: userid, money: money, orderid: orderid };
+				passback_params = { type, userid, money, orderid };
 			}
 			if (type === 'save_clothing') {
-				passback_params = { type: type, userid: userid, money: money };
+				passback_params = { type, userid, money };
 			}
 			passback_params = JSON.stringify(passback_params);
-			let out_trade_no = PayUtil.createOrderid();
-			let params = {
-				appid: config.appid, //微信开放平台审核通过的应用APPID
-				mch_id: config.mch_id, //微信支付分配的商户号
+			const out_trade_no = PayUtil.createOrderid();
+			const params = {
+				appid: config.appid, // 微信开放平台审核通过的应用APPID
+				mch_id: config.mch_id, // 微信支付分配的商户号
 				body: desc || 'MOVING洗衣', // 商品描述
-				nonce_str: PayUtil.getNonceStr(), //随机字符串
-				out_trade_no: out_trade_no, // 用户订单号
-				total_fee: Number(Number(money) * 100).toFixed(0), //商品价格 单位分
+				nonce_str: PayUtil.getNonceStr(), // 随机字符串
+				out_trade_no, // 用户订单号
+				total_fee: Number(Number(money) * 100).toFixed(0), // 商品价格 单位分
 				// total_fee: 1, //商品价格 单位分
 				spbill_create_ip: '47.107.43.166', // 发起访问ip
-				//异步接收微信支付结果通知的回调地址，通知url必须为外网可访问的url，不能携带参数。
+				// 异步接收微信支付结果通知的回调地址，通知url必须为外网可访问的url，不能携带参数。
 				notify_url: 'http://47.107.43.166:3001/payResult/handleWechat',
 				trade_type: 'APP', // 默认 交易类型
 				// time: new Date().getTime(), // 时间戳
@@ -59,8 +60,8 @@ module.exports = {
 				attach: passback_params,
 			};
 			// 签名算法
-			let sign = PayUtil.createSign(params);
-			let formData = `<xml>
+			const sign = PayUtil.createSign(params);
+			const formData = `<xml>
 							<appid>${params.appid}</appid>
 							<attach>${params.attach}</attach>
 							<body>${params.body}</body>
@@ -73,38 +74,40 @@ module.exports = {
 							<trade_type>${params.trade_type}</trade_type>
 							<sign>${sign}</sign>
 						</xml>`;
-			//发起请求，获取微信支付的一些必要信息
+			// 发起请求，获取微信支付的一些必要信息
 			request(
 				{
 					url: params.reqUrl,
 					method: 'POST',
 					body: formData,
 				},
-				function (error, response, body) {
+				(error, response, body) => {
 					if (error) {
 						console.log(error);
 						return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
-					} else if (!error && response.statusCode == 200) {
-						xml2js.parseString(body, function (err, result) {
+					}
+					if (!error && Number(response.statusCode) === 200) {
+						xml2js.parseString(body, (err, result) => {
 							if (err) {
 								console.log(err);
 								return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
 							}
-							let reData = result.xml;
+							const reData = result.xml;
 							if (!reData.prepay_id) {
 								return res.send(resultMessage.error(reData.err_code_des ? reData.err_code_des[0] : '支付失败'));
 							}
-							let responseData = {
+							const responseData = {
 								appid: config.appid,
 								mch_id: reData.mch_id[0] || '',
 								nonce_str: reData.nonce_str[0] || '',
 								prepay_id: reData.prepay_id[0] || '',
+								// eslint-disable-next-line radix
 								timeStamp: String(parseInt(new Date().getTime() / 1000)),
 								nonceStr: reData.nonce_str[0] || '',
 								package: 'Sign=WXPay',
 								key: config.key, // 商户key
 							};
-							let newSign = PayUtil.createSecondSign(responseData);
+							const newSign = PayUtil.createSecondSign(responseData);
 							responseData.newSign = newSign;
 							return res.send(resultMessage.success(responseData));
 						});
@@ -122,10 +125,10 @@ module.exports = {
 	// 使用支付宝付款
 	payByOrderAlipay: async (req, res) => {
 		try {
-			let { desc, money, type, userid, given, orderid } = req.body;
+			const { desc, money, type, userid, given, orderid } = req.body;
 			if (!type || !userid) return res.send(resultMessage.error('系统维护中，请稍后重试！'));
 			let passback_params = '';
-			//type分类： member-会员 recharge-余额充值 order-订单支付
+			// type分类： member-会员 recharge-余额充值 order-订单支付
 			if (type === 'member' || type === 'recharge') {
 				passback_params = `type=${type}&userid=${userid}&money=${money}&given=${given}`;
 			}
@@ -148,21 +151,21 @@ module.exports = {
 				version: '1.0', // 版本，默认 1.0
 				signType: 'RSA2', // 秘钥的解码版本
 			});
-			let out_trade_no = PayUtil.createOrderid();
+			const out_trade_no = PayUtil.createOrderid();
 			const formData = new AlipayFormData();
 			formData.setMethod('get');
 			formData.addField('notifyUrl', 'http://47.107.43.166:3001/payResult/handleAlipy');
-			let totalAmount = Number(money).toFixed(2);
+			const totalAmount = Number(money).toFixed(2);
 			formData.addField('bizContent', {
 				outTradeNo: out_trade_no,
 				productCode: config.alipayProductCode,
-				totalAmount: totalAmount,
+				totalAmount,
 				subject: desc, // 商品信息
 				body: type,
 				passback_params: urlencode(passback_params, 'gbk'),
 			});
-			const result = await alipaySdk.exec(config.alipayMethod, {}, { formData: formData });
-			let resData = result.split('https://openapi.alipay.com/gateway.do?')[1];
+			const result = await alipaySdk.exec(config.alipayMethod, {}, { formData });
+			const resData = result.split('https://openapi.alipay.com/gateway.do?')[1];
 			res.send(resultMessage.success(resData));
 		} catch (error) {
 			console.log(error);
@@ -173,21 +176,21 @@ module.exports = {
 	// 使用余额支付
 	payByOrderByBalance: async (req, res) => {
 		try {
-			let { userid, orderid, money } = req.body;
-			let currentUser = await userModel.findOne({
+			const { userid, orderid, money } = req.body;
+			const currentUser = await userModel.findOne({
 				where: {
 					id: userid,
 				},
 			});
-			let currentBalance = Number(currentUser.balance);
+			const currentBalance = Number(currentUser.balance);
 			if (currentBalance < Number(money)) {
 				return res.send(resultMessage.error('可用余额不足'));
 			}
-			let useabledMoney = Number(Number(currentUser.balance) - Number(money)).toFixed(2);
+			const useabledMoney = Number(Number(currentUser.balance) - Number(money)).toFixed(2);
 			// 更新用户余额
 			await userModel.update({ balance: useabledMoney }, { where: { id: userid } });
 			// 更改订单状态
-			let currentOrderDetail = await orderModel.findOne({ where: { id: orderid } });
+			const currentOrderDetail = await orderModel.findOne({ where: { id: orderid } });
 			// 将要更新的状态
 			let status = 4;
 			// 如果是支付订单金额,如果是存放在柜子里
@@ -205,7 +208,7 @@ module.exports = {
 				status = 5;
 			}
 			// 更改订单状态
-			await orderModel.update({ status: status }, { where: { id: orderid } });
+			await orderModel.update({ status }, { where: { id: orderid } });
 			res.send(resultMessage.success('success'));
 		} catch (error) {
 			console.log(error);
@@ -216,30 +219,30 @@ module.exports = {
 	// 申请退款
 	getBackPayMoney: async (req, res) => {
 		try {
-			let order = await orderModel.findOne({
+			const orderDetail = await orderModel.findOne({
 				where: {
 					id: req.body.id,
 				},
 			});
-			let total_price = order.total_price;
-			let total_fee = order.back_money;
-			let code = order.code;
-			let params = {
-				appid: config.appid, //自己的小程序appid
-				mch_id: config.mch_id, //自己的商户号
-				nonce_str: PayUtil.getNonceStr(), //随机字符串
+			const total_price = orderDetail.total_price;
+			const total_fee = orderDetail.back_money;
+			const code = orderDetail.code;
+			const params = {
+				appid: config.appid, // 自己的小程序appid
+				mch_id: config.mch_id, // 自己的商户号
+				nonce_str: PayUtil.getNonceStr(), // 随机字符串
 				out_refund_no: PayUtil.createOrderid(), // 商户退款单号
 				out_trade_no: code, // 商户订单号
-				total_fee: (Number(total_fee) * 100).toFixed(0), //商品价格 单位分
+				total_fee: (Number(total_fee) * 100).toFixed(0), // 商品价格 单位分
 				refund_fee: (Number(total_price) * 100).toFixed(0), // 退款金额
 				key: config.key, // 商户key
 			};
 
 			// 签名算法
-			let sign = PayUtil.createBackSign(params);
-			let reqUrl = 'https://api.mch.weixin.qq.com/secapi/pay/refund';
+			const sign = PayUtil.createBackSign(params);
+			const reqUrl = 'https://api.mch.weixin.qq.com/secapi/pay/refund';
 
-			let formData = `<xml>
+			const formData = `<xml>
 							<appid>${params.appid}</appid>
 							<mch_id>${params.mch_id}</mch_id>
 							<nonce_str>${params.nonce_str}</nonce_str>
@@ -249,7 +252,7 @@ module.exports = {
 							<total_fee>${params.total_fee}</total_fee>
 							<sign>${sign}</sign>
 						</xml>`;
-			//发起请求，获取微信支付的一些必要信息
+			// 发起请求，获取微信支付的一些必要信息
 			request(
 				{
 					url: reqUrl,
@@ -260,21 +263,22 @@ module.exports = {
 						key: fs.readFileSync(path.join(__dirname, '../apiclient_key.pem')),
 					},
 				},
-				function (error, response, body) {
+				(error, response, body) => {
 					if (error) {
 						console.log(error);
 						return res.send(resultMessage.success('支付失败'));
-					} else if (!error && response.statusCode == 200) {
-						xml2js.parseString(body, function (err, result) {
+					}
+					if (!error && Number(response.statusCode) === 200) {
+						xml2js.parseString(body, (err, result) => {
 							if (err) return res.send(resultMessage.success('退款失败'));
-							let reData = result.xml;
+							const reData = result.xml;
 							if (
 								reData.return_code &&
 								reData.return_code[0] &&
-								reData.return_code[0] == 'SUCCESS' &&
+								reData.return_code[0] === 'SUCCESS' &&
 								reData.return_msg &&
 								reData.return_msg[0] &&
-								reData.return_msg[0] == 'OK'
+								reData.return_msg[0] === 'OK'
 							) {
 								orderModel
 									.update(
@@ -289,7 +293,7 @@ module.exports = {
 										if (
 											reData.err_code &&
 											reData.err_code[0] &&
-											reData.err_code[0] == 'ERROR' &&
+											reData.err_code[0] === 'ERROR' &&
 											reData.err_code_des &&
 											reData.err_code_des[0]
 										) {
