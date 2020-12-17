@@ -21,6 +21,8 @@ app.use(
 			maxAge: 90000,
 		},
 		name: 'session_id', // 在浏览器中生成cookie的名称key，默认是connect.sid
+		resave: false,
+		saveUninitialized: true,
 	}),
 );
 
