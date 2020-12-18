@@ -144,9 +144,8 @@ module.exports = {
 						// {"code":400,"message":"BUSY","value":0,"data":null} 错误
 						// let data = '{ "code": 200, "message": "No Box Information" }'; // 测试环境
 						saveException(body, userid, boxid, cabinetId, cellid);
-						const data = body; // 真实环境
-						if (error) reject(data);
-						const result = JSON.parse(data);
+						if (error) reject(body);
+						const result = JSON.parse(body);
 						if (result && result.code === 200) {
 							used.push(cellid);
 							return resolve({ code: 200, success: true, data: cellid, used });
@@ -191,9 +190,8 @@ module.exports = {
 					(error, response, body) => {
 						// {"code":400,"message":"BUSY","value":0,"data":null} 错误
 						// let data = '{ "code": 200, "message": "No Box Information" }'; // 测试环境
-						const data = body; // 真实环境
-						if (error) return reject(data);
-						const result = JSON.parse(data);
+						if (error) return reject(body);
+						const result = JSON.parse(body);
 						if (result && result.code === 200) {
 							used = ObjectUtil.arrRemove(used, cellid);
 							return resolve({ code: 200, success: true, data: cellid, used });
@@ -214,10 +212,10 @@ module.exports = {
 		let big_box_used_num = 0;
 		let small_box_empty_num = 0;
 		box_big_num.forEach(item => {
-			if (usedArr.includes(item)) big_box_used_num++;
+			if (usedArr.includes(item)) big_box_used_num += 1;
 		});
 		box_samll_num.forEach(item => {
-			if (usedArr.includes(item)) small_box_empty_num++;
+			if (usedArr.includes(item)) small_box_empty_num += 1;
 		});
 		return {
 			bigBox: {

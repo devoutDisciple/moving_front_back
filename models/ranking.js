@@ -20,6 +20,10 @@ module.exports = sequelize => {
 				type: Sequelize.STRING(255),
 				allowNull: true,
 			},
+			photo: {
+				type: Sequelize.STRING(255),
+				allowNull: true,
+			},
 			money: {
 				type: Sequelize.STRING(255),
 				allowNull: true,

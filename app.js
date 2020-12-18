@@ -42,7 +42,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 // 打印日志
-app.use(logger(':date[iso] :method :url :status - :response-time ms'));
+app.use(logger(':date[iso] :remote-addr :remote-user :user-agent :method :url :status - :response-time ms'));
 
 app.all('*', (req, res, next) => {
 	res.header('Access-Control-Allow-Origin', '*');

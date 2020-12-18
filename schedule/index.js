@@ -42,11 +42,14 @@ const searchOrders = async type => {
 		orders.forEach(async item => {
 			MoneyUtil.countMoney(item);
 			const username = item.userDetail ? item.userDetail.username : '**';
+			console.log(item.userDetail);
+			const photo = item.userDetail ? item.userDetail.photo : '';
 			if (orderListByUserid.filter(ele => ele.userid === item.userid).length === 0) {
 				orderListByUserid.push({
 					orderids: [item.id],
 					userid: item.userid,
 					username,
+					photo,
 					money: item.payMoney,
 					discount: item.subDiscountMoney,
 					create_time: moment().format(timeFormat),
@@ -57,6 +60,7 @@ const searchOrders = async type => {
 					if (ele.userid === item.userid) {
 						ele.money = CountUtil.sumFloat(ele.money, item.payMoney);
 						ele.username = username;
+						ele.photo = photo;
 						ele.discount = CountUtil.sumFloat(ele.discount, item.subDiscountMoney);
 						if (ele.orderids) ele.orderids.push(item.id);
 					}
@@ -73,12 +77,14 @@ const searchOrders = async type => {
 };
 
 schedule.scheduleJob('1 1 3 * * *', async () => {
+	// schedule.scheduleJob('1-59 * * * * *', async () => {
 	console.log(`日消费记录开始更新：${moment().format(timeFormat)}`);
 	await searchOrders(1);
 	console.log(`日消费记录更新完毕：${moment().format(timeFormat)}`);
 });
 
 schedule.scheduleJob('1 2 3 * * *', async () => {
+	// schedule.scheduleJob('1-59 * * * * *', async () => {
 	console.log(`月消费记录开始更新：${moment().format(timeFormat)}`);
 	await searchOrders(2);
 	console.log(`月消费记录跟新完毕：${moment().format(timeFormat)}`);
