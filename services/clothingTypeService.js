@@ -11,9 +11,7 @@ module.exports = {
 		try {
 			const { shopid } = req.query;
 			const clothings = await clothingTypeModel.findAll({
-				where: {
-					shopid,
-				},
+				where: { shopid },
 				order: [['sort', 'DESC']],
 			});
 			const result = responseUtil.renderFieldsAll(clothings, ['id', 'shopid', 'name', 'url', 'sort']);

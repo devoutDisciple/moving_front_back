@@ -9,14 +9,12 @@ module.exports = {
 	// 根据商店获取衣物
 	getByShopid: async (req, res) => {
 		try {
-			const shopid = req.query.shopid;
+			const { shopid } = req.query;
 			const clothings = await ClothingModel.findAll({
-				where: {
-					shopid,
-				},
+				where: { shopid },
 				order: [['sort', 'DESC']],
 			});
-			const result = responseUtil.renderFieldsAll(clothings, ['id', 'shopid', 'name', 'price']);
+			const result = responseUtil.renderFieldsAll(clothings, ['id', 'shopid', 'typeid', 'name', 'price']);
 			res.send(resultMessage.success(result));
 		} catch (error) {
 			console.log(error);
