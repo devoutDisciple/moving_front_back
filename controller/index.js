@@ -16,6 +16,7 @@ const versionController = require('./versionController');
 const payResultController = require('./payResultController');
 const moneyController = require('./moneyController');
 const rankingController = require('./rankingController');
+const clothingTypeController = require('./clothingTypeController');
 
 const router = app => {
 	// 版本
@@ -54,5 +55,7 @@ const router = app => {
 	app.use('/money', moneyController);
 	// 获取洗衣排名
 	app.use('/ranking', rankingController);
+	// 衣物分类
+	app.use('/clothing_type', clothingTypeController);
 };
 module.exports = router;

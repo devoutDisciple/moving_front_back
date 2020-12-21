@@ -11,11 +11,7 @@ module.exports = {
 		try {
 			const { type } = req.query;
 			// 查看所有排行记录
-			const rankings = await rankingModal.findAll({
-				where: { type },
-				order: [['money', 'DESC']],
-				limit: 20,
-			});
+			const rankings = await rankingModal.findAll({ where: { type }, limit: 20 });
 			const result = responseUtil.renderFieldsAll(rankings, ['id', 'userid', 'username', 'money', 'discount', 'create_time']);
 			result.sort((a, b) => Number(b.money) - Number(a.money));
 			res.send(resultMessage.success(result));
