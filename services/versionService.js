@@ -10,9 +10,7 @@ module.exports = {
 	getCurrentVersion: async (req, res) => {
 		try {
 			const data = await versionModel.findOne({
-				where: {
-					type: 1,
-				},
+				where: { type: 1 },
 			});
 			const result = responseUtil.renderFieldsObj(data, ['id', 'version', 'desc', 'force']);
 			res.send(resultMessage.success(result));

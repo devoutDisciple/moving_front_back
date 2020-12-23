@@ -1,12 +1,13 @@
 module.exports = {
-	success: (data) => {
-		return {
+	success: data => {
+		const resData = {
 			code: 200,
 			success: true,
-			data: data,
+			data,
 		};
+		console.info('请求成功');
+		return resData;
 	},
-	// 重新登录的
 	toLogin: () => {
 		return {
 			code: 502,
@@ -14,12 +15,13 @@ module.exports = {
 			data: '请登录',
 		};
 	},
-	// 需要提示错误信息的
-	error: (data) => {
-		return {
+	error: data => {
+		const resData = {
 			code: 500,
 			success: false,
 			message: data,
 		};
+		console.info(`请求错误：data: ${JSON.stringify(resData)}`);
+		return resData;
 	},
 };

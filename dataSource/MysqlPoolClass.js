@@ -15,6 +15,7 @@ const sequelize = new Sequelize(config.database, config.username, config.passwor
 
 	// SQLite only
 	storage: 'path/to/database.sqlite',
+	logging: false, // 关闭日志功能
 
 	// http://docs.sequelizejs.com/manual/tutorial/querying.html#operators
 	// operatorsAliases: false,
