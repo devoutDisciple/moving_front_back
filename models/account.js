@@ -37,6 +37,11 @@ module.exports = sequelize => {
 				allowNull: true,
 				defaultValue: '2',
 			},
+			send_message: {
+				type: Sequelize.INTEGER(11),
+				allowNull: true,
+				defaultValue: '1',
+			},
 			is_delete: {
 				type: Sequelize.STRING(255),
 				allowNull: false,

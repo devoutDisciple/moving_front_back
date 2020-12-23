@@ -20,10 +20,6 @@ const bill = require('../models/bill');
 
 const billModal = bill(sequelize);
 
-const account = require('../models/account');
-
-const accountModel = account(sequelize);
-
 const PrintUtil = require('../util/PrintUtil');
 const PostMessage = require('../util/PostMessage');
 
@@ -169,13 +165,7 @@ const handlePayByType = async (payMsg, code, pay_type) => {
 		// 批量发送消息给商家
 		const { shopid } = orderDetail;
 		if (!shopid || !orderDetail.code) return;
-		const accountLists = await accountModel.findAll({ where: { shopid } });
-		const phoneList = [];
-		if (Array.isArray(accountLists)) {
-			accountLists.forEach(item => {
-				phoneList.push(item.phone);
-			});
-		}
+		const phoneList = await PostMessage.getShopPhoneList(shopid);
 		PostMessage.sendMessageGetClothingSuccessToShopBatch(phoneList, orderDetail.code);
 
 		// 打印商户订单

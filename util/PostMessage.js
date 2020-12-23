@@ -1,6 +1,10 @@
 const Core = require('@alicloud/pop-core');
 const moment = require('moment');
 const config = require('../config/AppConfig');
+const sequelize = require('../dataSource/MysqlPoolClass');
+const account = require('../models/account');
+
+const accountModel = account(sequelize);
 
 const requestOption = {
 	method: 'POST',
@@ -346,13 +350,24 @@ module.exports = {
 
 	// 随机的验证码
 	getMessageCode: () => {
-		// eslint-disable-next-line
-		let numArr = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+		const numArr = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 		let str = '';
 		for (let i = 0; i < 6; i++) {
 			const random = Math.floor(Math.random() * numArr.length);
 			str += numArr[random];
 		}
 		return str;
+	},
+
+	// 获取需要发送给商家的电话列表
+	getShopPhoneList: async shopid => {
+		const accountLists = await accountModel.findAll({ where: { shopid } });
+		const phoneList = [];
+		if (Array.isArray(accountLists)) {
+			accountLists.forEach(item => {
+				if (Number(item.send_message) !== 2) phoneList.push(item.phone);
+			});
+		}
+		return phoneList;
 	},
 };

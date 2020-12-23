@@ -17,10 +17,6 @@ const cabinet = require('../models/cabinet');
 const cabinetModel = cabinet(sequelize);
 orderModel.belongsTo(cabinetModel, { foreignKey: 'cabinetId', targetKey: 'id', as: 'cabinetDetail' });
 
-const account = require('../models/account');
-
-const accountModel = account(sequelize);
-
 const user = require('../models/user');
 
 const userModel = user(sequelize);
@@ -75,13 +71,8 @@ module.exports = {
 			// 发送信息给用户
 			PostMessage.sendOrderStartToUser(shopDetail.phone);
 			// 批量发送信息
-			const accountLists = await accountModel.findAll({ where: { shopid: body.shopid } });
-			const phoneList = [];
-			if (Array.isArray(accountLists)) {
-				accountLists.forEach(item => {
-					phoneList.push(item.phone);
-				});
-			}
+			if (!body.shopid) return;
+			const phoneList = await PostMessage.getShopPhoneList(body.shopid);
 			PostMessage.sendOrderStartToShopBatch(phoneList, userDetail.username, userDetail.phone);
 		} catch (error) {
 			console.log(error);
@@ -123,13 +114,8 @@ module.exports = {
 			// 发送信息给用户
 			PostMessage.sendUserShopOrderSuccessToUser(userDetail.phone);
 			// 批量发送信息
-			const accountLists = await accountModel.findAll({ where: { shopid: body.shopid } });
-			const phoneList = [];
-			if (Array.isArray(accountLists)) {
-				accountLists.forEach(item => {
-					phoneList.push(item.phone);
-				});
-			}
+			if (!body.shopid) return;
+			const phoneList = await PostMessage.getShopPhoneList(body.shopid);
 			PostMessage.sendUserShopOrderSuccessToShopBatch(phoneList);
 		} catch (error) {
 			console.log(error);
@@ -215,16 +201,10 @@ module.exports = {
 			PostMessage.sendMessageGetClothingSuccessToUser(orderDetail.home_phone);
 
 			// 批量发送消息
-			const shopid = orderDetail.id;
-			if (!shopid || !orderDetail.code) return;
-			const accountLists = await accountModel.findAll({ where: { shopid } });
-			const phoneList = [];
-			if (Array.isArray(accountLists)) {
-				accountLists.forEach(item => {
-					phoneList.push(item.phone);
-				});
+			if (orderDetail.id && orderDetail.code) {
+				const phoneList = await PostMessage.getShopPhoneList(orderDetail.id);
+				PostMessage.sendMessageGetClothingSuccessToShopBatch(phoneList, orderDetail.code);
 			}
-			PostMessage.sendMessageGetClothingSuccessToShopBatch(phoneList, orderDetail.code);
 
 			// 打印商户订单
 			const result = await orderModel.findOne({
@@ -282,15 +262,10 @@ module.exports = {
 			// 发送信息给用户
 			PostMessage.sendMessageIntergralGoodsSuccessToUser(userDetail.phone, goods.name || 'MOVING积分商品');
 			// 批量发送信息
-			const accountLists = await accountModel.findAll({ where: { shopid: body.shopid } });
-			const phoneList = [];
-			if (Array.isArray(accountLists)) {
-				accountLists.forEach(item => {
-					phoneList.push(item.phone);
-				});
+			if (body.shopid) {
+				const phoneList = await PostMessage.getShopPhoneList(body.shopid);
+				PostMessage.sendMessageIntergralGoodsSuccessToShopBatch(phoneList);
 			}
-			PostMessage.sendMessageIntergralGoodsSuccessToShopBatch(phoneList);
-
 			// 打印商户订单
 			const shopDetail = await shopModel.findOne({ where: { id: body.shopid } });
 			if (shopDetail.sn && resOrder.id) {

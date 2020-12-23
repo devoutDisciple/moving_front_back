@@ -1,6 +1,7 @@
 const resultMessage = require('../util/resultMessage');
 const sequelize = require('../dataSource/MysqlPoolClass');
 const version = require('../models/version');
+
 const versionModel = version(sequelize);
 const responseUtil = require('../util/responseUtil');
 
@@ -8,12 +9,12 @@ module.exports = {
 	// 获取当前版本号
 	getCurrentVersion: async (req, res) => {
 		try {
-			let data = await versionModel.findOne({
+			const data = await versionModel.findOne({
 				where: {
 					type: 1,
 				},
 			});
-			let result = responseUtil.renderFieldsObj(data, ['id', 'version', 'desc', 'force']);
+			const result = responseUtil.renderFieldsObj(data, ['id', 'version', 'desc', 'force']);
 			res.send(resultMessage.success(result));
 		} catch (error) {
 			console.log(error);

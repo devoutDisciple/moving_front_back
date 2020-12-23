@@ -16,5 +16,6 @@ module.exports = {
 		'no-console': 0,
 		'prefer-promise-reject-errors': 0,
 		'no-async-promise-executor': 0,
+		'no-plusplus': 0,
 	},
 };
