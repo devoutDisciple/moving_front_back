@@ -4,13 +4,17 @@ const Sequelize = require('sequelize');
 
 module.exports = sequelize => {
 	return sequelize.define(
-		'clothing',
+		'clothing_type',
 		{
 			id: {
 				type: Sequelize.INTEGER(11),
 				allowNull: false,
 				primaryKey: true,
 				autoIncrement: true,
+			},
+			shopid: {
+				type: Sequelize.INTEGER(11),
+				allowNull: false,
 			},
 			name: {
 				type: Sequelize.STRING(255),
@@ -23,10 +27,11 @@ module.exports = sequelize => {
 			sort: {
 				type: Sequelize.INTEGER(11),
 				allowNull: false,
+				defaultValue: '1',
 			},
 			create_time: {
 				type: Sequelize.DATE,
-				allowNull: false,
+				allowNull: true,
 			},
 		},
 		{

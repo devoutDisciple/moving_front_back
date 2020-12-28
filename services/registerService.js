@@ -49,7 +49,7 @@ module.exports = {
 				security_code: code,
 				create_time: moment().format('YYYY-MM-DD HH:mm:ss'),
 				expire_time: moment()
-					.add('seconds', 60)
+					.add(60, 'seconds')
 					.format('YYYY-MM-DD HH:mm:ss'),
 			});
 			res.send(resultMessage.success('success'));

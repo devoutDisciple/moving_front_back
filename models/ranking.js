@@ -27,15 +27,15 @@ module.exports = sequelize => {
 			money: {
 				type: Sequelize.STRING(255),
 				allowNull: true,
-				defaultValue: '0.00',
+				defaultValue: '0',
 			},
 			discount: {
 				type: Sequelize.STRING(255),
 				allowNull: true,
-				defaultValue: '0.00',
+				defaultValue: '0',
 			},
 			orderids: {
-				type: Sequelize.INTEGER(5000),
+				type: Sequelize.STRING(5000),
 				allowNull: true,
 				defaultValue: '[]',
 			},
