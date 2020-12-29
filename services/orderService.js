@@ -381,7 +381,7 @@ module.exports = {
 					},
 				],
 			});
-			const result = responseUtil.renderFieldsObj(order, [
+			const result = responseUtil.renderFieldsObj(orderDetail, [
 				'id',
 				'code',
 				'shopid',

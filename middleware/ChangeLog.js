@@ -10,7 +10,8 @@ module.exports = {
 	changeInfo: () => {
 		const info = console.info;
 		console.info = (...rest) => {
-			return info(`INFO: ${moment().format('YYYY-MM-DD HH:mm:ss')} ${rest}`);
+			info(`INFO: ${moment().format('YYYY-MM-DD HH:mm:ss')} ${rest}`);
+			info(' ');
 		};
 	},
 
