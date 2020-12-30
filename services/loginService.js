@@ -67,7 +67,7 @@ module.exports = {
 			// 判断是否注册过
 			if (!userRes) return res.send(resultMessage.error('该手机号未注册'));
 			// 判断验证码是否正确
-			if (userRes.security_code !== security_code) return res.send(resultMessage.error('验证码错误'));
+			if (String(userRes.security_code) !== String(security_code)) return res.send(resultMessage.error('验证码错误'));
 			// 判断验证码是否过期
 			if (ObjectUtil.maxTime(new Date().getTime(), userRes.security_expire_time) > 0) {
 				return res.send(resultMessage.error('验证码已经过期'));

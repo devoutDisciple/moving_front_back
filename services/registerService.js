@@ -78,7 +78,7 @@ module.exports = {
 			// 判断是否注册过
 			if (userRes) return res.send(resultMessage.error('该手机号或昵称已注册'));
 			// 判断用户的验证码是否正确
-			if (!registerRes || registerRes.security_code !== security_code) {
+			if (!registerRes || String(registerRes.security_code) !== String(security_code)) {
 				return res.send(resultMessage.error('请输入正确的验证码'));
 			}
 			// 判断验证码是否过期

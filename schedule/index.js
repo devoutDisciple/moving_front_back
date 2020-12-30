@@ -90,14 +90,14 @@ const searchOrders = async type => {
 	}
 };
 
-schedule.scheduleJob('1 1 * * * *', async () => {
+schedule.scheduleJob('1 1 2 * * *', async () => {
 	// schedule.scheduleJob('1-59 * * * * *', async () => {
 	console.log(`日消费记录开始更新：${moment().format(timeFormat)}`);
 	await searchOrders(1);
 	console.log(`日消费记录更新完毕：${moment().format(timeFormat)}`);
 });
 
-schedule.scheduleJob('5 1 * * * *', async () => {
+schedule.scheduleJob('5 1 2 * * *', async () => {
 	// schedule.scheduleJob('1-59 * * * * *', async () => {
 	console.log(`月消费记录开始更新：${moment().format(timeFormat)}`);
 	await searchOrders(2);
