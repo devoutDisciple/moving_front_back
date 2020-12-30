@@ -31,6 +31,7 @@ const searchOrders = async type => {
 						.format(timeFormat),
 				},
 				order_type: [1, 2, 3, 5],
+				is_delete: 1,
 				status: 5,
 				userid: {
 					[Op.not]: 'NULL',

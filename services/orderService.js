@@ -304,6 +304,7 @@ module.exports = {
 				where: {
 					userid,
 					status,
+					is_delete: 1,
 				},
 				include: [
 					{
