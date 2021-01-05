@@ -192,7 +192,7 @@ module.exports = {
 			// 更改订单状态
 			const currentOrderDetail = await orderModel.findOne({ where: { id: orderid } });
 			// 将要更新的状态
-			let status = 4;
+			let status = 5;
 			// 如果是支付订单金额,如果是存放在柜子里
 			if (currentOrderDetail.status === 3 && currentOrderDetail.cabinetId && currentOrderDetail.boxid && currentOrderDetail.cellid) {
 				status = 4;
@@ -210,106 +210,6 @@ module.exports = {
 			// 更改订单状态
 			await orderModel.update({ status }, { where: { id: orderid } });
 			res.send(resultMessage.success('success'));
-		} catch (error) {
-			console.log(error);
-			return res.send(resultMessage.success('支付失败'));
-		}
-	},
-
-	// 申请退款
-	getBackPayMoney: async (req, res) => {
-		try {
-			const orderDetail = await orderModel.findOne({
-				where: {
-					id: req.body.id,
-				},
-			});
-			const total_price = orderDetail.total_price;
-			const total_fee = orderDetail.back_money;
-			const code = orderDetail.code;
-			const params = {
-				appid: config.appid, // 自己的小程序appid
-				mch_id: config.mch_id, // 自己的商户号
-				nonce_str: PayUtil.getNonceStr(), // 随机字符串
-				out_refund_no: PayUtil.createOrderid(), // 商户退款单号
-				out_trade_no: code, // 商户订单号
-				total_fee: (Number(total_fee) * 100).toFixed(0), // 商品价格 单位分
-				refund_fee: (Number(total_price) * 100).toFixed(0), // 退款金额
-				key: config.key, // 商户key
-			};
-
-			// 签名算法
-			const sign = PayUtil.createBackSign(params);
-			const reqUrl = 'https://api.mch.weixin.qq.com/secapi/pay/refund';
-
-			const formData = `<xml>
-							<appid>${params.appid}</appid>
-							<mch_id>${params.mch_id}</mch_id>
-							<nonce_str>${params.nonce_str}</nonce_str>
-							<out_refund_no>${params.out_refund_no}</out_refund_no>
-							<out_trade_no>${params.out_trade_no}</out_trade_no>
-							<refund_fee>${params.refund_fee}</refund_fee>
-							<total_fee>${params.total_fee}</total_fee>
-							<sign>${sign}</sign>
-						</xml>`;
-			// 发起请求，获取微信支付的一些必要信息
-			request(
-				{
-					url: reqUrl,
-					method: 'POST',
-					body: formData,
-					agentOptions: {
-						cert: fs.readFileSync(path.join(__dirname, '../apiclient_cert.pem')),
-						key: fs.readFileSync(path.join(__dirname, '../apiclient_key.pem')),
-					},
-				},
-				(error, response, body) => {
-					if (error) {
-						console.log(error);
-						return res.send(resultMessage.success('支付失败'));
-					}
-					if (!error && Number(response.statusCode) === 200) {
-						xml2js.parseString(body, (err, result) => {
-							if (err) return res.send(resultMessage.success('退款失败'));
-							const reData = result.xml;
-							if (
-								reData.return_code &&
-								reData.return_code[0] &&
-								reData.return_code[0] === 'SUCCESS' &&
-								reData.return_msg &&
-								reData.return_msg[0] &&
-								reData.return_msg[0] === 'OK'
-							) {
-								orderModel
-									.update(
-										{ status: 7 },
-										{
-											where: {
-												id: order.id,
-											},
-										},
-									)
-									.then(() => {
-										if (
-											reData.err_code &&
-											reData.err_code[0] &&
-											reData.err_code[0] === 'ERROR' &&
-											reData.err_code_des &&
-											reData.err_code_des[0]
-										) {
-											return res.send(resultMessage.success(reData.err_code_des[0]));
-										}
-										return res.send(resultMessage.success('success'));
-									});
-							} else {
-								return res.send(resultMessage.success('退款失败'));
-							}
-						});
-					} else {
-						return res.send(resultMessage.success('退款失败'));
-					}
-				},
-			);
 		} catch (error) {
 			console.log(error);
 			return res.send(resultMessage.success('支付失败'));

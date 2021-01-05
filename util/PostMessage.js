@@ -3,6 +3,7 @@ const moment = require('moment');
 const config = require('../config/AppConfig');
 const sequelize = require('../dataSource/MysqlPoolClass');
 const account = require('../models/account');
+const AppConfig = require('../config/AppConfig');
 
 const accountModel = account(sequelize);
 
@@ -20,6 +21,7 @@ const client = new Core({
 module.exports = {
 	// 发送验证信息
 	postLoginMessage: (phoneNum, code) => {
+		if (AppConfig.send_message_flag === 2) return;
 		const params = {
 			RegionId: 'cn-hangzhou',
 			PhoneNumbers: phoneNum,
@@ -43,6 +45,7 @@ module.exports = {
 
 	// 发送下单成功通知给用户
 	sendOrderStartToUser: phoneNum => {
+		if (AppConfig.send_message_flag === 2) return;
 		const params = {
 			RegionId: 'cn-hangzhou',
 			PhoneNumbers: phoneNum,
@@ -66,6 +69,7 @@ module.exports = {
 
 	// 发送订单通知给商家
 	sendOrderStartToShop: (shopPhone, username, userPhone) => {
+		if (AppConfig.send_message_flag === 2) return;
 		const params = {
 			RegionId: 'cn-hangzhou',
 			PhoneNumbers: shopPhone,
@@ -88,6 +92,7 @@ module.exports = {
 
 	// 发送订单通知给商家
 	sendOrderStartToShopBatch: (PhoneNumberJson, username, userPhone) => {
+		if (AppConfig.send_message_flag === 2) return;
 		if (!Array.isArray(PhoneNumberJson)) return;
 		const SignNameJson = [];
 		const TemplateParamJson = [];
@@ -117,6 +122,7 @@ module.exports = {
 
 	// 发送订单完成通知给用户
 	sendOrderSuccessToUser: phoneNum => {
+		if (AppConfig.send_message_flag === 2) return;
 		const params = {
 			RegionId: 'cn-hangzhou',
 			PhoneNumbers: phoneNum,
@@ -139,6 +145,7 @@ module.exports = {
 
 	// 发送订单完成通知给商家
 	sendOrderSuccessToShop: (phoneNum, code) => {
+		if (AppConfig.send_message_flag === 2) return;
 		const params = {
 			RegionId: 'cn-hangzhou',
 			PhoneNumbers: phoneNum,
@@ -161,6 +168,7 @@ module.exports = {
 
 	// 发送山门取衣预约成功通知给用户
 	sendMessageGetClothingSuccessToUser: phoneNum => {
+		if (AppConfig.send_message_flag === 2) return;
 		const params = {
 			RegionId: 'cn-hangzhou',
 			PhoneNumbers: phoneNum,
@@ -182,6 +190,7 @@ module.exports = {
 
 	// 发送预约取衣给商家
 	sendMessageGetClothingSuccessToShop: (phoneNum, code) => {
+		if (AppConfig.send_message_flag === 2) return;
 		const params = {
 			RegionId: 'cn-hangzhou',
 			PhoneNumbers: phoneNum,
@@ -204,6 +213,7 @@ module.exports = {
 
 	// 批量发送预约取衣给商家
 	sendMessageGetClothingSuccessToShopBatch: (PhoneNumberJson, code) => {
+		if (AppConfig.send_message_flag === 2) return;
 		if (!Array.isArray(PhoneNumberJson)) return;
 		const SignNameJson = [];
 		const TemplateParamJson = [];
@@ -233,6 +243,7 @@ module.exports = {
 
 	// 发送积分兑换通知给用户
 	sendMessageIntergralGoodsSuccessToUser: (phoneNum, name) => {
+		if (AppConfig.send_message_flag === 2) return;
 		const params = {
 			RegionId: 'cn-hangzhou',
 			PhoneNumbers: phoneNum,
@@ -255,6 +266,7 @@ module.exports = {
 
 	// 发送积分兑换通知给商家
 	sendMessageIntergralGoodsSuccessToShop: phoneNum => {
+		if (AppConfig.send_message_flag === 2) return;
 		const params = {
 			RegionId: 'cn-hangzhou',
 			PhoneNumbers: phoneNum,
@@ -276,6 +288,7 @@ module.exports = {
 
 	// 发送积分兑换通知给商家
 	sendMessageIntergralGoodsSuccessToShopBatch: PhoneNumberJson => {
+		if (AppConfig.send_message_flag === 2) return;
 		if (!Array.isArray(PhoneNumberJson)) return;
 		const SignNameJson = [];
 		PhoneNumberJson.forEach(() => {
@@ -302,6 +315,7 @@ module.exports = {
 
 	// 发送用户店内下单成功通知给用户
 	sendUserShopOrderSuccessToUser: phoneNum => {
+		if (AppConfig.send_message_flag === 2) return;
 		const params = {
 			RegionId: 'cn-hangzhou',
 			PhoneNumbers: phoneNum,
@@ -324,6 +338,7 @@ module.exports = {
 
 	// 发送用户店内订单通知给商家
 	sendUserShopOrderSuccessToShopBatch: PhoneNumberJson => {
+		if (AppConfig.send_message_flag === 2) return;
 		if (!Array.isArray(PhoneNumberJson)) return;
 		const SignNameJson = [];
 		PhoneNumberJson.forEach(() => {

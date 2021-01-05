@@ -6,6 +6,7 @@ const Op = Sequelize.Op;
 const shelljs = require('shelljs');
 const sequelize = require('../dataSource/MysqlPoolClass');
 const order = require('../models/order');
+const bill = require('../models/bill');
 const user = require('../models/user');
 const CountUtil = require('../util/CountUtil');
 const ranking = require('../models/ranking');
@@ -15,12 +16,14 @@ const sqlConfig = require('../config/sqlConfig');
 const rankingModal = ranking(sequelize);
 
 const orderModel = order(sequelize);
+const billModel = bill(sequelize);
 const userModel = user(sequelize);
 const timeFormat = 'YYYY-MM-DD HH:mm:ss';
 const sqlFormat = 'YYYY-MM-DD:HH-mm';
 
 orderModel.belongsTo(userModel, { foreignKey: 'userid', targetKey: 'id', as: 'userDetail' });
 
+// 查询洗衣排名
 const searchOrders = async type => {
 	try {
 		const orders = await orderModel.findAll({
@@ -91,6 +94,83 @@ const searchOrders = async type => {
 	}
 };
 
+// 判断用户余额是否异常
+const correctBalance = async () => {
+	const userList = await userModel.findAll();
+	let num = 0;
+	userList.forEach(async item => {
+		const userid = item.id;
+		const balance = item.balance;
+		if (userid !== 215) return;
+		let payMoney = 0; // 总充值金额
+		let consumeMoney = 0; // 总消费金额
+		if (item.member === 1) return;
+		const memberMoneyList = await billModel.findAll({ where: { userid, type: 'member' } });
+		const rechargeMoneyList = await billModel.findAll({ where: { userid, type: 'recharge' } });
+		memberMoneyList.forEach(m => {
+			payMoney += Number(m.money);
+			payMoney += Number(m.send);
+		});
+		rechargeMoneyList.forEach(m => {
+			payMoney += Number(m.money);
+			payMoney += Number(m.send);
+		});
+		if (payMoney === 0) return;
+		const consumeList = await billModel.findAll({ where: { pay_type: 'account', userid } });
+		consumeList.forEach(m => {
+			consumeMoney += Number(m.money);
+		});
+		const shouldMoney = Number(Number(payMoney) - Number(consumeMoney)).toFixed(2);
+		if (balance !== shouldMoney) {
+			num++;
+			console.log('+++++++++++++');
+			console.log(
+				`userid: ${item.id} name: ${item.username} 总充值：${payMoney} 消费：${consumeMoney} 目前剩余：${balance} 应该剩余：${shouldMoney}`,
+			);
+			console.log(`UPDATE \`user\` SET balance = ${shouldMoney} where id=${item.id};`);
+		}
+	});
+	if (num === 0) {
+		console.log('暂无异常记录');
+	} else {
+		console.log(`共有${num}条异常记录`);
+	}
+};
+
+// 将订单同步到支付记录
+// eslint-disable-next-line no-unused-vars
+const syncBill = async () => {
+	const orderList = await orderModel.findAll({ where: { status: 5 } });
+	const billList = await billModel.findAll();
+	const bulkData = [];
+	const orderIds = [];
+	orderList.forEach(item => {
+		if (!item.userid) return;
+		MoneyUtil.countMoney(item);
+		const sameBill = billList.filter(bl => String(bl.orderid) === String(item.id));
+		if (sameBill && sameBill[0]) return;
+		orderIds.push(item.id);
+		bulkData.push({
+			code: item.code,
+			userid: item.userid,
+			orderid: item.id,
+			money: item.payMoney,
+			send: 0.0,
+			pay_type: 'account',
+			type: 'order',
+			create_time: item.create_time,
+		});
+	});
+	await billModel.bulkCreate(bulkData);
+	if (bulkData.length === 0) {
+		console.log('暂无更新账单记录');
+	} else {
+		console.log(`同步的id: ${orderIds}`);
+		console.log('同步完成');
+	}
+	correctBalance();
+};
+
 schedule.scheduleJob('1 1 2 * * *', async () => {
 	// schedule.scheduleJob('1-59 * * * * *', async () => {
 	console.log(`日消费记录开始更新：${moment().format(timeFormat)}`);
@@ -116,3 +196,7 @@ schedule.scheduleJob('1 1 * * * *', async () => {
 	);
 	console.log('备份结束');
 });
+
+// syncBill();
+
+// correctBalance();
