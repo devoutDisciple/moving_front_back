@@ -101,7 +101,7 @@ const correctBalance = async () => {
 	userList.forEach(async item => {
 		const userid = item.id;
 		const balance = item.balance;
-		if (userid !== 215) return;
+		// if (userid !== 87) return;
 		let payMoney = 0; // 总充值金额
 		let consumeMoney = 0; // 总消费金额
 		if (item.member === 1) return;
@@ -197,6 +197,6 @@ schedule.scheduleJob('1 1 * * * *', async () => {
 	console.log('备份结束');
 });
 
-// syncBill();
+syncBill();
 
 // correctBalance();
