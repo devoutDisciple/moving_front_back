@@ -154,7 +154,7 @@ const syncBill = async () => {
 			code: item.code,
 			userid: item.userid,
 			orderid: item.id,
-			money: item.payMoney,
+			money: Number(item.payMoney) + Number(item.send_money),
 			send: 0.0,
 			pay_type: 'account',
 			type: 'order',
