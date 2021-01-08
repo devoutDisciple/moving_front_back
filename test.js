@@ -31,6 +31,7 @@
 // 	postMessage.sendOrderStartToShopBatch(['18210619398', '15906672702'], '张振', '15698766789');
 // };
 // postHello();
+const moment = require('moment');
 
 const time = String(new Date().getTime());
 // eslint-disable-next-line prettier/prettier
@@ -48,3 +49,5 @@ const getTimeStamp = (start, end) => {
 };
 
 console.log(`${getRandomStr(3)}${getTimeStamp(4, 8)}${getRandomStr(4)}${getTimeStamp(1, 4)}${getRandomStr(5)}${getTimeStamp(8, 12)}`);
+
+console.log(moment('2020-01-15').diff(moment('2020-01-13'), 'days'));

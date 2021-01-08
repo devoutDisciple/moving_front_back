@@ -5,7 +5,7 @@ module.exports = {
 			success: true,
 			data,
 		};
-		console.info('请求成功');
+		console.info(`请求成功   data: ${JSON.stringify(resData)}`);
 		return resData;
 	},
 	toLogin: () => {

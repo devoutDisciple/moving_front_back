@@ -171,6 +171,24 @@ const syncBill = async () => {
 	correctBalance();
 };
 
+// 找出未支付订单，短信通知
+const seachNotPayOrders = async () => {
+	const ordersList = await orderModel.findAll({ where: { status: [3, 4] } });
+	ordersList.forEach(async item => {
+		const nowTime = moment().format(timeFormat);
+		const create_time = moment(item.create_time).format(timeFormat);
+		const diffDays = moment(new Date()).diff(moment(item.create_time), 'days');
+		if (diffDays > 7) {
+			const userDetail = await userModel.findOne({ where: { id: item.userid } });
+			console.log(
+				`userid: ${userDetail.id} name: ${userDetail.username} orderid: ${item.id} 相差: ${diffDays} 创建时间: ${create_time} 现在时间: ${nowTime}`,
+			);
+		}
+		// console.log(item.id);
+		// console.log(`orderid: ${item.id} 相差: ${diffDays} 创建时间: ${create_time} 现在时间: ${nowTime}`);
+	});
+};
+
 schedule.scheduleJob('1 1 2 * * *', async () => {
 	// schedule.scheduleJob('1-59 * * * * *', async () => {
 	console.log(`日消费记录开始更新：${moment().format(timeFormat)}`);
@@ -199,4 +217,4 @@ schedule.scheduleJob('1 1 * * * *', async () => {
 
 // syncBill();
 
-// correctBalance();
+seachNotPayOrders();
