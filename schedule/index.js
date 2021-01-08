@@ -197,6 +197,6 @@ schedule.scheduleJob('1 1 * * * *', async () => {
 	console.log('备份结束');
 });
 
-syncBill();
+// syncBill();
 
 // correctBalance();

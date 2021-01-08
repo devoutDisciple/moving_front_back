@@ -6,12 +6,15 @@ const AlipaySdk = require('alipay-sdk').default;
 // 引入xml解析模块
 const urlencode = require('urlencode');
 const AlipayFormData = require('alipay-sdk/lib/form').default;
+const moment = require('moment');
 const sequelize = require('../dataSource/MysqlPoolClass');
 const resultMessage = require('../util/resultMessage');
 const order = require('../models/order');
+const bill = require('../models/bill');
 const user = require('../models/user');
 
 const orderModel = order(sequelize);
+const billModel = bill(sequelize);
 const userModel = user(sequelize);
 const config = require('../config/AppConfig');
 const PayUtil = require('../util/PayUtil');
@@ -189,15 +192,24 @@ module.exports = {
 			const useabledMoney = Number(Number(currentUser.balance) - Number(money)).toFixed(2);
 			// 更新用户余额
 			await userModel.update({ balance: useabledMoney }, { where: { id: userid } });
-			// 更改订单状态
+			// 查询当前订单详情
 			const currentOrderDetail = await orderModel.findOne({ where: { id: orderid } });
+			// 支付信息入库
+			billModel.create({
+				code: currentOrderDetail.code,
+				userid,
+				orderid,
+				money,
+				pay_type: 'account',
+				type: 'order',
+				create_time: moment().format('YYYY-MM-DD HH:mm:ss'),
+			});
 			// 将要更新的状态
 			let status = 5;
 			// 如果是支付订单金额,如果是存放在柜子里
 			if (currentOrderDetail.status === 3 && currentOrderDetail.cabinetId && currentOrderDetail.boxid && currentOrderDetail.cellid) {
 				status = 4;
 			}
-
 			// 如果是支付订单金额,此时订单已经派送到用户手中
 			if (
 				currentOrderDetail.status === 3 &&

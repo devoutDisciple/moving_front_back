@@ -4,8 +4,10 @@ const sequelize = require('../dataSource/MysqlPoolClass');
 const MoneyUtil = require('../util/MoneyUtil');
 
 const order = require('../models/order');
+const bill = require('../models/bill');
 
 const orderModel = order(sequelize);
+const billModal = bill(sequelize);
 
 const shop = require('../models/shop');
 
@@ -157,7 +159,8 @@ module.exports = {
 	// 预约上门取衣用余额支付
 	subMoneyByAccount: async (req, res) => {
 		try {
-			const { userid, orderid, money } = req.body;
+			const { userid, orderid, money, type } = req.body;
+			// type: pre_pay: 1 --- 预付款 9.9 (send_clothing)    2--- payAllClothing-支付订单金额(clothing)
 			const userDetail = await userModel.findOne({ where: { id: userid } });
 			// 目前账户余额
 			const currentBalance = userDetail.balance;
@@ -174,7 +177,18 @@ module.exports = {
 					},
 				},
 			);
+			// 查询当前订单详情
 			const currentOrderDetail = await orderModel.findOne({ where: { id: orderid } });
+			// 支付信息入库
+			billModal.create({
+				code: currentOrderDetail.code,
+				userid,
+				orderid,
+				money,
+				pay_type: 'account',
+				type,
+				create_time: moment().format('YYYY-MM-DD HH:mm:ss'),
+			});
 			// 将要更新的状态
 			const state = {};
 			// 支付取衣费用
@@ -182,15 +196,16 @@ module.exports = {
 				state.status = 8;
 				state.send_money = 9.9;
 			}
-			// 如果是支付订单金额,如果是存放在柜子里
-			if (currentOrderDetail.status === 3 && currentOrderDetail.cabinetId) {
-				if (currentOrderDetail.boxid && currentOrderDetail.cellid) state.status = 4;
+			if (currentOrderDetail.status === 3) {
+				// 如果是支付订单金额,如果是存放在柜子里
+				if (currentOrderDetail.cabinetId && currentOrderDetail.boxid && currentOrderDetail.cellid) {
+					state.status = 4;
+				} else {
+					// 如果是支付订单金额,此时订单已经派送到用户手中
+					state.status = 5;
+				}
 			}
 
-			// 如果是支付订单金额,此时订单已经派送到用户手中
-			if (currentOrderDetail.status === 3 && currentOrderDetail.send_home === 2) {
-				if (!currentOrderDetail.cabinetId && !currentOrderDetail.boxid) state.status = 5;
-			}
 			// 更新订单状态
 			await orderModel.update(state, { where: { id: orderid } });
 			res.send(resultMessage.success('success'));
