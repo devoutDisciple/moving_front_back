@@ -217,7 +217,7 @@ module.exports = {
 
 			// 批量发送消息
 			if (orderDetail.id && orderDetail.code) {
-				const phoneList = await PostMessage.getShopPhoneList(orderDetail.id);
+				const phoneList = await PostMessage.getShopPhoneList(orderDetail.shopid);
 				PostMessage.sendMessageGetClothingSuccessToShopBatch(phoneList, orderDetail.code);
 			}
 
