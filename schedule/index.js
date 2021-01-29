@@ -217,4 +217,4 @@ schedule.scheduleJob('1 1 * * * *', async () => {
 
 // syncBill();
 
-seachNotPayOrders();
+// seachNotPayOrders();
