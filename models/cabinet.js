@@ -1,5 +1,3 @@
-/* jshint indent: 2 */
-
 const Sequelize = require('sequelize');
 
 module.exports = sequelize => {
@@ -7,30 +5,35 @@ module.exports = sequelize => {
 		'cabinet',
 		{
 			id: {
-				type: Sequelize.INTEGER(11),
+				autoIncrement: true,
+				type: Sequelize.INTEGER,
 				allowNull: false,
 				primaryKey: true,
-				autoIncrement: true,
 			},
 			shopid: {
-				type: Sequelize.INTEGER(11),
+				type: Sequelize.INTEGER,
 				allowNull: true,
+				comment: '关联店铺',
 			},
 			name: {
 				type: Sequelize.STRING(255),
 				allowNull: true,
+				comment: '快递柜名称',
 			},
 			address: {
 				type: Sequelize.STRING(255),
 				allowNull: true,
+				comment: '快递柜地址',
 			},
 			boxid: {
 				type: Sequelize.STRING(255),
 				allowNull: false,
+				comment: 'boxid',
 			},
 			url: {
 				type: Sequelize.STRING(255),
 				allowNull: true,
+				comment: '首页展示图片',
 			},
 			total: {
 				type: Sequelize.STRING(800),
@@ -45,15 +48,26 @@ module.exports = sequelize => {
 			create_time: {
 				type: Sequelize.DATE,
 				allowNull: true,
+				comment: '创建时间',
 			},
 			sort: {
-				type: Sequelize.INTEGER(11),
+				type: Sequelize.INTEGER,
 				allowNull: true,
+				comment: '排序',
 			},
 		},
 		{
+			sequelize,
 			tableName: 'cabinet',
 			timestamps: false,
+			indexes: [
+				{
+					name: 'PRIMARY',
+					unique: true,
+					using: 'BTREE',
+					fields: [{ name: 'id' }],
+				},
+			],
 		},
 	);
 };

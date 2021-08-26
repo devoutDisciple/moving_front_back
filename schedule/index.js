@@ -102,32 +102,36 @@ const correctBalance = async () => {
 		const userid = item.id;
 		const balance = item.balance;
 		// if (userid !== 87) return;
-		let payMoney = 0; // 总充值金额
+		let totalMoney = 0; // 总充值金额
 		let consumeMoney = 0; // 总消费金额
 		if (item.member === 1) return;
-		const memberMoneyList = await billModel.findAll({ where: { userid, type: 'member' } });
-		const rechargeMoneyList = await billModel.findAll({ where: { userid, type: 'recharge' } });
-		memberMoneyList.forEach(m => {
-			payMoney += Number(m.money);
-			payMoney += Number(m.send);
+		// 总共充值金额
+		const payMontyList = await billModel.findAll({ where: { userid, type: ['recharge', 'member'] } });
+		payMontyList.forEach(m => {
+			totalMoney += Number(m.money);
+			totalMoney += Number(m.send);
 		});
-		rechargeMoneyList.forEach(m => {
-			payMoney += Number(m.money);
-			payMoney += Number(m.send);
+		if (totalMoney === 0) return;
+		const consumeList = await billModel.findAll({
+			where: {
+				pay_type: 'account',
+				userid,
+			},
 		});
-		if (payMoney === 0) return;
-		const consumeList = await billModel.findAll({ where: { pay_type: 'account', userid } });
 		consumeList.forEach(m => {
 			consumeMoney += Number(m.money);
 		});
-		const shouldMoney = Number(Number(payMoney) - Number(consumeMoney)).toFixed(2);
+		const shouldMoney = Number(Number(totalMoney) - Number(consumeMoney)).toFixed(2);
 		if (balance !== shouldMoney) {
 			num++;
 			console.log('+++++++++++++');
+			console.log();
 			console.log(
-				`userid: ${item.id} name: ${item.username} 总充值：${payMoney} 消费：${consumeMoney} 目前剩余：${balance} 应该剩余：${shouldMoney}`,
+				`userid: ${item.id} name: ${item.username} 总充值：${totalMoney} 消费：${consumeMoney} 目前剩余：${balance} 应该剩余：${shouldMoney}`,
 			);
 			console.log(`UPDATE \`user\` SET balance = ${shouldMoney} where id=${item.id};`);
+			console.log(consumeList.length);
+			console.log();
 		}
 	});
 	if (num === 0) {
@@ -148,18 +152,69 @@ const syncBill = async () => {
 		if (!item.userid) return;
 		MoneyUtil.countMoney(item);
 		const sameBill = billList.filter(bl => String(bl.orderid) === String(item.id));
-		if (sameBill && sameBill[0]) return;
+		// order_type: 1-通过柜子下单 2-上门取衣 3-积分兑换 4-店员录入订单 5-店内下单
+		// 通过柜子下单
+		// if (item.order_type === 1) {
+		// 	const pay_save = sameBill.filter(bl => bl.type === 'save_clothing');
+		// 	if (!pay_save || pay_save.length === 0) {
+		// 		bulkData.push({
+		// 			code: item.code,
+		// 			userid: item.userid,
+		// 			orderid: item.id,
+		// 			money: 1,
+		// 			send: 0.0,
+		// 			pay_type: 'account',
+		// 			type: 'save_clothing',
+		// 			// create_time: item.create_time,
+		// 			create_time: moment().format('YYYY-MM-DD HH:mm:ss'),
+		// 		});
+		// 	}
+		// }
+		// 预约上门取衣
+		if (item.order_type === 2) {
+			const pay_getbill = sameBill.filter(bl => bl.type === 'clothing');
+			if (!pay_getbill || pay_getbill.length === 0) {
+				bulkData.push({
+					code: item.code,
+					userid: item.userid,
+					orderid: item.id,
+					money: 9.9,
+					send: 0.0,
+					pay_type: 'account',
+					type: 'clothing',
+					update_type: 2,
+					// create_time: item.create_time,
+					create_time: moment().format('YYYY-MM-DD HH:mm:ss'),
+				});
+			}
+		}
+		// 店员录入订单和店内下单不产生额外费用
+		const pay_orderbill = sameBill.filter(bl => bl.type === 'order');
+		if (!pay_orderbill || pay_orderbill.length === 0) {
+			bulkData.push({
+				code: item.code,
+				userid: item.userid,
+				orderid: item.id,
+				money: Number(item.payMoney),
+				send: 0.0,
+				pay_type: 'account',
+				type: 'order',
+				update_type: 2,
+				// create_time: item.create_time,
+				create_time: moment().format('YYYY-MM-DD HH:mm:ss'),
+			});
+		}
 		orderIds.push(item.id);
-		bulkData.push({
-			code: item.code,
-			userid: item.userid,
-			orderid: item.id,
-			money: Number(item.payMoney) + Number(item.send_money),
-			send: 0.0,
-			pay_type: 'account',
-			type: 'order',
-			create_time: item.create_time,
-		});
+		// bulkData.push({
+		// 	code: item.code,
+		// 	userid: item.userid,
+		// 	orderid: item.id,
+		// 	money: Number(item.payMoney) + Number(item.send_money),
+		// 	send: 0.0,
+		// 	pay_type: 'account',
+		// 	type: 'order',
+		// 	create_time: item.create_time,
+		// });
 	});
 	await billModel.bulkCreate(bulkData);
 	if (bulkData.length === 0) {
@@ -184,37 +239,41 @@ const seachNotPayOrders = async () => {
 				`userid: ${userDetail.id} name: ${userDetail.username} orderid: ${item.id} 相差: ${diffDays} 创建时间: ${create_time} 现在时间: ${nowTime}`,
 			);
 		}
-		// console.log(item.id);
-		// console.log(`orderid: ${item.id} 相差: ${diffDays} 创建时间: ${create_time} 现在时间: ${nowTime}`);
+		console.log(item.id);
+		console.log(`orderid: ${item.id} 相差: ${diffDays} 创建时间: ${create_time} 现在时间: ${nowTime}`);
 	});
 };
 
-// schedule.scheduleJob('1 1 2 * * *', async () => {
-// 	// schedule.scheduleJob('1-59 * * * * *', async () => {
-// 	console.log(`日消费记录开始更新：${moment().format(timeFormat)}`);
-// 	await searchOrders(1);
-// 	console.log(`日消费记录更新完毕：${moment().format(timeFormat)}`);
-// });
+// 每天进行消费记录统计
+schedule.scheduleJob('1 1 2 * * *', async () => {
+	// schedule.scheduleJob('1-59 * * * * *', async () => {
+	console.log(`消费记录开始更新：${moment().format(timeFormat)}`);
+	await searchOrders(1);
+	await searchOrders(2);
+	console.log(`消费记录更新完毕：${moment().format(timeFormat)}`);
+});
 
-// schedule.scheduleJob('5 1 2 * * *', async () => {
-// 	// schedule.scheduleJob('1-59 * * * * *', async () => {
-// 	console.log(`月消费记录开始更新：${moment().format(timeFormat)}`);
-// 	await searchOrders(2);
-// 	console.log(`月消费记录跟新完毕：${moment().format(timeFormat)}`);
-// });
+// 每天凌晨1点进行数据库备份
+schedule.scheduleJob('1 1 1 * * *', async () => {
+	// schedule.scheduleJob('1-59 * * * * *', async () => {
+	console.log('开始备份数据');
+	console.log(
+		`mysqldump -u${sqlConfig.username} -p${sqlConfig.password} ${sqlConfig.database} > ~/database/${moment().format(sqlFormat)}.sql`,
+	);
+	shelljs.exec(
+		`mysqldump -u${sqlConfig.username} -p${sqlConfig.password} ${sqlConfig.database} > ~/database/${moment().format(sqlFormat)}.sql`,
+	);
+	console.log('备份结束');
+});
 
-// schedule.scheduleJob('1 1 * * * *', async () => {
-// 	// schedule.scheduleJob('1-59 * * * * *', async () => {
-// 	console.log('开始备份数据');
-// 	console.log(
-// 		`mysqldump -u${sqlConfig.username} -p${sqlConfig.password} ${sqlConfig.database} > ~/database/${moment().format(sqlFormat)}.sql`,
-// 	);
-// 	shelljs.exec(
-// 		`mysqldump -u${sqlConfig.username} -p${sqlConfig.password} ${sqlConfig.database} > ~/database/${moment().format(sqlFormat)}.sql`,
-// 	);
-// 	console.log('备份结束');
-// });
+// 每天凌晨3点进行金额校验
+schedule.scheduleJob('1 1 3 * * *', async () => {
+	syncBill();
+});
 
-syncBill();
+// 每天18点，通知未支付用户完成订单
+schedule.scheduleJob('* * 18 * * *', async () => {
+	seachNotPayOrders();
+});
 
 // seachNotPayOrders();

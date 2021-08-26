@@ -218,12 +218,12 @@ module.exports = {
 			if (!req.body || !req.body.passback_params) return res.send(resultMessage.error('支付失败'));
 			const alipayRes = req.body;
 			const code = alipayRes.out_trade_no;
-            if(alipayRes.trade_status === "TRADE_CLOSED") {
-                return res.send(resultMessage.error('交易关闭'));
-            }
-            if(alipayRes.trade_status !== "TRADE_SUCCESS") {
-                return res.send(resultMessage.error('支付失败'));
-            }
+			if (alipayRes.trade_status === 'TRADE_CLOSED') {
+				return res.send(resultMessage.error('交易关闭'));
+			}
+			if (alipayRes.trade_status !== 'TRADE_SUCCESS') {
+				return res.send(resultMessage.error('支付失败'));
+			}
 			// type： member-成为会员 recharge-充值 order-订单支付
 			// 查看是否已经村则该订单
 			const currentBill = await billModal.findOne({ where: { code } });

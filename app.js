@@ -27,7 +27,7 @@ app.use(
 	}),
 );
 
-app.use(express.static(config.env ? '/root/asserts' : path.join(__dirname, './public')));
+app.use(express.static(config.env ? '/root/asserts' : path.join(__dirname, '../asserts')));
 
 app.use((req, res, next) => {
 	if (req.url === '/pay/getAlipayResult') {

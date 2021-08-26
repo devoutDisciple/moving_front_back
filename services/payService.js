@@ -190,12 +190,18 @@ module.exports = {
 				return res.send(resultMessage.error('可用余额不足'));
 			}
 			const useabledMoney = Number(Number(currentUser.balance) - Number(money)).toFixed(2);
-			// 更新用户余额
-			await userModel.update({ balance: useabledMoney }, { where: { id: userid } });
 			// 查询当前订单详情
 			const currentOrderDetail = await orderModel.findOne({ where: { id: orderid } });
+			// 防止重复支付
+			const curBill = await billModel.findOne({
+				where: { code: currentOrderDetail.code, userid, orderid, pay_type: 'account', type: 'order' },
+			});
+			// 如果改订单存在，且已经支付完费用
+			if (curBill) return res.send(resultMessage.error('请勿重复支付！'));
+			// 更新用户余额
+			await userModel.update({ balance: useabledMoney }, { where: { id: userid } });
 			// 支付信息入库
-			billModel.create({
+			await billModel.create({
 				code: currentOrderDetail.code,
 				userid,
 				orderid,

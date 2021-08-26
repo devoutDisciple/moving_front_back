@@ -1,29 +1,34 @@
 const Sequelize = require('sequelize');
 
 module.exports = (sequelize) => {
-  return sequelize.define('clothing_type', {
+  return sequelize.define('advertising', {
     id: {
       autoIncrement: true,
       type: Sequelize.INTEGER,
       allowNull: false,
       primaryKey: true
     },
-    shopid: {
-      type: Sequelize.INTEGER,
-      allowNull: false
-    },
-    name: {
-      type: Sequelize.STRING(255),
-      allowNull: false
-    },
     url: {
       type: Sequelize.STRING(255),
-      allowNull: true
+      allowNull: false,
+      comment: "广告图片url"
+    },
+    shopid: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      comment: "商铺id"
     },
     sort: {
       type: Sequelize.INTEGER,
-      allowNull: false,
-      defaultValue: 1
+      allowNull: true,
+      defaultValue: 1,
+      comment: "排序"
+    },
+    is_delete: {
+      type: Sequelize.INTEGER,
+      allowNull: true,
+      defaultValue: 1,
+      comment: "1-存在 2-删除"
     },
     create_time: {
       type: Sequelize.DATE,
@@ -31,7 +36,7 @@ module.exports = (sequelize) => {
     }
   }, {
     sequelize,
-    tableName: 'clothing_type',
+    tableName: 'advertising',
     timestamps: false,
     indexes: [
       {

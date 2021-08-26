@@ -53,4 +53,9 @@ router.post('/cancleOrder', (req, res) => {
 	orderService.cancleOrder(req, res);
 });
 
+// 查询是否有未完成订单  hasUnCompleateOrder
+router.get('/hasUnCompleateOrder', (req, res) => {
+	orderService.getHasUnCompleateOrder(req, res);
+});
+
 module.exports = router;

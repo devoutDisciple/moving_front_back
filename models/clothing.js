@@ -1,46 +1,51 @@
-/* jshint indent: 2 */
-
 const Sequelize = require('sequelize');
 
-module.exports = sequelize => {
-	return sequelize.define(
-		'clothing',
-		{
-			id: {
-				type: Sequelize.INTEGER(11),
-				allowNull: false,
-				primaryKey: true,
-				autoIncrement: true,
-			},
-			typeid: {
-				type: Sequelize.INTEGER(11),
-				allowNull: true,
-				defaultValue: '1',
-			},
-			shopid: {
-				type: Sequelize.INTEGER(11),
-				allowNull: false,
-			},
-			name: {
-				type: Sequelize.STRING(255),
-				allowNull: true,
-			},
-			price: {
-				type: Sequelize.STRING(255),
-				allowNull: true,
-			},
-			sort: {
-				type: Sequelize.INTEGER(255),
-				allowNull: true,
-			},
-			create_time: {
-				type: Sequelize.DATE,
-				allowNull: false,
-			},
-		},
-		{
-			tableName: 'clothing',
-			timestamps: false,
-		},
-	);
+module.exports = (sequelize) => {
+  return sequelize.define('clothing', {
+    id: {
+      autoIncrement: true,
+      type: Sequelize.INTEGER,
+      allowNull: false,
+      primaryKey: true
+    },
+    shopid: {
+      type: Sequelize.INTEGER,
+      allowNull: false
+    },
+    typeid: {
+      type: Sequelize.INTEGER,
+      allowNull: true,
+      defaultValue: 1
+    },
+    name: {
+      type: Sequelize.STRING(255),
+      allowNull: true
+    },
+    price: {
+      type: Sequelize.STRING(255),
+      allowNull: true
+    },
+    sort: {
+      type: Sequelize.INTEGER,
+      allowNull: true
+    },
+    create_time: {
+      type: Sequelize.DATE,
+      allowNull: false
+    }
+  }, {
+    sequelize,
+    tableName: 'clothing',
+    timestamps: false,
+    indexes: [
+      {
+        name: "PRIMARY",
+        unique: true,
+        using: "BTREE",
+        fields: [
+          { name: "id" },
+        ]
+      },
+    ]
+  });
 };

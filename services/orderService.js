@@ -37,35 +37,64 @@ const config = require('../config/AppConfig');
 const isThursDay = moment(new Date().getTime()).day() === 4;
 
 module.exports = {
+	// 判断用户是否存在未完成订单
+	getHasUnCompleateOrder: async (req, res) => {
+		try {
+			const { userid } = req.query;
+			// 查看用户是否有未完成订单，有的话，不允许下单
+			const orders = await orderModel.findAll({ where: { userid }, attributes: ['id', 'status', 'order_type'] });
+			let flag = false;
+			if (Array.isArray(orders)) {
+				orders.forEach(item => {
+					if (item.status !== 5) flag = true;
+				});
+			}
+			if (flag) return res.send(resultMessage.error('您有订单未完成，请完成后再下单'));
+			res.send(resultMessage.success('success'));
+		} catch (error) {
+			console.log(error);
+			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
+		}
+	},
+
 	// 通过洗衣柜下单
 	addByCabinet: async (req, res) => {
 		try {
-			const { body } = req;
+			const { shopid, userid, goods, money, desc, status, cabinetId, boxid, cellid, urgency, pre_pay, order_type } = req.body;
 			const code = ObjectUtil.createOrderCode();
 			const params = {
-				shopid: body.shopid,
+				shopid,
 				code,
-				userid: body.userid,
-				goods: body.goods || '[]',
-				origin_money: body.money,
-				money: body.money,
-				desc: body.desc,
-				status: body.status,
-				cabinetId: body.cabinetId,
-				boxid: body.boxid,
-				cellid: body.cellid,
+				userid,
+				goods: goods || '[]',
+				origin_money: money,
+				money,
+				desc,
+				status,
+				cabinetId,
+				boxid,
+				cellid,
 				create_time: moment().format('YYYY-MM-DD HH:mm:ss'),
 				is_sure: 1,
 				discount: isThursDay ? 8.5 : 10,
-				urgency: body.urgency,
-				pre_pay: body.pre_pay || 0,
-				order_type: body.order_type,
+				urgency,
+				pre_pay: pre_pay || 0,
+				order_type,
 			};
+			// 查看用户是否有未完成订单，有的话，不允许下单
+			const orders = await orderModel.findAll({ where: { userid }, attributes: ['id', 'status', 'order_type'] });
+			let flag = false;
+			if (Array.isArray(orders)) {
+				orders.forEach(item => {
+					if (item.status !== 5) flag = true;
+				});
+			}
+			if (flag) return res.send(resultMessage.error('您有订单未完成，请完成后再下单'));
 			const resOrder = await orderModel.create(params);
 			res.send(resultMessage.success('success'));
 			if (config.send_message_flag === 2) return;
-			const shopDetail = await shopModel.findOne({ where: { id: body.shopid } });
-			const userDetail = await userModel.findOne({ where: { id: body.userid } });
+			const shopDetail = await shopModel.findOne({ where: { id: shopid } });
+			const userDetail = await userModel.findOne({ where: { id: userid } });
 			// 打印商户订单
 			if (shopDetail.sn && resOrder.id) {
 				PrintUtil.printOrderByOrderId(resOrder.id);
@@ -73,8 +102,8 @@ module.exports = {
 			// 发送信息给用户
 			PostMessage.sendOrderStartToUser(shopDetail.phone);
 			// 批量发送信息
-			if (!body.shopid) return;
-			const phoneList = await PostMessage.getShopPhoneList(body.shopid);
+			if (!shopid) return;
+			const phoneList = await PostMessage.getShopPhoneList(shopid);
 			PostMessage.sendOrderStartToShopBatch(phoneList, userDetail.username, userDetail.phone);
 		} catch (error) {
 			console.log(error);
@@ -85,21 +114,31 @@ module.exports = {
 	// 店内下单
 	addByShopInput: async (req, res) => {
 		try {
-			const { body } = req;
+			const { userid, goods, shopid, money, desc, send_status, urgency } = req.body;
+			// 查看用户是否有未完成订单，有的话，不允许下单
+			const orders = await orderModel.findAll({ where: { userid }, attributes: ['id', 'status', 'order_type'] });
+			let flag = false;
+			if (Array.isArray(orders)) {
+				orders.forEach(item => {
+					if (item.status !== 5) flag = true;
+				});
+			}
+			if (flag) return res.send(resultMessage.error('您有订单未完成，请完成后再下单'));
 			const code = ObjectUtil.createOrderCode();
+			// 周四 8.5 折
 			const params = {
-				shopid: body.shopid,
+				shopid,
 				code,
-				userid: body.userid,
-				goods: body.goods || '[]',
-				origin_money: body.money,
-				money: body.money,
-				desc: body.desc,
+				userid,
+				goods: goods || '[]',
+				origin_money: money,
+				money,
+				desc,
 				status: 2,
 				create_time: moment().format('YYYY-MM-DD HH:mm:ss'),
 				is_sure: 1,
-				send_status: body.send_status,
-				urgency: body.urgency,
+				send_status,
+				urgency,
 				discount: isThursDay ? 8.5 : 10,
 				pre_pay: 0,
 				order_type: 5,
@@ -107,8 +146,8 @@ module.exports = {
 			const resOrder = await orderModel.create(params);
 			res.send(resultMessage.success('success'));
 			if (config.send_message_flag === 2) return;
-			const shopDetail = await shopModel.findOne({ where: { id: body.shopid } });
-			const userDetail = await userModel.findOne({ where: { id: body.userid } });
+			const shopDetail = await shopModel.findOne({ where: { id: shopid } });
+			const userDetail = await userModel.findOne({ where: { id: userid } });
 			// 打印商户订单
 			if (shopDetail.sn && resOrder.id) {
 				PrintUtil.printOrderByOrderId(resOrder.id);
@@ -116,8 +155,8 @@ module.exports = {
 			// 发送信息给用户
 			PostMessage.sendUserShopOrderSuccessToUser(userDetail.phone);
 			// 批量发送信息
-			if (!body.shopid) return;
-			const phoneList = await PostMessage.getShopPhoneList(body.shopid);
+			if (!shopid) return;
+			const phoneList = await PostMessage.getShopPhoneList(shopid);
 			PostMessage.sendUserShopOrderSuccessToShopBatch(phoneList);
 		} catch (error) {
 			console.log(error);
@@ -128,24 +167,32 @@ module.exports = {
 	// 预约上门取衣
 	addByHome: async (req, res) => {
 		try {
-			const { body } = req;
+			const { shopid, userid, home_username, home_phone, home_address, home_time, desc, urgency } = req.body;
+			const orders = await orderModel.findAll({ where: { userid }, attributes: ['id', 'status', 'order_type'] });
+			let flag = false;
+			if (Array.isArray(orders)) {
+				orders.forEach(item => {
+					if (item.status !== 5) flag = true;
+				});
+			}
+			if (flag) return res.send(resultMessage.error('您有订单未完成，请完成后再下单'));
 			const code = ObjectUtil.createOrderCode();
 			const params = {
-				shopid: body.shopid,
+				shopid,
 				code,
-				userid: body.userid,
+				userid,
 				goods: '[]',
-				home_username: body.home_username,
-				home_phone: body.home_phone,
-				home_address: body.home_address,
-				desc: body.desc,
-				home_time: body.home_time,
+				home_username,
+				home_phone,
+				home_address,
+				desc,
+				home_time,
 				create_time: moment().format('YYYY-MM-DD HH:mm:ss'),
 				send_money: 0,
 				is_sure: 1,
 				discount: isThursDay ? 8.5 : 10,
 				status: 6, // 预约上门等待店员取货
-				urgency: body.urgency,
+				urgency,
 				order_type: 2, // 山门取衣
 			};
 			const { id } = await orderModel.create(params);
@@ -156,7 +203,7 @@ module.exports = {
 		}
 	},
 
-	// 预约上门取衣用余额支付
+	// 用余额支付
 	subMoneyByAccount: async (req, res) => {
 		try {
 			const { userid, orderid, money, type } = req.body;
@@ -168,6 +215,14 @@ module.exports = {
 			if (updateBalance < 0) {
 				return res.send(resultMessage.error('账户余额不足，请充值'));
 			}
+			// 订单详情
+			const currentOrderDetail = await orderModel.findOne({ where: { id: orderid } });
+			// 防止重复支付
+			const curBill = await billModal.findOne({
+				where: { code: currentOrderDetail.code, userid, orderid, pay_type: 'account', type },
+			});
+			// 如果改订单存在，且已经支付完费用
+			if (curBill) return res.send(resultMessage.error('请勿重复支付！'));
 			// 更新账户余额
 			await userModel.update(
 				{ balance: updateBalance },
@@ -177,10 +232,8 @@ module.exports = {
 					},
 				},
 			);
-			// 查询当前订单详情
-			const currentOrderDetail = await orderModel.findOne({ where: { id: orderid } });
 			// 支付信息入库
-			billModal.create({
+			await billModal.create({
 				code: currentOrderDetail.code,
 				userid,
 				orderid,
@@ -189,6 +242,7 @@ module.exports = {
 				type,
 				create_time: moment().format('YYYY-MM-DD HH:mm:ss'),
 			});
+
 			// 将要更新的状态
 			const state = {};
 			// 支付取衣费用
@@ -243,46 +297,46 @@ module.exports = {
 	// 积分兑换
 	addByIntergral: async (req, res) => {
 		try {
-			const { body } = req;
+			const { shopid, userid, goods, intergral_address, intergral_phone, intergral_username, intergral_num } = req.body;
 			const code = ObjectUtil.createOrderCode();
 			const params = {
-				shopid: body.shopid,
+				shopid,
 				code,
-				userid: body.userid,
-				goods: body.goods,
-				intergral_address: body.intergral_address,
-				intergral_phone: body.intergral_phone,
-				intergral_username: body.intergral_username,
-				intergral_num: body.intergral_num,
+				userid,
+				goods,
+				intergral_address,
+				intergral_phone,
+				intergral_username,
+				intergral_num,
 				is_sure: 1,
 				status: 7, // 预约上门等待店员取货
 				order_type: 3, // 积分兑换
 				create_time: moment().format('YYYY-MM-DD HH:mm:ss'),
 			};
-			const userDetail = await userModel.findOne({ where: { id: body.userid } });
+			const userDetail = await userModel.findOne({ where: { id: userid } });
 			if (!userDetail) return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
-			if (Number(userDetail.integral) < Number(body.intergral_num)) return res.send(resultMessage.error('兑换失败,您的积分不足'));
+			if (Number(userDetail.integral) < Number(intergral_num)) return res.send(resultMessage.error('兑换失败,您的积分不足'));
 			const resOrder = await orderModel.create(params);
-			const currentIntergral = Number(userDetail.integral) - Number(body.intergral_num);
+			const currentIntergral = Number(userDetail.integral) - Number(intergral_num);
 			await userModel.update(
 				{ integral: currentIntergral },
 				{
-					where: { id: body.userid },
+					where: { id: userid },
 				},
 			);
 			res.send(resultMessage.success('success'));
 
 			if (config.send_message_flag === 2) return;
-			const goods = JSON.parse(body.goods) || {};
+			const curGoods = JSON.parse(goods) || {};
 			// 发送信息给用户
-			PostMessage.sendMessageIntergralGoodsSuccessToUser(userDetail.phone, goods.name || 'MOVING积分商品');
+			PostMessage.sendMessageIntergralGoodsSuccessToUser(userDetail.phone, curGoods.name || 'MOVING积分商品');
 			// 批量发送信息
-			if (body.shopid) {
-				const phoneList = await PostMessage.getShopPhoneList(body.shopid);
+			if (shopid) {
+				const phoneList = await PostMessage.getShopPhoneList(shopid);
 				PostMessage.sendMessageIntergralGoodsSuccessToShopBatch(phoneList);
 			}
 			// 打印商户订单
-			const shopDetail = await shopModel.findOne({ where: { id: body.shopid } });
+			const shopDetail = await shopModel.findOne({ where: { id: shopid } });
 			if (shopDetail.sn && resOrder.id) {
 				PrintUtil.printOrderByOrderId(resOrder.id);
 			}

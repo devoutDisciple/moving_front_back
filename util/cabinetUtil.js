@@ -104,6 +104,7 @@ module.exports = {
 	openCellSave: (cabinetId, boxid, token, type, userid) => {
 		return new Promise(async (resolve, reject) => {
 			try {
+				return resolve({ code: 200, success: true, data: 111, used: [123] });
 				const data = await CabinetModel.findOne({
 					where: {
 						id: cabinetId,
@@ -164,6 +165,7 @@ module.exports = {
 	openCellGet: (cabinetId, boxid, cellid, token) => {
 		return new Promise(async (resolve, reject) => {
 			try {
+				return resolve({ code: 200, success: true, data: 111, used: [123] });
 				const data = await CabinetModel.findOne({
 					where: {
 						id: cabinetId,

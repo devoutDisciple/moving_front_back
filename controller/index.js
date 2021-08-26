@@ -17,6 +17,7 @@ const payResultController = require('./payResultController');
 const moneyController = require('./moneyController');
 const rankingController = require('./rankingController');
 const clothingTypeController = require('./clothingTypeController');
+const shopAdverController = require('./shopAdverController');
 const billController = require('./billController');
 
 const router = app => {
@@ -60,5 +61,7 @@ const router = app => {
 	app.use('/clothing_type', clothingTypeController);
 	// 账单
 	app.use('/bill', billController);
+	// 店铺广告
+	app.use('/shopAdver', shopAdverController);
 };
 module.exports = router;
