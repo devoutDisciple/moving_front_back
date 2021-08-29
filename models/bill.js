@@ -50,7 +50,7 @@ module.exports = sequelize => {
 			},
 			update_type: {
 				type: Sequelize.INTEGER,
-				allowNull: true,
+				allowNull: false,
 				defaultValue: 1,
 				comment: '1-用户创建 2-系统自动计算完成',
 			},

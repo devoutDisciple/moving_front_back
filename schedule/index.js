@@ -121,7 +121,7 @@ const correctBalance = async () => {
 		consumeList.forEach(m => {
 			consumeMoney += Number(m.money);
 		});
-		const shouldMoney = Number(Number(totalMoney) - Number(consumeMoney)).toFixed(2);
+		let shouldMoney = Number(Number(totalMoney) - Number(consumeMoney)).toFixed(2);
 		if (balance !== shouldMoney) {
 			num++;
 			console.log('+++++++++++++');
@@ -129,9 +129,10 @@ const correctBalance = async () => {
 			console.log(
 				`userid: ${item.id} name: ${item.username} 总充值：${totalMoney} 消费：${consumeMoney} 目前剩余：${balance} 应该剩余：${shouldMoney}`,
 			);
+			if (shouldMoney < 0) shouldMoney = 0;
 			console.log(`UPDATE \`user\` SET balance = ${shouldMoney} where id=${item.id};`);
-			console.log(consumeList.length);
-			console.log();
+			const statement = `UPDATE \`user\` SET balance = ${shouldMoney} where id=${item.id};`;
+			sequelize.query(statement, { type: sequelize.QueryTypes.UPDATE });
 		}
 	});
 	if (num === 0) {
@@ -275,5 +276,3 @@ schedule.scheduleJob('1 1 3 * * *', async () => {
 schedule.scheduleJob('* * 18 * * *', async () => {
 	seachNotPayOrders();
 });
-
-// seachNotPayOrders();
