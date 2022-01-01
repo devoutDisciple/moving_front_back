@@ -24,6 +24,7 @@ module.exports = {
 	payOrderByWechat: async (req, res) => {
 		try {
 			const { desc, money, type, userid, given, orderid } = req.body;
+			return res.send(resultMessage.error('网络出小差了, 请稍后重试'));
 			if (!type || !userid) return res.send(resultMessage.error('系统维护中，请稍后重试！'));
 			// shopid: shopid,
 			// home_time: home_time,

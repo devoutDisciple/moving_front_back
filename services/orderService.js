@@ -42,7 +42,7 @@ module.exports = {
 		try {
 			const { userid } = req.query;
 			// 查看用户是否有未完成订单，有的话，不允许下单
-			const orders = await orderModel.findAll({ where: { userid }, attributes: ['id', 'status', 'order_type'] });
+			const orders = await orderModel.findAll({ where: { userid, is_delete: 1 }, attributes: ['id', 'status', 'order_type'] });
 			let flag = false;
 			if (Array.isArray(orders)) {
 				orders.forEach(item => {
@@ -82,7 +82,7 @@ module.exports = {
 				order_type,
 			};
 			// 查看用户是否有未完成订单，有的话，不允许下单
-			const orders = await orderModel.findAll({ where: { userid }, attributes: ['id', 'status', 'order_type'] });
+			const orders = await orderModel.findAll({ where: { userid, is_delete: 1 }, attributes: ['id', 'status', 'order_type'] });
 			let flag = false;
 			if (Array.isArray(orders)) {
 				orders.forEach(item => {
@@ -116,7 +116,7 @@ module.exports = {
 		try {
 			const { userid, goods, shopid, money, desc, send_status, urgency } = req.body;
 			// 查看用户是否有未完成订单，有的话，不允许下单
-			const orders = await orderModel.findAll({ where: { userid }, attributes: ['id', 'status', 'order_type'] });
+			const orders = await orderModel.findAll({ where: { userid, is_delete: 1 }, attributes: ['id', 'status', 'order_type'] });
 			let flag = false;
 			if (Array.isArray(orders)) {
 				orders.forEach(item => {
@@ -168,7 +168,8 @@ module.exports = {
 	addByHome: async (req, res) => {
 		try {
 			const { shopid, userid, home_username, home_phone, home_address, home_time, desc, urgency } = req.body;
-			const orders = await orderModel.findAll({ where: { userid }, attributes: ['id', 'status', 'order_type'] });
+			// 查看用户是否有未完成订单，有的话，不允许下单
+			const orders = await orderModel.findAll({ where: { userid, is_delete: 1 }, attributes: ['id', 'status', 'order_type'] });
 			let flag = false;
 			if (Array.isArray(orders)) {
 				orders.forEach(item => {

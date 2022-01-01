@@ -185,7 +185,7 @@ const syncBill = async () => {
 					type: 'clothing',
 					update_type: 2,
 					// create_time: item.create_time,
-					create_time: moment().format('YYYY-MM-DD HH:mm:ss'),
+					create_time: item.create_time,
 				});
 			}
 		}
@@ -202,7 +202,7 @@ const syncBill = async () => {
 				type: 'order',
 				update_type: 2,
 				// create_time: item.create_time,
-				create_time: moment().format('YYYY-MM-DD HH:mm:ss'),
+				create_time: item.create_time,
 			});
 		}
 		orderIds.push(item.id);
@@ -234,14 +234,14 @@ const seachNotPayOrders = async () => {
 		const nowTime = moment().format(timeFormat);
 		const create_time = moment(item.create_time).format(timeFormat);
 		const diffDays = moment(new Date()).diff(moment(item.create_time), 'days');
-		if (diffDays > 7) {
+		if (diffDays > 7 && item.userid) {
 			const userDetail = await userModel.findOne({ where: { id: item.userid } });
 			console.log(
-				`userid: ${userDetail.id} name: ${userDetail.username} orderid: ${item.id} 相差: ${diffDays} 创建时间: ${create_time} 现在时间: ${nowTime}`,
+				`超过七天订单：userid: ${userDetail.id} name: ${userDetail.username} orderid: ${item.id} 距离现在: ${diffDays}天 创建时间: ${create_time} 现在时间: ${nowTime}`,
 			);
+			console.log('++++++++++++++++++++++++++++++++++++++++');
 		}
-		console.log(item.id);
-		console.log(`orderid: ${item.id} 相差: ${diffDays} 创建时间: ${create_time} 现在时间: ${nowTime}`);
+		// console.log(`未完成订单id: ${item.id} 距离现在: ${diffDays}天 创建时间: ${create_time} 现在时间: ${nowTime}`);
 	});
 };
 
